@@ -33,10 +33,17 @@ GEM
       tzinfo (~> 0.3.37)
     arel (4.0.0)
     atomic (1.1.14)
+    awesome_nested_set (2.1.6)
+      activerecord (>= 3.0.0)
     builder (3.1.4)
+    carrierwave (0.9.0)
+      activemodel (>= 3.2.0)
+      activesupport (>= 3.2.0)
+      json (>= 1.7)
     erubis (2.7.0)
     hike (1.2.3)
     i18n (0.6.5)
+    json (1.8.0)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -84,5 +91,7 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
+  awesome_nested_set
+  carrierwave
   repository_manager!
   sqlite3
