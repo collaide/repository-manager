@@ -23,7 +23,7 @@ describe "Associations" do
     expect(user2.shares.count).to eq(0)
     expect(user.app_files.count).to eq(0)
 
-    file = AppFile.create
+    file = AppFile.new
     file.owner = user
 
     #pp user.app_files
@@ -45,18 +45,45 @@ describe "Associations" do
     expect(user.app_files.count).to eq(1)
     expect(user2.shares.count).to eq(1)
     expect(file.shares.count).to eq(1)
-
-    #TODO rendre ça plus facile
   end
 
-  #def test_of_share_a_file
-  #  user1 = User.new
-  #  user2 = User.new
-  #  share = Share.new
-  #  share.owner = user
-  #  assert_equal share.owner, user
-  #end
+  it "should be possible for a group to share a file" do
 
+    user = FactoryGirl.create(:user)
+    user2 = FactoryGirl.create(:user)
+    group = FactoryGirl.create(:group)
+    group2 = FactoryGirl.create(:group)
+    expect(group.shares.count).to eq(0)
+    expect(group.app_files.count).to eq(0)
 
+    file = AppFile.new
+    file.owner = user
+
+    #pp user.app_files
+
+    share = Share.new(can_read:true, can_create:true)
+    share.owner = group
+    file.shares << share
+    shareItem = SharesItem.new
+    shareItem.item=group2
+    share.shares_items << shareItem
+
+    #expect(user2.shares.count).to eq(0)
+    #expect(file.shares.count).to eq(0)
+
+    #shareItem.save
+    #share.save
+    file.save
+
+    expect(user.app_files.count).to eq(1)
+    expect(user2.shares.count).to eq(0)
+    expect(user.shares.count).to eq(0)
+    expect(group.app_files.count).to eq(0)
+    expect(group.shares.count).to eq(0)
+    #Il est auteur d'un share
+    expect(group.shares_owners.count).to eq(1)
+    expect(group2.shares.count).to eq(1)
+    expect(file.shares.count).to eq(1)
+  end
 
 end
