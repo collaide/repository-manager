@@ -10,4 +10,5 @@ describe "ActsAsRepository" do
     group = Group.new
     expect("test: Hello World").to eq(group.test("Hello World"))
   end
+
 end

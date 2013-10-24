@@ -17,16 +17,24 @@ describe "Associations" do
   end
 
   it "should be possible for a user to share a file" do
+
     user = FactoryGirl.build(:user)
     user2 = FactoryGirl.build(:user)
+    #user2.shares
+    #expect(user2.shares.count).to eq(0)
+
     file = AppFile.new
     file.owner = user
-    share = Share.new(can_read:true, can_create:true)
-    share.owner = user
-    file.shares << share
-    shareItem = SharesItem.new
-    shareItem.item=user2
-    share.shares_items << shareItem
+
+    user.app_files
+    #share = Share.new(can_read:true, can_create:true)
+    #share.owner = user
+    #file.shares << share
+    #shareItem = SharesItem.new
+    #shareItem.item=user2
+    #share.shares_items << shareItem
+    #
+    #expect(user2.shares.count).to eq(1)
 
     #TODO rendre ça plus facile
   end

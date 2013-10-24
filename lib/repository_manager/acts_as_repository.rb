@@ -3,6 +3,11 @@ module RepositoryManager
     extend ActiveSupport::Concern
 
     included do
+      has_many :shares, :through => :shares_items, dependent: :destroy
+      has_many :shares_items, dependent: :destroy
+
+      has_many :app_files#, dependent: :destroy
+
     end
 
     module ClassMethods
