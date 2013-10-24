@@ -8,7 +8,7 @@ Gerer les uploads grace à CarrierWare
 Implémenter les methodes dans le modèle act_as_repository pour que tout soit plus facile
 etc...
 
-== Liscence
+== License
 
 This project rocks and uses MIT-LICENSE.
 
