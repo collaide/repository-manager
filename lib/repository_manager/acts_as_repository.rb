@@ -3,8 +3,6 @@ module RepositoryManager
     extend ActiveSupport::Concern
 
     included do
-
-
     end
 
     module ClassMethods
