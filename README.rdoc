@@ -1,3 +1,14 @@
 = RepositoryManager
 
+Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions). 
+
+== TODO
+
+Gerer les uploads grace à CarrierWare
+Implémenter les methodes dans le modèle act_as_repository pour que tout soit plus facile
+etc...
+
+== License
+
 This project rocks and uses MIT-LICENSE.
+
