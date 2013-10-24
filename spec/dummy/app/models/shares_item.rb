@@ -1,5 +1,7 @@
 class SharesItem < ActiveRecord::Base
-  belongs_to :shareable, polymorphic: true
+
+  belongs_to :item, polymorphic: true
+
   belongs_to :share
 
   #can_add

@@ -20,7 +20,7 @@ class CreateRepositoryManager < ActiveRecord::Migration
       t.integer :share_id
       #t.integer :item_type
       #t.integer :item_id
-      t.references :shareable, polymorphic: true
+      t.references :item, polymorphic: true
       t.boolean :can_add, :default => false
       t.boolean :can_remove, :default => false
     end
