@@ -3,15 +3,21 @@ module RepositoryManager
     extend ActiveSupport::Concern
 
     included do
-      has_many :shares, :through => :shares_items, dependent: :destroy
-      has_many :shares_items, dependent: :destroy
 
-      has_many :app_files#, dependent: :destroy
 
     end
 
     module ClassMethods
       def acts_as_repository(options = {})
+
+        has_many :shares, :through => :shares_items,  as: :owner, dependent: :destroy
+        has_many :shares_items, as: :item, dependent: :destroy
+
+        #has_many :meals, :through => :events, :source => :eventable,
+        #         :source_type => "Meal"
+
+        has_many :app_files, as: :owner#, dependent: :destroy
+
         #cattr_accessor :yaffle_text_field
         #self.yaffle_text_field = (options[:yaffle_text_field] || :last_squawk).to_s
         # your code will go here

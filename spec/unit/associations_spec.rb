@@ -18,23 +18,33 @@ describe "Associations" do
 
   it "should be possible for a user to share a file" do
 
-    user = FactoryGirl.build(:user)
-    user2 = FactoryGirl.build(:user)
-    #user2.shares
-    #expect(user2.shares.count).to eq(0)
+    user = FactoryGirl.create(:user)
+    user2 = FactoryGirl.create(:user)
+    expect(user2.shares.count).to eq(0)
+    expect(user.app_files.count).to eq(0)
 
-    file = AppFile.new
+    file = AppFile.create
     file.owner = user
 
-    user.app_files
-    #share = Share.new(can_read:true, can_create:true)
-    #share.owner = user
-    #file.shares << share
-    #shareItem = SharesItem.new
-    #shareItem.item=user2
-    #share.shares_items << shareItem
-    #
-    #expect(user2.shares.count).to eq(1)
+    #pp user.app_files
+
+    share = Share.new(can_read:true, can_create:true)
+    share.owner = user
+    file.shares << share
+    shareItem = SharesItem.new
+    shareItem.item=user2
+    share.shares_items << shareItem
+
+    #expect(user2.shares.count).to eq(0)
+    #expect(file.shares.count).to eq(0)
+
+    #shareItem.save
+    #share.save
+    file.save
+
+    expect(user.app_files.count).to eq(1)
+    expect(user2.shares.count).to eq(1)
+    expect(file.shares.count).to eq(1)
 
     #TODO rendre ça plus facile
   end
