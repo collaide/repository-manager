@@ -13,7 +13,7 @@ class CreateRepositoryManager < ActiveRecord::Migration
       #t.integer :permission_id
       #t.integer :user_id
       t.references :owner, polymorphic: true
-      t.integer :app_file_id
+      t.integer :repository_id
       t.boolean :can_create, :default => false
       t.boolean :can_read, :default => false
       t.boolean :can_update, :default => false
@@ -30,12 +30,9 @@ class CreateRepositoryManager < ActiveRecord::Migration
       t.boolean :can_remove, :default => false
     end
 
-    create_table :app_files do |t|
+    create_table :repositories do |t|
       t.references :owner, polymorphic: true
-      t.integer :parent_id
-      t.integer :lft
-      t.integer :rgt
-      t.integer :depth # this is optional.
+      t.string :ancestry
     end
   end
 end

@@ -11,16 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131018214212) do
-
-  create_table "app_files", force: true do |t|
-    t.integer "owner_id"
-    t.string  "owner_type"
-    t.integer "parent_id"
-    t.integer "lft"
-    t.integer "rgt"
-    t.integer "depth"
-  end
+ActiveRecord::Schema.define(version: 20131025085844) do
 
   create_table "groups", force: true do |t|
     t.string   "name"
@@ -34,15 +25,24 @@ ActiveRecord::Schema.define(version: 20131018214212) do
     t.integer "user_id",  null: false
   end
 
+  create_table "repositories", force: true do |t|
+    t.integer "owner_id"
+    t.string  "owner_type"
+    t.string  "ancestry"
+    t.string  "repository"
+    t.float   "file_size"
+    t.string  "content_type"
+  end
+
   create_table "shares", force: true do |t|
     t.integer "owner_id"
     t.string  "owner_type"
-    t.integer "app_file_id"
-    t.boolean "can_create",  default: false
-    t.boolean "can_read",    default: false
-    t.boolean "can_update",  default: false
-    t.boolean "can_delete",  default: false
-    t.boolean "can_share",   default: false
+    t.integer "repository_id"
+    t.boolean "can_create",    default: false
+    t.boolean "can_read",      default: false
+    t.boolean "can_update",    default: false
+    t.boolean "can_delete",    default: false
+    t.boolean "can_share",     default: false
   end
 
   create_table "shares_items", force: true do |t|

@@ -21,6 +21,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'factory_girl_rails'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'rspec-rails', '~> 2.0'
-  s.add_development_dependency 'awesome_nested_set'
+  s.add_development_dependency 'ancestry'
   s.add_development_dependency 'carrierwave'
 end

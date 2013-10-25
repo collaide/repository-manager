@@ -12,7 +12,7 @@ module RepositoryManager
         has_many :shares_items, as: :item, dependent: :destroy
         has_many :shares_owners, as: :owner, :class_name => 'Share'
 
-        has_many :app_files, as: :owner#, dependent: :destroy
+        has_many :repositories, as: :owner#, dependent: :destroy
 
         #cattr_accessor :yaffle_text_field
         #self.yaffle_text_field = (options[:yaffle_text_field] || :last_squawk).to_s

@@ -4,7 +4,7 @@ describe "Associations" do
 
   it "test if user can have a own file" do
     user = FactoryGirl.build(:user)
-    file = AppFile.new
+    file = Repository.new
     file.owner = user
     expect(file.owner).to eq(user)
   end
@@ -21,12 +21,12 @@ describe "Associations" do
     user = FactoryGirl.create(:user)
     user2 = FactoryGirl.create(:user)
     expect(user2.shares.count).to eq(0)
-    expect(user.app_files.count).to eq(0)
+    expect(user.repositories.count).to eq(0)
 
-    file = AppFile.new
+    file = Repository.new
     file.owner = user
 
-    #pp user.app_files
+    #pp user.repositories
 
     share = Share.new(can_read:true, can_create:true)
     share.owner = user
@@ -42,7 +42,7 @@ describe "Associations" do
     #share.save
     file.save
 
-    expect(user.app_files.count).to eq(1)
+    expect(user.repositories.count).to eq(1)
     expect(user2.shares.count).to eq(1)
     expect(file.shares.count).to eq(1)
   end
@@ -54,12 +54,12 @@ describe "Associations" do
     group = FactoryGirl.create(:group)
     group2 = FactoryGirl.create(:group)
     expect(group.shares.count).to eq(0)
-    expect(group.app_files.count).to eq(0)
+    expect(group.repositories.count).to eq(0)
 
-    file = AppFile.new
+    file = Repository.new
     file.owner = user
 
-    #pp user.app_files
+    #pp user.repositories
 
     share = Share.new(can_read:true, can_create:true)
     share.owner = group
@@ -75,10 +75,10 @@ describe "Associations" do
     #share.save
     file.save
 
-    expect(user.app_files.count).to eq(1)
+    expect(user.repositories.count).to eq(1)
     expect(user2.shares.count).to eq(0)
     expect(user.shares.count).to eq(0)
-    expect(group.app_files.count).to eq(0)
+    expect(group.repositories.count).to eq(0)
     expect(group.shares.count).to eq(0)
     #Il est auteur d'un share
     expect(group.shares_owners.count).to eq(1)
