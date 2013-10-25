@@ -1,4 +1,8 @@
 class Repository < ActiveRecord::Base
+  extend Enumerize
+
+  enumerize :repository_type, in: [:directory, :file], default: :file
+
   acts_as_tree
 
   #Associate with the User Classe

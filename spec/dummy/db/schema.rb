@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(version: 20131025085844) do
     t.string  "repository"
     t.float   "file_size"
     t.string  "content_type"
+    t.string  "repository_type"
   end
 
   create_table "shares", force: true do |t|
