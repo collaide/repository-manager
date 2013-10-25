@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :repository do
-    attachment { fixture_file }
+    repository { fixture_file }
     #sequence :password do |n|
     #  'secret'
     #end
@@ -8,5 +8,5 @@ FactoryGirl.define do
 end
 
 def fixture_file
-  File.open("#{Rails.root}/spec/fixture/textfile.txt")
+  File.open("#{Rails.root}/../fixture/textfile.txt")
 end

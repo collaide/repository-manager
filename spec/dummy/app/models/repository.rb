@@ -6,4 +6,15 @@ class Repository < ActiveRecord::Base
   has_many :shares
 
   mount_uploader :repository, RepositoryUploader
+
+  before_save :update_asset_attributes
+
+  private
+
+  def update_asset_attributes
+    if repository.present? && repository_changed?
+      self.content_type = repository.file.content_type
+      self.file_size = repository.file.size
+    end
+  end
 end
