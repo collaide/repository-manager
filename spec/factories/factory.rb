@@ -3,7 +3,7 @@ FactoryGirl.define do
     sequence :repository_type do
       :file
     end
-    repository { fixture_file }
+    file { fixture_file }
     #sequence :password do |n|
     #  'secret'
     #end

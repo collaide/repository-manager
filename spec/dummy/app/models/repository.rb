@@ -1,7 +1,7 @@
 class Repository < ActiveRecord::Base
   extend Enumerize
 
-  enumerize :repository_type, in: [:directory, :file], default: :file
+  enumerize :repository_type, in: [:folder, :file], default: :file
 
   acts_as_tree
 
@@ -9,16 +9,19 @@ class Repository < ActiveRecord::Base
   belongs_to :owner, :polymorphic => true
   has_many :shares
 
-  mount_uploader :repository, RepositoryUploader
+  mount_uploader :file, RepositoryUploader
 
   before_save :update_asset_attributes
 
   private
 
   def update_asset_attributes
-    if repository.present? && repository_changed?
-      self.content_type = repository.file.content_type
-      self.file_size = repository.file.size
+    unless file.present?
+      self.repository_type = :folder
+    end
+    if file.present? && file_changed?
+      self.content_type = file.file.content_type
+      self.file_size = file.file.size
     end
   end
 end

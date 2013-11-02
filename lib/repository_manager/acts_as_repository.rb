@@ -32,10 +32,25 @@ module RepositoryManager
       #share_permission contains :
         #can_add and can_remove specifie if the users can add/remove people to the share
       def share(repository, items, repo_permissions = nil, share_permissions = nil)
-        #TODO verifie if the item can share with this rep_permissions
         if authorisation = can_share(repository)
+          #If it is an array, we have restriction in the permissions
+          if authorisation.kind_of?(Hash) && repo_permissions.kind_of?(Hash)
+            #built the share with the accepted permissions
+            #We remove the permission if we can't share it
+            if repo_permissions[:can_read] == true && authorisation[:can_read] == false
+              repo_permissions[:can_read] = false
+            end
+            if repo_permissions[:can_create] == true && authorisation[:can_create] == false
+              repo_permissions[:can_create] = false
+            end
+            if repo_permissions[:can_update] == true && authorisation[:can_update] == false
+              repo_permissions[:can_update] = false
+            end
+            if repo_permissions[:can_delete] == true && authorisation[:can_delete] == false
+              repo_permissions[:can_delete] = false
+            end
+          end
 
-          #built the share
           share = Share.new(repo_permissions)
           share.owner = self
 
@@ -51,14 +66,16 @@ module RepositoryManager
 
           repository.save
         else
-          # No share
+          # No permission => No share
           false
         end
       end
 
       private
 
-      #false if the entity has not the authorisation to share this rep
+      #Return false if the entity has not the authorisation to share this rep
+      #Return true if the entity can share this rep with all the authorisations
+      #Return an Array if the entity can share but with restriction
       def can_share(rep)
         # If the item is the owner, he can share !
         if rep.owner == self
@@ -71,7 +88,7 @@ module RepositoryManager
               #He go the rep, but can he share it ?
               if s.can_share
                 #Ok, give an array with the permission of the actual share
-                # (he can't share with more permission then here)
+                # (we can't share with more permission then we have)
                 return {can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
               end
             end
