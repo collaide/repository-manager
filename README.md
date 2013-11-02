@@ -70,6 +70,27 @@ class Group < ActiveRecord::Base
 end
 ```
 
+## How to use RepositoryManager
+
+### How can I share a file/folder
+
+```ruby
+#user1 wants to share a file or folder with user2
+
+items = []
+#He can add other instance (who acts_as_repository) in this array to share with more than one instance
+items << user2
+
+#Share permission can specifie if the instance who receive the share can add or remove user in this share (if he is admin of this share, for instance).
+#Default shares permisions are : 
+share_permissions = {can_add: false, can_remove: false}
+      
+#Default reposiroty permissions are:
+repo_permissions = {can_read: false, can_create: false, can_update:false, can_delete:false, can_share: false}
+
+user1.share(repository, items, repo_permissions, share_permissions)
+```
+
 ## TODO
 
 Gerer les uploads grace à CarrierWare
