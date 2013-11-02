@@ -13,8 +13,8 @@ This gem is my informatic project for the Master in University of Lausanne (CH).
 
 WARNING : This gem is not finish, only a few method are implemented !
 
-Installation
-------------
+## Installation
+
 
 Add to your Gemfile:
 
