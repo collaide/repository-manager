@@ -9,7 +9,7 @@ After looking for a good gem to use I noticed the lack of repository gems
 and flexibility in them. RepositoryManager tries to be the more flexible possible.
 Each instance (users, groups, etc..) can have it own repositories (with files and folders). It can manage them easily (edit, remove, add, etc) and share them with other instance.
 
-This gem is my informatic project for the Master in University of Lausanne (CH). 
+This gem is my informatic project for the Master in [University of Lausanne (CH)](http://www.unil.ch/index.html). 
 
 WARNING : This gem is not finish, only a few method are implemented !
 
