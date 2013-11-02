@@ -1,6 +1,6 @@
 Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions). 
 
-= RepositoryManager
+# RepositoryManager
 
 This project is based on the need for a repository manager system for [Collaide](https://github.com/facenord-sud/collaide). Instead of creating my core repository manager system heavily
 dependent on our development, I'm trying to implement a generic and potent repository gem.
@@ -12,8 +12,6 @@ Each instance (users, groups, etc..) can have it own repositories (with files an
 This gem is my informatic project for the Master in University of Lausanne (CH). 
 
 WARNING : This gem is not finish, only a few method are implemented !
-
-== Installation
 
 Installation
 ------------
@@ -43,13 +41,13 @@ $ rake db:migrate
 ```
 
 
-== TODO
+## TODO
 
 Gerer les uploads grace à CarrierWare
 Implémenter les methodes dans le modèle act_as_repository pour que tout soit plus facile
 etc...
 
-== License
+## License
 
 This project rocks and uses MIT-LICENSE.
 
