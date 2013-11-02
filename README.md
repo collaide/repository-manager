@@ -78,13 +78,17 @@ end
 #user1 wants to share a file or folder with user2
 
 items = []
-#He can add other instance (who acts_as_repository) in this array to share with more than one instance
+#You can add other instance (who acts_as_repository) in this array to share with more than one instance
 items << user2
 
 #Share permission can specifie if the instance who receive the share can add or remove user in this share (if he is admin of this share, for instance).
 #Default shares permisions are : 
 share_permissions = {can_add: false, can_remove: false}
-      
+
+The repository permission spicifie what kind of permission do you give at this share. If all in false (as default), this is like the share doesn't exist, becose you can't se the files/folders end can't edit or remove it.
+So, you have to be carefull of being consis in you choice of permissions. For exemple, is there a sence to put can_read to false et can_update to true ?
+But this parametre permit you to do what ever you want.
+The can_share option is the fact that the user can share this repository too or not.
 #Default reposiroty permissions are:
 repo_permissions = {can_read: false, can_create: false, can_update:false, can_delete:false, can_share: false}
 
