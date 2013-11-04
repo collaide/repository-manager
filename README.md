@@ -103,6 +103,7 @@ user1.share(repository, items, repo_permissions, share_permissions)
 
 ## TODO
 
+Verifier les droits, quand on crée un dossier
 Gerer les uploads grace à CarrierWare
 Implémenter les methodes dans le modèle act_as_repository pour que tout soit plus facile
 etc...
