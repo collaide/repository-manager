@@ -1,27 +1,26 @@
 class Repository < ActiveRecord::Base
-  extend Enumerize
-
-  enumerize :repository_type, in: [:folder, :file], default: :file
-
-  acts_as_tree
+  has_ancestry
 
   #Associate with the User Classe
   belongs_to :owner, :polymorphic => true
   has_many :shares
 
-  mount_uploader :file, RepositoryUploader
-
-  before_save :update_asset_attributes
-
-  private
-
-  def update_asset_attributes
-    unless file.present?
-      self.repository_type = :folder
-    end
-    if file.present? && file_changed?
-      self.content_type = file.file.content_type
-      self.file_size = file.file.size
-    end
+  def copy(target_folder)
+    #new_file = self.dup
+    #new_file.folder = target_folder
+    #new_file.save!
+    #
+    #path = "#{Rails.root}/uploads/#{Rails.env}/#{new_file.id}/original"
+    #FileUtils.mkdir_p path
+    #FileUtils.cp_r self.attachment.path, "#{path}/#{new_file.id}"
+    #
+    #new_file
   end
+
+  def move(target_folder)
+    #self.folder = target_folder
+    #save!
+  end
+
+
 end

@@ -7,9 +7,9 @@ describe "ActsAsRepository" do
     @user2 = FactoryGirl.create(:user)
     @user3 = FactoryGirl.create(:user)
     @group1 = FactoryGirl.create(:group)
-    @group2 = FactoryGirl.create(:group)
-    @group3 = FactoryGirl.create(:group)
-    @fileAlone = FactoryGirl.create(:repository)
+    #@group2 = FactoryGirl.create(:group)
+    #@group3 = FactoryGirl.create(:group)
+    #@fileAlone = FactoryGirl.create(:app_file)
   end
 
   it "should be associate with shares" do
@@ -27,7 +27,7 @@ describe "ActsAsRepository" do
   end
 
   it 'can share his own repository with other users' do
-    rep = FactoryGirl.create(:repository)
+    rep = FactoryGirl.create(:app_file)
     rep.owner = @user1
     rep.save
 
@@ -55,7 +55,7 @@ describe "ActsAsRepository" do
   end
 
   it 'can not share a repository without shares and without the permission' do
-    rep = FactoryGirl.create(:repository)
+    rep = FactoryGirl.create(:app_file)
     rep.owner = @user3
     rep.save
 
@@ -69,7 +69,7 @@ describe "ActsAsRepository" do
   end
 
   it 'can not share a repository with share but without the permission' do
-    rep = FactoryGirl.create(:repository)
+    rep = FactoryGirl.create(:folder)
     rep.owner = @user3
     rep.save
 
@@ -88,7 +88,7 @@ describe "ActsAsRepository" do
   end
 
   it 'can share a repository with share and with the permission' do
-    rep = FactoryGirl.create(:repository)
+    rep = FactoryGirl.create(:folder)
     rep.owner = @user3
     rep.save
 
@@ -110,7 +110,7 @@ describe "ActsAsRepository" do
   end
 
   it 'default shares permissions are to false' do
-    rep = FactoryGirl.create(:repository)
+    rep = FactoryGirl.create(:folder)
     rep.owner = @user3
     rep.save
 
@@ -139,7 +139,7 @@ describe "ActsAsRepository" do
   end
 
   it 'can share a repository with share and with restricted permissions' do
-    rep = FactoryGirl.create(:repository)
+    rep = FactoryGirl.create(:folder)
     rep.owner = @user3
     rep.save
 
@@ -171,7 +171,7 @@ describe "ActsAsRepository" do
   end
 
   it 'can share a repository with share permissions' do
-    rep = FactoryGirl.create(:repository)
+    rep = FactoryGirl.create(:folder)
     rep.owner = @user3
     rep.save
 
@@ -191,17 +191,35 @@ describe "ActsAsRepository" do
     #expect(@user2.shares_owners.count).to eq(1)
   end
 
+  it 'can share a repository with ancestor share permissions' do
+    parent = FactoryGirl.create(:folder)
+    parent.owner = @user3
+    middle = @user3.createFolder('Middle', parent)
+    children = @user3.createFolder('Children', middle)
 
+    file = FactoryGirl.build(:app_file)
+    file.owner = @user3
+    file.save
 
+    children.addRepository(file)
 
-  it "should be the instance function test in user" do
-    user = User.new
-    expect("test: Hello World").to eq(user.test("Hello World"))
+    repo_permissions = {can_read: true, can_update: true, can_share: false}
+    @user3.share(parent, @user1, repo_permissions)
+
+    repo_permissions = {can_read: true, can_update: true, can_share: true}
+    @user3.share(children, @user1, repo_permissions)
+
+    @user1.share(middle, @user2)
+    expect(@user2.shares.count).to eq(0)
+    @user1.share(file, @user2)
+    expect(@user2.shares.count).to eq(1)
   end
 
-  it "should be the instance function test in group" do
-    group = Group.new
-    expect("test: Hello World").to eq(group.test("Hello World"))
+  it "can create a folder" do
+    folder = @user1.createFolder('test folder')
+    #folder = @user1.repositories.last
+    expect(folder.name).to eq('test folder')
+    expect(folder.type).to eq('Folder')
   end
 
 end

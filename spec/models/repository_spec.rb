@@ -5,21 +5,17 @@ describe 'Repository' do
   before do
     @user1 = FactoryGirl.create(:user)
     @user2 = FactoryGirl.create(:user)
-    @file_alone = FactoryGirl.create(:repository)
+    @user1_file = FactoryGirl.build(:app_file)
+    @user1_file.owner = @user1
+    @user1_folder = FactoryGirl.build(:folder)
+    @user1_folder.owner = @user1
+    @user1_folder.save
+    @user1_file.save
   end
 
-  it "can create a folder" do
-    @file_alone.owner = @user1
-    @folder = Repository.new
+  it 'can create a folder in it own folder' do
+    folder = @user1.createFolder('Folder1', @user1_folder)
 
-    @folder.name = 'Folder'
-    #@folder.repository_type = :folder
-
-    @folder.children = @file_alone
-
-    @folder.save
-
-    expect(@folder.has_children?).to eq(true)
-
+    expect(@user1_folder.has_children?).to eq(1)
   end
 end

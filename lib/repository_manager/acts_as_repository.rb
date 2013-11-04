@@ -12,7 +12,7 @@ module RepositoryManager
         has_many :shares_items, as: :item, dependent: :destroy
         has_many :shares_owners, as: :owner, :class_name => 'Share'
 
-        has_many :repositories, as: :owner#, dependent: :destroy
+        has_many :repositories, as: :owner #, dependent: :destroy
 
         #cattr_accessor :yaffle_text_field
         #self.yaffle_text_field = (options[:yaffle_text_field] || :last_squawk).to_s
@@ -23,46 +23,36 @@ module RepositoryManager
     end
 
     module LocalInstanceMethods
-      def test(string)
-        "test: #{string}"
-        #write_attribute(self.class.yaffle_text_field, string.to_squawk)
-      end
-
       #Share the repository to the items, with the repo_permissions
       #share_permission contains :
-        #can_add and can_remove specifie if the users can add/remove people to the share
+      #can_add and can_remove specify if the users can add/remove people to the share
       def share(repository, items, repo_permissions = nil, share_permissions = nil)
-        if authorisation = can_share(repository)
-          #If it is an array, we have restriction in the permissions
-          if authorisation.kind_of?(Hash) && repo_permissions.kind_of?(Hash)
-            #built the share with the accepted permissions
-            #We remove the permission if we can't share it
-            if repo_permissions[:can_read] == true && authorisation[:can_read] == false
-              repo_permissions[:can_read] = false
-            end
-            if repo_permissions[:can_create] == true && authorisation[:can_create] == false
-              repo_permissions[:can_create] = false
-            end
-            if repo_permissions[:can_update] == true && authorisation[:can_update] == false
-              repo_permissions[:can_update] = false
-            end
-            if repo_permissions[:can_delete] == true && authorisation[:can_delete] == false
-              repo_permissions[:can_delete] = false
-            end
-          end
+        authorisations = get_authorisations(repository)
+
+        #Here we look if the instance has the authorisation for making a share
+        if can_share(nil, authorisations)
+
+          repo_permissions = make_repo_permissions(repo_permissions, authorisations)
 
           share = Share.new(repo_permissions)
           share.owner = self
 
           repository.shares << share
-
-          #add each item to this share
-          items.each do |i|
+          if items.kind_of?(Array)
+            #add each item to this share
+            items.each do |i|
+              shareItem = SharesItem.new(share_permissions)
+              shareItem.item = i
+              #add the shares items in the share
+              share.shares_items << shareItem
+            end
+          else
             shareItem = SharesItem.new(share_permissions)
-            shareItem.item = i
+            shareItem.item = items
             #add the shares items in the share
             share.shares_items << shareItem
           end
+
 
           repository.save
         else
@@ -71,34 +61,80 @@ module RepositoryManager
         end
       end
 
-      private
+      def createFolder(name, sourceFolder = nil)
+        folder = Folder.new(name: name)
+        folder.owner = self
+        folder.save
+
+        #If we want to create a folder in a folder, we have to check if we have the authorisation
+        if sourceFolder
+          #authorisations = get_authorisations(sourceFolder)
+          sourceFolder.addRepository(folder)
+        end
+
+        return folder
+      end
 
       #Return false if the entity has not the authorisation to share this rep
       #Return true if the entity can share this rep with all the authorisations
       #Return an Array if the entity can share but with restriction
-      def can_share(rep)
+      def get_authorisations(repository)
         # If the item is the owner, he can share !
-        if rep.owner == self
+        if repository.owner == self
           #You can do what ever you want :)
           return true
+          #Find if a share of this rep exist for the self instance
+        elsif s = self.shares.where(repository_id: repository.id).take
+            #Ok, give an array with the permission of the actual share
+            # (we can't share with more permission then we have)
+            return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
         else
-          #look in the shares
-          self.shares.each do |s|
-            if s.repository == rep
-              #He go the rep, but can he share it ?
-              if s.can_share
-                #Ok, give an array with the permission of the actual share
-                # (we can't share with more permission then we have)
-                return {can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
-              end
-            end
+          #We look at the ancestor if there is a share
+          ancestor_ids = repository.ancestor_ids
+          #check the nearest share if it exist
+          if s = self.shares.where(repository_id: ancestor_ids).last
+            return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
           end
-          #else, false
-          return false
         end
+        #else, false
+        return false
       end
-    end
 
+      #Return true if you can share the repo, false else
+      #You can give the authorisations or the repository as params
+      def can_share(repository, authorisations = nil)
+        #If we pass no authorisations we have to get it
+        if authorisations === nil
+          authorisations = get_authorisations(repository)
+        end
+        return authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_share] == true)
+      end
+
+      private
+
+      #Correct the repo_permissions with the authorisations
+      def make_repo_permissions(wanted_permissions, authorisations)
+        #If it is an array, we have restriction in the permissions
+        if authorisations.kind_of?(Hash) && wanted_permissions
+          #built the share with the accepted permissions
+          #We remove the permission if we can't share it
+          if wanted_permissions[:can_read] == true && authorisations[:can_read] == false
+            wanted_permissions[:can_read] = false
+          end
+          if wanted_permissions[:can_create] == true && authorisations[:can_create] == false
+            wanted_permissions[:can_create] = false
+          end
+          if wanted_permissions[:can_update] == true && authorisations[:can_update] == false
+            wanted_permissions[:can_update] = false
+          end
+          if wanted_permissions[:can_delete] == true && authorisations[:can_delete] == false
+            wanted_permissions[:can_delete] = false
+          end
+        end
+        return wanted_permissions
+      end
+
+    end
   end
 end
 

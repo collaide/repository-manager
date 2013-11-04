@@ -34,6 +34,7 @@ class CreateRepositoryManager < ActiveRecord::Migration
       t.references :owner, polymorphic: true
       t.string :ancestry
       t.string :name
+      t.string :type
     end
   end
 end

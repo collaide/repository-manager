@@ -1,9 +1,6 @@
 FactoryGirl.define do
-  factory :repository do
-    sequence :repository_type do
-      :file
-    end
-    file { fixture_file }
+  factory :app_file do
+    name { fixture_file }
     #sequence :password do |n|
     #  'secret'
     #end
