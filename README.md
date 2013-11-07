@@ -120,7 +120,7 @@ file = AppFile.new
 file.name = params[:file]
 #OR
 file.name = File.open('somewhere')
-file.save
+file.save!
 
 #Add this file in the folder named 'Folder1'
 @user1.createFile(file, folder)
