@@ -106,7 +106,7 @@ user1.share(repository, items, repo_permissions, share_permissions)
 You just have to call the method createFile, or createFolder.
 
 ```ruby
-#user1 wants to create a folder is a directory (he needs the create permission !)
+#user1 wants to create a folder in another directory (he needs the create permission !)
 
 #sourceFolder is the directory in wich you want to create the folder
 sourceFolder = user1_folder
