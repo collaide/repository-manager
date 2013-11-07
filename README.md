@@ -101,6 +101,32 @@ repo_permissions = {can_read: false, can_create: false, can_update:false, can_de
 user1.share(repository, items, repo_permissions, share_permissions)
 ```
 
+### How can I create a file/folder
+
+You just have to call the method createFile, or createFolder.
+
+```ruby
+#user1 wants to create a folder is a directory (he needs the create permission !)
+
+#sourceFolder is the directory in wich you want to create the folder
+sourceFolder = user1_folder
+
+#The name of the new folder
+name = 'Folder1'
+folder = @user1.createFolder('Folder1', @user1_folder)
+
+#Ok, now we want to add a file into this folder (he needs the create permission)
+file = AppFile.new
+file.name = params[:file]
+#OR
+file.name = File.open('somewhere')
+file.save
+
+#Add this file in the folder named 'Folder1'
+@user1.createFile(file, folder)
+```
+
+
 ## TODO
 
 Verifier les droits, quand on crée un dossier
