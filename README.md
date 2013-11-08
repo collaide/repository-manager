@@ -101,8 +101,52 @@ repo_permissions = {can_read: false, can_create: false, can_update:false, can_de
 user1.share(repository, items, repo_permissions, share_permissions)
 ```
 
+### How can I create a file/folder
+
+You just have to call the method createFile, or createFolder.
+
+```ruby
+#user1 wants to create a folder in another directory (he needs the create permission !)
+
+#sourceFolder is the directory in wich you want to create the folder
+sourceFolder = user1_folder
+
+#The name of the new folder
+name = 'Folder1'
+folder = @user1.createFolder('Folder1', @user1_folder)
+
+#Ok, now we want to add a file into this folder (he needs the create permission)
+file = AppFile.new
+file.name = params[:file]
+#OR
+file.name = File.open('somewhere')
+
+#Add this file in the folder named 'Folder1'
+@user1.createFile(file, folder)
+#OR more easy :
+@user1.createFile(params[:file], folder)
+```
+
+### Authorisations
+
+The owner of a repository (file or folder) has all the authorisations on it. The authorisations are :
+- can_create(repository) : You can create a file/folder on the repository (if repository is nil, you can create).
+- can_update(repository) : You can update a file/folder
+- can_delete(repository) : You can delete a repository
+- can_share(repository) : You can share a repository
+
+This method returns true if you can do the action, else false. All these methods are using get_authorisations method:
+```ruby
+#Return false if the entity has not the authorisation to share this rep
+#Return true if the entity can share this rep with all the authorisations
+#eturn an Array if the entity can share but with restriction
+#Return true if the repository is nil (he as all authorisations on his own rep)
+def get_authorisations(repository=nil)
+```
+
 ## TODO
 
+Verifier les droits, quand on crée un dossier
 Gerer les uploads grace à CarrierWare
 Implémenter les methodes dans le modèle act_as_repository pour que tout soit plus facile
 etc...
