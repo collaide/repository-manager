@@ -1,6 +1,17 @@
 module RepositoryManager #:nodoc:
   class InstallGenerator < Rails::Generators::Base
+    include Rails::Generators::Migration
     source_root File.expand_path("../templates", __FILE__)
+    require 'rails/generators/migration'
+
+    def self.next_migration_number path
+      unless @prev_migration_nr
+        @prev_migration_nr = Time.now.utc.strftime("%Y%m%d%H%M%S").to_i
+      else
+        @prev_migration_nr += 1
+      end
+      @prev_migration_nr.to_s
+    end
 
     # all public methods in here will be run in order
     #def copy_initializer_file
@@ -12,7 +23,7 @@ module RepositoryManager #:nodoc:
                     ["20131025085844_add_file_to_repositories.rb","add_file_to_repositories.rb"]
                     ]
       migrations.each do |migration|
-        copy_file "../../../../db/migrate/" + migration[0], "db/migrate/" + migration[1]
+        migration_template "../../../../db/migrate/" + migration[0], "db/migrate/" + migration[1]
       end
     end
   end
