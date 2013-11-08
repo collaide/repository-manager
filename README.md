@@ -93,7 +93,8 @@ theFolder = user1.createFolder(name, sourceFolder)
 #   'Root folder'
 #     'The new folder'
 
-# Now we want to add a file into theFolder (user1 needs the ':can_create' permission in the folder : theFolder)
+# Now we want to add a file into theFolder 
+# (user1 needs the ':can_create' permission in the folder : theFolder)
 user1.createFile(params[:file], theFolder)
 # OR
 user1.createFile(File.open('somewhere'), theFolder)
