@@ -72,23 +72,56 @@ end
 
 ## How to use RepositoryManager
 
-### How can I create a repository (file or folder)
+### How can I create/delete a repository (file or folder)
 
-You just have to call the method createFile, or createFolder.
+You just have to call the method `createFile`, `createFolder`, or `deleteRepository`.
 
 ```ruby
-# user1 wants to create a folder in a directory (he needs to have the ':can_create' permission in this directory !)
+# user1 wants to create a folder in his repository
 
-# sourceFolder is the directory in wich user1 wants to create the folder
+# Create a root folder on the user1 repository (you can have how many roots as you want)
 sourceFolder = createFolder('Root folder')
 
+# We have :
+#   'Root folder'
+
+# sourceFolder is the directory in wich user1 wants to create the folder 'The new folder'
 name = 'The new folder'
 theFolder = user1.createFolder(name, sourceFolder)
+
+# We have :
+#   'Root folder'
+#     'The new folder'
 
 # Now we want to add a file into theFolder (user1 needs the ':can_create' permission in the folder : theFolder)
 user1.createFile(params[:file], theFolder)
 # OR
 user1.createFile(File.open('somewhere'), theFolder)
+
+# user1 own repository :
+#   'Root folder'
+#     'The new folder'
+#        'file'
+
+file2 = user1.createFile(params[:file2])
+
+# user1 own repository :
+#   'Root folder'
+#     'The new folder'
+#        'file'
+#   'file2'
+
+# Delete a repository
+user1.deleteRepository(theFolder)
+
+# user1 own repository :
+#   'Root folder'
+#   'file2'
+
+user1.deleteRepository(file2)
+
+# user1 own repository :
+#   'Root folder'
 
 ```
 
@@ -100,7 +133,7 @@ Now, user1 want to share his 'The new folder' with a Group object et another Use
 # user1 wants to share theFolder with group1 and user2
 
 items = []
-# You can add other instance (who acts_as_repository) in this array to share with more than one instance
+# You can add other instance (who has_repository) in this array to share with more than one instance
 item << group1
 items << user2
 
