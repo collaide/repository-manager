@@ -124,11 +124,10 @@ items << group2
 @user1.addItemsToShare(share, items, share_permissions)
 
 # Here the user2 and group2 can add instance in this share, but they can't remove an instance.
-# If user2 add an item in the share, he can chose if the permission can_add is true or false, but he can't put can_remove to true (because he don't have thise permission himself).
+# If user2 add an item in the share, he can choose if the permission 'can_add' is true or false, but he can't put 'can_remove' to true (because he don't have this permission himself).
 
 # Or her wants to remove items
 @user1.removeItemsToShare(share, items)
-
 
 
 # Directly work with the share
