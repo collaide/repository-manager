@@ -69,4 +69,16 @@ describe 'Repository' do
     expect(@user1.repositories.folders.count()).to eq(1)
   end
 
+  it 'can return only the share repositories' do
+    #expect(@user2.shares_repositories.count).to eq(0)
+    @user1.share(@user1_file, @user2)
+    expect(@user2.shares_repositories.count).to eq(1)
+  end
+
+  it 'can download a file' do
+    #expect(@user2.shares_repositories.count).to eq(0)
+    @user1.download(@user1_file)
+    #expect(@user2.shares_repositories.count).to eq(1)
+  end
+
 end
