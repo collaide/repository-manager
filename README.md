@@ -236,7 +236,7 @@ end
 
 #### Share permissions
 
-You can manage the permission of an instance in a share. The owner of the share has all the permissions. The permissions are:
+You can manage the permissions of an instance in a share. The owner of the share has all the permissions. The permissions are:
 - can_add_to_share(share) : The item can add a new instance in this share.
 - can_remove_to_share(share) : Can remove an instance from this share.
 
