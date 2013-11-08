@@ -50,23 +50,23 @@ In your model:
 
 ```ruby
 class User < ActiveRecord::Base
-  acts_as_repository
+  has_repository
 end
 ```
 
-You are not limited to the User model. You can use RepositoryManager in any other model and use it in serveral different models. If you have groups and Houses in your application and you want to exchange repositories as if they were the same, just add `acts_as_repository` to each one and you will be able to share files/folders groups-groups, groups-users, users-groups and users-users. Of course, you can extend it for as many classes as you need.
+You are not limited to the User model. You can use RepositoryManager in any other model and use it in serveral different models. If you have groups and Houses in your application and you want to exchange repositories as if they were the same, just add `has_repository` to each one and you will be able to share files/folders groups-groups, groups-users, users-groups and users-users. Of course, you can extend it for as many classes as you need.
 
 Example:
 
 ```ruby
 class User < ActiveRecord::Base
-  acts_as_repository
+  has_repository
 end
 ```
 
 ```ruby
 class Group < ActiveRecord::Base
-  acts_as_repository
+  has_repository
 end
 ```
 
