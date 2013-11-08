@@ -131,7 +131,7 @@ file.name = File.open('somewhere')
 
 The owner of a repository (file or folder) has all the authorisations on it. The authorisations are :
 - can_create(repository) : You can create a file/folder on the repository (if repository is nil, you can create).
-- can_edit(repository) : You can edit a file/folder
+- can_update(repository) : You can update a file/folder
 - can_delete(repository) : You can delete a repository
 - can_share(repository) : You can share a repository
 
