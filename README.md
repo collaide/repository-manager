@@ -15,7 +15,7 @@ WARNING : This gem is not finish, only a few method are implemented !
 
 ## Installation
 
-TODO : This is not mad !!!
+TODO : This is not made !!!
 
 
 Add to your Gemfile:
