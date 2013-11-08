@@ -11,11 +11,7 @@ Each instance (users, groups, etc..) can have it own repositories (with files an
 
 This gem is my informatics project for the Master in [University of Lausanne (CH)](http://www.unil.ch/index.html). 
 
-WARNING : This gem is not finish, only a few method are implemented !
-
 ## Installation
-
-TODO : This is not made !!!
 
 
 Add to your Gemfile:
