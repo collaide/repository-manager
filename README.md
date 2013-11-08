@@ -147,14 +147,14 @@ share.removeItems(items)
 You just have to call the method createFile, or createFolder.
 
 ```ruby
-#user1 wants to create a folder in another directory (he needs the create permission !)
+#user1 wants to create a folder in another directory (he needs to have the 'can_create' permission !)
 
 #sourceFolder is the directory in wich you want to create the folder
-sourceFolder = user1_folder
+sourceFolder = @user1_folder
 
 #The name of the new folder
 name = 'Folder1'
-folder = @user1.createFolder('Folder1', @user1_folder)
+folder = @user1.createFolder('Folder1', sourceFolder)
 
 #Ok, now we want to add a file into this folder (he needs the create permission)
 file = AppFile.new
