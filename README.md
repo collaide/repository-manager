@@ -80,14 +80,12 @@ You just have to call the method `createFile`, `createFolder`, or `deleteReposit
 # user1 wants to create a folder in his repository
 
 # Create a root folder on the user1 repository (you can have how many roots as you want)
-
 sourceFolder = createFolder('Root folder')
 
 # user1 own repository :
 #   'Root folder'
 
 # sourceFolder is the directory in wich user1 wants to create the folder 'The new folder'
-
 name = 'The new folder'
 theFolder = user1.createFolder(name, sourceFolder)
 
@@ -97,7 +95,6 @@ theFolder = user1.createFolder(name, sourceFolder)
 
 # Now we want to add a file into theFolder 
 # Note : user1 needs the ':can_create => true' permission in the folder : theFolder
-
 user1.createFile(params[:file], theFolder)
 # OR
 #user1.createFile(File.open('somewhere'), theFolder)
@@ -117,7 +114,6 @@ file2 = user1.createFile(params[:file2])
 
 # Delete a repository
 # Note : user1 needs the ':can_delete => true' permission in the folder : theFolder
-
 user1.deleteRepository(theFolder)
 
 # user1 own repository :
