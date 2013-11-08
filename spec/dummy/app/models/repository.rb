@@ -4,6 +4,7 @@ class Repository < ActiveRecord::Base
   #Associate with the User Classe
   belongs_to :owner, :polymorphic => true
   has_many :shares
+  #has_many :items, through: :shares
 
   scope :files, -> { where type: 'AppFile' }
   scope :folders, -> { where type: 'Folder' }

@@ -49,6 +49,9 @@ describe "HasRepository" do
     expect(@user2.shares.count).to eq(1)
     expect(@user3.shares.count).to eq(1)
     expect(@user1.shares_owners.count).to eq(1)
+    expect(@user2.repositories.count).to eq(0)
+    expect(@user2.shares_repositories.count).to eq(1)
+
     #expect(@user2.shares_owners.count).to eq(0)
     #expect(@user3.shares_owners.count).to eq(0)
 

@@ -8,11 +8,25 @@ module RepositoryManager
     module ClassMethods
       def has_repository(options = {})
 
-        has_many :shares, :through => :shares_items, dependent: :destroy
+        has_many :shares, through: :shares_items, dependent: :destroy
         has_many :shares_items, as: :item, dependent: :destroy
-        has_many :shares_owners, as: :owner, :class_name => 'Share'
+        has_many :shares_owners, as: :owner, class_name: 'Share'
 
+        #The own repositories
         has_many :repositories, as: :owner #, dependent: :destroy
+
+        #The repositories shares
+        #if Rails::VERSION::MAJOR == 4
+        #  has_many :shares_repositories, -> { where can_read: true }, as: :item, through: :shares_items, class_name: 'Repository'
+        #else
+          # Rails 3 does it this way
+        has_many :shares_repositories, through: :shares, source: :repository, class_name: 'Repository'
+        #end
+
+        #scope :all_repositories, -> { self.repositories.shares_repositories }
+
+        #All repositories (own and shares)
+        #has_many :all_repositories
 
         #cattr_accessor :yaffle_text_field
         #self.yaffle_text_field = (options[:yaffle_text_field] || :last_squawk).to_s
@@ -156,6 +170,11 @@ module RepositoryManager
       #You can give the authorisations or the repository as params
       def can_share(repository, authorisations = nil)
         can_do('share', repository, authorisations)
+      end
+
+      #Return true if you can share the repo, else false
+      def can_read(repository, authorisations = nil)
+        can_do('read', repository, authorisations)
       end
 
       #Return true if you can create in the repo, false else
