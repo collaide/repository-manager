@@ -166,8 +166,14 @@ module RepositoryManager
         can_do('share', repository, authorisations)
       end
 
-      # Return true if you can share the repo, else false
+      # Return true if you can read the repo, else false
       def can_read(repository, authorisations = nil)
+        can_do('read', repository, authorisations)
+      end
+
+      # Return true if you can download the repo, else false
+      # Read = Download for the moment
+      def can_download(repository, authorisations = nil)
         can_do('read', repository, authorisations)
       end
 
@@ -187,7 +193,7 @@ module RepositoryManager
       end
 
       # Return true if you can add an item in this share, false else
-      def can_add_to_share(share, share_permissions = nil)
+      def can_add_to_share(share)
         can_do_to_share('add', share)
       end
 
@@ -200,7 +206,7 @@ module RepositoryManager
       # Param item could be an object or an array of object
       def addItemsToShare(share, items, share_permissions = nil)
         authorisations = get_share_authorisations(share)
-        if can_add_to_share(share, authorisations)
+        if can_add_to_share(share)
           share_permissions = make_share_permissions(share_permissions, authorisations)
           share.addItems(items, share_permissions)
         end

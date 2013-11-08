@@ -1,19 +1,24 @@
 class CreateRepositoryManager < ActiveRecord::Migration
 
   def change
-    create_table :permissions do |t|
+    #create_table :permissions do |t|
+    #  t.boolean :can_create, :default => false
+    #  t.boolean :can_read, :default => false
+    #  t.boolean :can_update, :default => false
+    #  t.boolean :can_delete, :default => false
+    #  t.boolean :can_share, :default => false
+    #end
+
+    create_table :shares do |t|
+      #t.integer :permission_id
+      #t.integer :user_id
+      t.references :owner, polymorphic: true
+      t.integer :repository_id
       t.boolean :can_create, :default => false
       t.boolean :can_read, :default => false
       t.boolean :can_update, :default => false
       t.boolean :can_delete, :default => false
       t.boolean :can_share, :default => false
-    end
-
-    create_table :shares do |t|
-      t.integer :permission_id
-      #t.integer :user_id
-      t.references :owner, polymorphic: true
-      t.integer :app_file_id
     end
 
     create_table :shares_items do |t|
@@ -25,13 +30,11 @@ class CreateRepositoryManager < ActiveRecord::Migration
       t.boolean :can_remove, :default => false
     end
 
-    create_table :app_files do |t|
+    create_table :repositories do |t|
       t.references :owner, polymorphic: true
-      t.integer :parent_id
-      t.integer :lft
-      t.integer :rgt
-      t.integer :depth # this is optional.
+      t.string :ancestry
+      t.string :name
+      t.string :type
     end
-
   end
 end
