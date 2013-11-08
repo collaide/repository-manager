@@ -12,7 +12,7 @@ module RepositoryManager #:nodoc:
                     ["20131025085844_add_file_to_repositories.rb","add_file_to_repositories.rb"]
                     ]
       migrations.each do |migration|
-        migration_template "../../../../db/migrate/" + migration[0], "db/migrate/" + migration[1]
+        copy_file "../../../../db/migrate/" + migration[0], "db/migrate/" + migration[1]
       end
     end
   end
