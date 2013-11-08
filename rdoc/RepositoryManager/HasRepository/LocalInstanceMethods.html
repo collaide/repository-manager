@@ -1,0 +1,777 @@
+<?xml version="1.0" encoding="CP850"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta content="text/html; charset=CP850" http-equiv="Content-Type" />
+
+  <title>Module: RepositoryManager::HasRepository::LocalInstanceMethods</title>
+
+  <link rel="stylesheet" href="../../rdoc.css" type="text/css" media="screen" />
+
+  <script src="../../js/jquery.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../../js/thickbox-compressed.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../../js/quicksearch.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../../js/darkfish.js" type="text/javascript" charset="utf-8"></script>
+
+</head>
+<body id="top" class="module">
+
+  <div id="metadata">
+    <div id="home-metadata">
+      <div id="home-section" class="section">
+        <h3 class="section-header">
+          <a href="../../index.html">Home</a>
+          <a href="../../index.html#classes">Classes</a>
+          <a href="../../index.html#methods">Methods</a>
+        </h3>
+      </div>
+    </div>
+
+    <div id="file-metadata">
+      <div id="file-list-section" class="section">
+        <h3 class="section-header">In Files</h3>
+        <div class="section-body">
+          <ul>
+          
+            <li><a href="../../lib/repository_manager/has_repository_rb.html?TB_iframe=true&amp;height=550&amp;width=785"
+              class="thickbox" title="lib/repository_manager/has_repository.rb">lib/repository_manager/has_repository.rb</a></li>
+          
+          </ul>
+        </div>
+      </div>
+
+      
+    </div>
+
+    <div id="class-metadata">
+      
+
+      
+
+      
+
+      
+      <!-- Method Quickref -->
+      <div id="method-list-section" class="section">
+        <h3 class="section-header">Methods</h3>
+        <ul class="link-list">
+          
+          <li><a href="#method-i-addItemsToShare">#addItemsToShare</a></li>
+          
+          <li><a href="#method-i-can_add_to_share">#can_add_to_share</a></li>
+          
+          <li><a href="#method-i-can_create">#can_create</a></li>
+          
+          <li><a href="#method-i-can_delete">#can_delete</a></li>
+          
+          <li><a href="#method-i-can_read">#can_read</a></li>
+          
+          <li><a href="#method-i-can_remove_to_share">#can_remove_to_share</a></li>
+          
+          <li><a href="#method-i-can_share">#can_share</a></li>
+          
+          <li><a href="#method-i-can_update">#can_update</a></li>
+          
+          <li><a href="#method-i-createFile">#createFile</a></li>
+          
+          <li><a href="#method-i-createFolder">#createFolder</a></li>
+          
+          <li><a href="#method-i-deleteRepository">#deleteRepository</a></li>
+          
+          <li><a href="#method-i-get_authorisations">#get_authorisations</a></li>
+          
+          <li><a href="#method-i-get_share_authorisations">#get_share_authorisations</a></li>
+          
+          <li><a href="#method-i-removeItemsToShare">#removeItemsToShare</a></li>
+          
+          <li><a href="#method-i-share">#share</a></li>
+          
+        </ul>
+      </div>
+      
+
+      
+    </div>
+
+    <div id="project-metadata">
+      
+      
+
+      <div id="classindex-section" class="section project-section">
+        <h3 class="section-header">Class/Module Index
+          <span class="search-toggle"><img src="../../images/find.png"
+            height="16" width="16" alt="[+]"
+            title="show/hide quicksearch" /></span></h3>
+        <form action="#" method="get" accept-charset="utf-8" class="initially-hidden">
+        <fieldset>
+          <legend>Quicksearch</legend>
+          <input type="text" name="quicksearch" value=""
+            class="quicksearch-field" />
+        </fieldset>
+        </form>
+
+        <ul class="link-list">
+        
+          <li><a href="../../RepositoryManager.html">RepositoryManager</a></li>
+        
+          <li><a href="../../RepositoryManager/HasRepository.html">RepositoryManager::HasRepository</a></li>
+        
+          <li><a href="../../RepositoryManager/HasRepository/ClassMethods.html">RepositoryManager::HasRepository::ClassMethods</a></li>
+        
+          <li><a href="../../RepositoryManager/HasRepository/LocalInstanceMethods.html">RepositoryManager::HasRepository::LocalInstanceMethods</a></li>
+        
+          <li><a href="../../RepositoryManager/Models.html">RepositoryManager::Models</a></li>
+        
+        </ul>
+        <div id="no-class-search-results" style="display: none;">No matching classes.</div>
+      </div>
+
+      
+    </div>
+  </div>
+
+  <div id="documentation">
+    <h1 class="module">RepositoryManager::HasRepository::LocalInstanceMethods</h1>
+
+    <div id="description" class="description">
+      
+    </div><!-- description -->
+
+    
+    
+    
+    <div id="5Buntitled-5D" class="documentation-section">
+      
+
+      
+
+      
+
+      
+
+      <!-- Methods -->
+      
+      <div id="public-instance-method-details" class="method-section section">
+        <h3 class="section-header">Public Instance Methods</h3>
+
+      
+        <div id="addItemsToShare-method" class="method-detail ">
+          <a name="method-i-addItemsToShare"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">addItemsToShare</span><span
+              class="method-args">(share, items, share_permissions = nil)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>You can here add new items in the share Param item could be an object or an
+array of object</p>
+            
+
+            
+            <div class="method-source-code" id="addItemsToShare-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 201</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">addItemsToShare</span>(<span class="ruby-identifier">share</span>, <span class="ruby-identifier">items</span>, <span class="ruby-identifier">share_permissions</span> = <span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">authorisations</span> = <span class="ruby-identifier">get_share_authorisations</span>(<span class="ruby-identifier">share</span>)
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">can_add_to_share</span>(<span class="ruby-identifier">share</span>, <span class="ruby-identifier">authorisations</span>)
+    <span class="ruby-identifier">share_permissions</span> = <span class="ruby-identifier">make_share_permissions</span>(<span class="ruby-identifier">share_permissions</span>, <span class="ruby-identifier">authorisations</span>)
+    <span class="ruby-identifier">share</span>.<span class="ruby-identifier">addItems</span>(<span class="ruby-identifier">items</span>, <span class="ruby-identifier">share_permissions</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- addItemsToShare-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- addItemsToShare-method -->
+
+      
+        <div id="can_add_to_share-method" class="method-detail ">
+          <a name="method-i-can_add_to_share"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">can_add_to_share</span><span
+              class="method-args">(share, share_permissions = nil)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Return true if you can add an item in this share, false else</p>
+            
+
+            
+            <div class="method-source-code" id="can_add_to_share-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 190</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_add_to_share</span>(<span class="ruby-identifier">share</span>, <span class="ruby-identifier">share_permissions</span> = <span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">can_do_to_share</span>(<span class="ruby-string">'add'</span>, <span class="ruby-identifier">share</span>)
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- can_add_to_share-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- can_add_to_share-method -->
+
+      
+        <div id="can_create-method" class="method-detail ">
+          <a name="method-i-can_create"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">can_create</span><span
+              class="method-args">(repository, authorisations = nil)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Return true if you can create in the repo, false else</p>
+            
+
+            
+            <div class="method-source-code" id="can_create-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 175</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_create</span>(<span class="ruby-identifier">repository</span>, <span class="ruby-identifier">authorisations</span> = <span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">can_do</span>(<span class="ruby-string">'create'</span>, <span class="ruby-identifier">repository</span>, <span class="ruby-identifier">authorisations</span>)
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- can_create-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- can_create-method -->
+
+      
+        <div id="can_delete-method" class="method-detail ">
+          <a name="method-i-can_delete"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">can_delete</span><span
+              class="method-args">(repository, authorisations = nil)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Return true if you can delete the repo, false else</p>
+            
+
+            
+            <div class="method-source-code" id="can_delete-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 185</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_delete</span>(<span class="ruby-identifier">repository</span>, <span class="ruby-identifier">authorisations</span> = <span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">can_do</span>(<span class="ruby-string">'delete'</span>, <span class="ruby-identifier">repository</span>, <span class="ruby-identifier">authorisations</span>)
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- can_delete-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- can_delete-method -->
+
+      
+        <div id="can_read-method" class="method-detail ">
+          <a name="method-i-can_read"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">can_read</span><span
+              class="method-args">(repository, authorisations = nil)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Return true if you can share the repo, else false</p>
+            
+
+            
+            <div class="method-source-code" id="can_read-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 170</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_read</span>(<span class="ruby-identifier">repository</span>, <span class="ruby-identifier">authorisations</span> = <span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">can_do</span>(<span class="ruby-string">'read'</span>, <span class="ruby-identifier">repository</span>, <span class="ruby-identifier">authorisations</span>)
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- can_read-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- can_read-method -->
+
+      
+        <div id="can_remove_to_share-method" class="method-detail ">
+          <a name="method-i-can_remove_to_share"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">can_remove_to_share</span><span
+              class="method-args">(share)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Return true if you can remove an item in this share, false else</p>
+            
+
+            
+            <div class="method-source-code" id="can_remove_to_share-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 195</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_remove_to_share</span>(<span class="ruby-identifier">share</span>)
+  <span class="ruby-identifier">can_do_to_share</span>(<span class="ruby-string">'remove'</span>, <span class="ruby-identifier">share</span>)
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- can_remove_to_share-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- can_remove_to_share-method -->
+
+      
+        <div id="can_share-method" class="method-detail ">
+          <a name="method-i-can_share"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">can_share</span><span
+              class="method-args">(repository, authorisations = nil)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Return true if you can share the repo, else false You can give the
+authorisations or the repository as params</p>
+            
+
+            
+            <div class="method-source-code" id="can_share-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 165</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_share</span>(<span class="ruby-identifier">repository</span>, <span class="ruby-identifier">authorisations</span> = <span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">can_do</span>(<span class="ruby-string">'share'</span>, <span class="ruby-identifier">repository</span>, <span class="ruby-identifier">authorisations</span>)
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- can_share-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- can_share-method -->
+
+      
+        <div id="can_update-method" class="method-detail ">
+          <a name="method-i-can_update"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">can_update</span><span
+              class="method-args">(repository, authorisations = nil)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Return true if you can edit the repo, false else</p>
+            
+
+            
+            <div class="method-source-code" id="can_update-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 180</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_update</span>(<span class="ruby-identifier">repository</span>, <span class="ruby-identifier">authorisations</span> = <span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">can_do</span>(<span class="ruby-string">'update'</span>, <span class="ruby-identifier">repository</span>, <span class="ruby-identifier">authorisations</span>)
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- can_update-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- can_update-method -->
+
+      
+        <div id="createFile-method" class="method-detail ">
+          <a name="method-i-createFile"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">createFile</span><span
+              class="method-args">(file, sourceFolder = nil)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Create the file (file) in the directory (sourceFolder) Param file can be a
+File, or a instance of AppFile Return the object of the file created if it
+is ok Return false if the file is not created (no authorisation)</p>
+            
+
+            
+            <div class="method-source-code" id="createFile-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 101</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">createFile</span>(<span class="ruby-identifier">file</span>, <span class="ruby-identifier">sourceFolder</span> = <span class="ruby-keyword">nil</span>)
+  <span class="ruby-comment"># If he want to create a file in a directory, we have to check if he have the authorisation</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">can_create</span>(<span class="ruby-identifier">sourceFolder</span>)
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">file</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">'File'</span>
+      <span class="ruby-identifier">appFile</span> = <span class="ruby-constant">AppFile</span>.<span class="ruby-identifier">new</span>
+      <span class="ruby-identifier">appFile</span>.<span class="ruby-identifier">name</span> = <span class="ruby-identifier">file</span>
+      <span class="ruby-identifier">appFile</span>.<span class="ruby-identifier">owner</span> = <span class="ruby-keyword">self</span>
+      <span class="ruby-identifier">appFile</span>.<span class="ruby-identifier">save!</span>
+    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">file</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">'AppFile'</span>
+      <span class="ruby-identifier">appFile</span> = <span class="ruby-identifier">file</span>
+      <span class="ruby-identifier">appFile</span>.<span class="ruby-identifier">owner</span> = <span class="ruby-keyword">self</span>
+      <span class="ruby-identifier">appFile</span>.<span class="ruby-identifier">save!</span>
+    <span class="ruby-keyword">else</span>
+      <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-comment"># Add the file into the sourceFolder</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">sourceFolder</span>
+      <span class="ruby-identifier">sourceFolder</span>.<span class="ruby-identifier">addRepository</span>(<span class="ruby-identifier">file</span>)
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-keyword">return</span> <span class="ruby-identifier">appFile</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- createFile-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- createFile-method -->
+
+      
+        <div id="createFolder-method" class="method-detail ">
+          <a name="method-i-createFolder"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">createFolder</span><span
+              class="method-args">(name, sourceFolder = nil)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Create a folder with the name (name) in the directory (sourceFolder)
+Returns the object of the folder created if it is ok Returns false if the
+folder is not created (no authorisation)</p>
+            
+
+            
+            <div class="method-source-code" id="createFolder-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 71</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">createFolder</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">sourceFolder</span> = <span class="ruby-keyword">nil</span>)
+  <span class="ruby-comment"># If he want to create a folder in a directory, we have to check if he have the authorisation</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">can_create</span>(<span class="ruby-identifier">sourceFolder</span>)
+
+    <span class="ruby-identifier">folder</span> = <span class="ruby-constant">Folder</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-identifier">name</span>)
+    <span class="ruby-identifier">folder</span>.<span class="ruby-identifier">owner</span> = <span class="ruby-keyword">self</span>
+    <span class="ruby-identifier">folder</span>.<span class="ruby-identifier">save</span>
+
+    <span class="ruby-comment"># If we want to create a folder in a folder, we have to check if we have the authorisation</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">sourceFolder</span>
+      <span class="ruby-identifier">sourceFolder</span>.<span class="ruby-identifier">addRepository</span>(<span class="ruby-identifier">folder</span>)
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-keyword">return</span> <span class="ruby-identifier">folder</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- createFolder-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- createFolder-method -->
+
+      
+        <div id="deleteRepository-method" class="method-detail ">
+          <a name="method-i-deleteRepository"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">deleteRepository</span><span
+              class="method-args">(repository)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Delete the repository</p>
+            
+
+            
+            <div class="method-source-code" id="deleteRepository-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 91</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">deleteRepository</span>(<span class="ruby-identifier">repository</span>)
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">can_delete</span>(<span class="ruby-identifier">repository</span>)
+    <span class="ruby-identifier">repository</span>.<span class="ruby-identifier">destroy!</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- deleteRepository-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- deleteRepository-method -->
+
+      
+        <div id="get_authorisations-method" class="method-detail ">
+          <a name="method-i-get_authorisations"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">get_authorisations</span><span
+              class="method-args">(repository=nil)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Gets the repo authorisations Return false if the entity has not the
+authorisation to share this rep Return true if the entity can share this
+rep with all the authorisations Return an Array if the entity can share but
+with restriction Return true if the repository is nil (he as all
+authorisations on his own rep)</p>
+            
+
+            
+            <div class="method-source-code" id="get_authorisations-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 133</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_authorisations</span>(<span class="ruby-identifier">repository</span>=<span class="ruby-keyword">nil</span>)
+  <span class="ruby-comment"># If repository is nil, he can do what he want</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">repository</span><span class="ruby-operator">==</span><span class="ruby-keyword">nil</span>
+
+  <span class="ruby-comment"># If the item is the owner, he can do what he want !</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">repository</span>.<span class="ruby-identifier">owner</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">self</span>
+    <span class="ruby-comment"># You can do what ever you want :)</span>
+    <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
+    <span class="ruby-comment"># Find if a share of this rep exist for the self instance</span>
+  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">s</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">shares</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">repository_id</span><span class="ruby-operator">:</span> <span class="ruby-identifier">repository</span>.<span class="ruby-identifier">id</span>).<span class="ruby-identifier">take</span>
+    <span class="ruby-comment"># Ok, give an array with the permission of the actual share</span>
+    <span class="ruby-comment"># (we can't share with more permission then we have)</span>
+    <span class="ruby-keyword">return</span> {<span class="ruby-identifier">can_share</span><span class="ruby-operator">:</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">can_share</span>, <span class="ruby-identifier">can_read</span><span class="ruby-operator">:</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">can_read</span>, <span class="ruby-identifier">can_create</span><span class="ruby-operator">:</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">can_create</span>, <span class="ruby-identifier">can_update</span><span class="ruby-operator">:</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">can_update</span>, <span class="ruby-identifier">can_delete</span><span class="ruby-operator">:</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">can_delete</span>}
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-comment"># We look at the ancestor if there is a share</span>
+    <span class="ruby-identifier">ancestor_ids</span> = <span class="ruby-identifier">repository</span>.<span class="ruby-identifier">ancestor_ids</span>
+    <span class="ruby-comment"># Check the nearest share if it exist</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">s</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">shares</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">repository_id</span><span class="ruby-operator">:</span> <span class="ruby-identifier">ancestor_ids</span>).<span class="ruby-identifier">last</span>
+      <span class="ruby-keyword">return</span> {<span class="ruby-identifier">can_share</span><span class="ruby-operator">:</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">can_share</span>, <span class="ruby-identifier">can_read</span><span class="ruby-operator">:</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">can_read</span>, <span class="ruby-identifier">can_create</span><span class="ruby-operator">:</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">can_create</span>, <span class="ruby-identifier">can_update</span><span class="ruby-operator">:</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">can_update</span>, <span class="ruby-identifier">can_delete</span><span class="ruby-operator">:</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">can_delete</span>}
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-comment"># Else, false</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- get_authorisations-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- get_authorisations-method -->
+
+      
+        <div id="get_share_authorisations-method" class="method-detail ">
+          <a name="method-i-get_share_authorisations"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">get_share_authorisations</span><span
+              class="method-args">(share)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Return the authorisations of the share (can_add, can_remove)</p>
+            
+
+            
+            <div class="method-source-code" id="get_share_authorisations-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 159</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_share_authorisations</span>(<span class="ruby-identifier">share</span>)
+  <span class="ruby-identifier">share</span>.<span class="ruby-identifier">get_authorisations</span>(<span class="ruby-keyword">self</span>)
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- get_share_authorisations-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- get_share_authorisations-method -->
+
+      
+        <div id="removeItemsToShare-method" class="method-detail ">
+          <a name="method-i-removeItemsToShare"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">removeItemsToShare</span><span
+              class="method-args">(share, items)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>You can here add new items in the share Param item could be an object or an
+array of object</p>
+            
+
+            
+            <div class="method-source-code" id="removeItemsToShare-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 211</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">removeItemsToShare</span>(<span class="ruby-identifier">share</span>, <span class="ruby-identifier">items</span>)
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">can_remove_to_share</span>(<span class="ruby-identifier">share</span>)
+    <span class="ruby-identifier">share</span>.<span class="ruby-identifier">removeItems</span>(<span class="ruby-identifier">items</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- removeItemsToShare-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- removeItemsToShare-method -->
+
+      
+        <div id="share-method" class="method-detail ">
+          <a name="method-i-share"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">share</span><span
+              class="method-args">(repository, items, repo_permissions = nil, share_permissions = nil)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            <p>Share the repository with the items, with the repo_permissions
+repo_permissions contains :</p>
+
+<pre>&lt;tt&gt;:can_read&lt;/tt&gt; - Item can download the repository
+&lt;tt&gt;:can_create&lt;/tt&gt; - Item can create a new repository on it
+&lt;tt&gt;:can_edit&lt;/tt&gt; - Item can edit the repository
+&lt;tt&gt;:can_delete&lt;/tt&gt; - Item can delete the repository
+&lt;tt&gt;:can_share&lt;/tt&gt; - Item can share the repository</pre>
+
+<p>share_permissions contains :</p>
+
+<pre>&lt;tt&gt;:can_add&lt;/tt&gt; - Specify if the item can add objects to the share
+&lt;tt&gt;:can_remove&lt;/tt&gt; - Specify if the item can remove object to the share</pre>
+            
+
+            
+            <div class="method-source-code" id="share-source">
+<pre>
+<span class="ruby-comment"># File lib/repository_manager/has_repository.rb, line 46</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">share</span>(<span class="ruby-identifier">repository</span>, <span class="ruby-identifier">items</span>, <span class="ruby-identifier">repo_permissions</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">share_permissions</span> = <span class="ruby-keyword">nil</span>)
+  <span class="ruby-identifier">authorisations</span> = <span class="ruby-identifier">get_authorisations</span>(<span class="ruby-identifier">repository</span>)
+
+  <span class="ruby-comment"># Here we look if the instance has the authorisation for making a share</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">can_share</span>(<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">authorisations</span>)
+
+    <span class="ruby-identifier">repo_permissions</span> = <span class="ruby-identifier">make_repo_permissions</span>(<span class="ruby-identifier">repo_permissions</span>, <span class="ruby-identifier">authorisations</span>)
+
+    <span class="ruby-identifier">share</span> = <span class="ruby-constant">Share</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">repo_permissions</span>)
+    <span class="ruby-identifier">share</span>.<span class="ruby-identifier">owner</span> = <span class="ruby-keyword">self</span>
+
+    <span class="ruby-identifier">share</span>.<span class="ruby-identifier">addItems</span>(<span class="ruby-identifier">items</span>, <span class="ruby-identifier">share_permissions</span>)
+
+    <span class="ruby-identifier">repository</span>.<span class="ruby-identifier">shares</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">share</span>
+    <span class="ruby-identifier">repository</span>.<span class="ruby-identifier">save!</span>
+    <span class="ruby-identifier">share</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-comment"># No permission =&gt; No share</span>
+    <span class="ruby-keyword">false</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- share-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- share-method -->
+
+      
+      </div><!-- public-instance-method-details -->
+    
+    </div><!-- 5Buntitled-5D -->
+  
+
+  </div><!-- documentation -->
+
+  <div id="validator-badges">
+    <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+    <p><small>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish
+      Rdoc Generator</a> 2</small>.</p>
+  </div>
+
+</body>
+</html>
+

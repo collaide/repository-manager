@@ -10,7 +10,7 @@ class Share < ActiveRecord::Base
     joins(:shares_items).where('shares_items.item_id' => item.id,'shares_items.item_type' => item.class.base_class.to_s)
   }
 
-  #Return the authorisations of the share for the item
+  # Return the authorisations of the share for the item
   def get_authorisations(item)
     # If the item is the owner, he can do what he want !
     if self.owner == item
@@ -22,28 +22,28 @@ class Share < ActiveRecord::Base
     end
   end
 
-  #Add items to the share
+  # Add items to the share
   def addItems(items, share_permissions=nil)
     if items.kind_of?(Array)
-      #add each item to this share
+      # Add each item to this share
       items.each do |i|
         shareItem = SharesItem.new(share_permissions)
         shareItem.item = i
-        #add the shares items in the share
+        # Add the shares items in the share
         self.shares_items << shareItem
       end
     else
       shareItem = SharesItem.new(share_permissions)
       shareItem.item = items
-      #add the shares items in the share
+      # Add the shares items in the share
       self.shares_items << shareItem
     end
   end
 
-  #remove items to the share
+  # Remove items to the share
   def removeItems(items)
     if items.kind_of?(Array)
-      #add each item to this share
+      # Add each item to this share
       items.each do |item|
         self.shares_items.where(item_id: item.id, item_type: item.class.base_class.to_s).take.destroy
       end
