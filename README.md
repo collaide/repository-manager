@@ -72,7 +72,7 @@ end
 
 ## How to use RepositoryManager
 
-### How can I create a file/folder
+### How can I create a file/folder (repository)
 
 You just have to call the method createFile, or createFolder.
 
