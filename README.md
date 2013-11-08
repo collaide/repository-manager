@@ -172,11 +172,11 @@ user2.shares_repositories.all
 
 If it has the authorisation, an object can add items to a share.
 ```ruby
-#user1 want to add items to his share (the actions are done only if user1 has the ':can_add' permission)
+# user1 want to add items to his share (the actions are done only if user1 has the ':can_add' permission)
 user1.can_add_to_share(share) # => true
 
 share_permissions = {can_add: true, can_remove: false}
-#Add items
+# Add items
 items = []
 items << user3
 items << group2
@@ -190,7 +190,7 @@ group2.can_remove_to_share(share) # => false
 # If user2 add an item in the share, he can choose if the permission ':can_add' is true or false, but he can't put ':can_remove' to true (because he don't have this permission himself).
 ```
 
-If it has the authorisation, an object can remove items to a share.
+If it has the authorisation, an object can remove items from a share.
 ```ruby
 # user1 want to remove group2 from this share
 user1.removeItemsToShare(share, group2)
