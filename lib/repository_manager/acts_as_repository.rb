@@ -61,33 +61,85 @@ module RepositoryManager
         end
       end
 
+      #Create a folder with the name (name) in the directory (sourceFolder)
+      #Return the object of the folder created if it is ok
+      #Return false if the folder is not created (no authorisation)
       def createFolder(name, sourceFolder = nil)
-        folder = Folder.new(name: name)
-        folder.owner = self
-        folder.save
+        #If he want to create a folder in a directory, we have to check if he have the authorisation
+        if can_create(sourceFolder)
 
-        #If we want to create a folder in a folder, we have to check if we have the authorisation
-        if sourceFolder
-          #authorisations = get_authorisations(sourceFolder)
-          sourceFolder.addRepository(folder)
+          folder = Folder.new(name: name)
+          folder.owner = self
+          folder.save
+
+          #If we want to create a folder in a folder, we have to check if we have the authorisation
+          if sourceFolder
+            #authorisations = get_authorisations(sourceFolder)
+            sourceFolder.addRepository(folder)
+          end
+
+          return folder
+        else
+          return false
         end
+      end
 
-        return folder
+      def deleteRepository(repository)
+        if can_delete(repository)
+          repository.destroy!
+        end
+      end
+
+      #Create the file (file) in the directory (sourceFolder)
+      #param file can be a ile, or a instance of AppFile
+      #param file can be a File, or a instance of AppFile
+      #Return the object of the file created if it is ok
+      #Return false if the file is not created (no authorisation)
+      def createFile(file, sourceFolder = nil)
+        #If he want to create a file in a directory, we have to check if he have the authorisation
+        if can_create(sourceFolder)
+          if file.class.name == 'File'
+            appFile = AppFile.new
+            appFile.name = file
+            appFile.owner = self
+            appFile.save!
+          elsif file.class.name == 'AppFile'
+            appFile = file
+            appFile.owner = self
+            appFile.save!
+          else
+            return false
+          end
+
+          #If we want to create a folder in a folder, we have to check if we have the authorisation
+          if sourceFolder
+            #authorisations = get_authorisations(sourceFolder)
+            sourceFolder.addRepository(file)
+          end
+
+          return appFile
+        else
+          return false
+        end
       end
 
       #Return false if the entity has not the authorisation to share this rep
       #Return true if the entity can share this rep with all the authorisations
       #Return an Array if the entity can share but with restriction
-      def get_authorisations(repository)
+      #Return true if the repository is nil (he as all authorisations on his own rep)
+      def get_authorisations(repository=nil)
+        #If repository is nil, he can do what he want
+        return true if repository==nil
+
         # If the item is the owner, he can share !
         if repository.owner == self
           #You can do what ever you want :)
           return true
           #Find if a share of this rep exist for the self instance
         elsif s = self.shares.where(repository_id: repository.id).take
-            #Ok, give an array with the permission of the actual share
-            # (we can't share with more permission then we have)
-            return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
+          #Ok, give an array with the permission of the actual share
+          # (we can't share with more permission then we have)
+          return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
         else
           #We look at the ancestor if there is a share
           ancestor_ids = repository.ancestor_ids
@@ -100,17 +152,52 @@ module RepositoryManager
         return false
       end
 
-      #Return true if you can share the repo, false else
+      #Return true if you can share the repo, else false
       #You can give the authorisations or the repository as params
       def can_share(repository, authorisations = nil)
+        can_do('share', repository, authorisations)
+      end
+
+      #Return true if you can create in the repo, false else
+      def can_create(repository, authorisations = nil)
+        can_do('create', repository, authorisations)
+      end
+
+      #Return true if you can edit the repo, false else
+      def can_update(repository, authorisations = nil)
+        can_do('update', repository, authorisations)
+      end
+
+      #Return true if you can delete the repo, false else
+      def can_delete(repository, authorisations = nil)
+        can_do('delete', repository, authorisations)
+      end
+
+      private
+
+      #Return if you can do or not this action (what)
+      def can_do(what, repository, authorisations = nil)
         #If we pass no authorisations we have to get it
         if authorisations === nil
           authorisations = get_authorisations(repository)
         end
-        return authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_share] == true)
-      end
 
-      private
+        case what
+          when 'read'
+            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_read] == true)
+          when 'delete'
+            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_delete] == true)
+          when 'update'
+            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_update] == true)
+          when 'share'
+            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_share] == true)
+          when 'create'
+            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_create] == true)
+          else
+            false
+        end
+
+      end
 
       #Correct the repo_permissions with the authorisations
       def make_repo_permissions(wanted_permissions, authorisations)

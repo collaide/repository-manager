@@ -5,6 +5,9 @@ class Repository < ActiveRecord::Base
   belongs_to :owner, :polymorphic => true
   has_many :shares
 
+  scope :files, -> { where type: 'AppFile' }
+  scope :folders, -> { where type: 'Folder' }
+
   def copy(target_folder)
     #new_file = self.dup
     #new_file.folder = target_folder
@@ -17,9 +20,12 @@ class Repository < ActiveRecord::Base
     #new_file
   end
 
+  #Move the repository into the target_folder
+  #TODO à tester
   def move(target_folder)
-    #self.folder = target_folder
-    #save!
+    if target_folder.type == 'Folder'
+      self.update_attribute :parent, target_folder
+    end
   end
 
 

@@ -222,4 +222,10 @@ describe "ActsAsRepository" do
     expect(folder.type).to eq('Folder')
   end
 
+  it "can create a file" do
+    file = @user1.createFile(File.open("#{Rails.root}/../fixture/textfile.txt"))
+    expect(file.name.identifier).to eq('textfile.txt')
+    expect(@user1.repositories.count).to eq(1)
+  end
+
 end
