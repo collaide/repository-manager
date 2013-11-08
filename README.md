@@ -72,6 +72,14 @@ end
 
 ## How to use RepositoryManager
 
+### How can I see my repository
+
+Here, there is two king of repository. you own files/folders, and the files/folders on wich you have acces with a share.
+
+To see your own repository, you have ton write this : `user.repositories.all`
+
+To see your shared repository : `user.shares_repositories.all`
+
 ### How can I share a file/folder
 
 Read the comments in the code below.
