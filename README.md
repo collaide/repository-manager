@@ -103,6 +103,8 @@ user1.share(repository, items, repo_permissions, share_permissions)
 
 ### How can I manage a share
 
+TODO : Comme dans un repo, on ne peux pas ajouter des permissions qu'on a pas.
+
 You can add and remove instance from a share user these methods
 ```ruby
 #@user1 want to add items to his share (the actions are done only if @user1 has the required permission)
