@@ -129,7 +129,7 @@ user1.deleteRepository(file2)
 
 ### How can I share a repository (file/folder)
 
-Now, user1 want to share his 'The new folder' with a Group object et another User.
+Now, user1 want to share his folder 'The new folder' with a Group object et another User object.
 
 ```ruby
 # user1 wants to share theFolder with group1 and user2
