@@ -101,6 +101,38 @@ repo_permissions = {can_read: false, can_create: false, can_update:false, can_de
 user1.share(repository, items, repo_permissions, share_permissions)
 ```
 
+### How can I manage a share
+
+You can add and remove instance from a share user these methods
+```ruby
+#@user1 want to add items to his share (the actions are done only if @user1 has the required permission)
+@user1.addItemsToShare(share, items)
+
+# Or her wants to remove items
+@user1.removeItemsToShare(share, items)
+
+
+
+# Directly work with the share
+# WARNING, here there is no control of permissions !
+#Add items
+items = []
+items << user1
+items << group1
+...
+
+share_permissions = {can_add: false, can_remove: false}
+
+share.addItems(items, share_permissions)
+
+#Delete items
+
+share.removeItems(items)
+
+```
+
+
+
 ### How can I create a file/folder
 
 You just have to call the method createFile, or createFolder.
@@ -129,11 +161,16 @@ file.name = File.open('somewhere')
 
 ### Authorisations
 
+#### Repository authorisations
+
 The owner of a repository (file or folder) has all the authorisations on it. The authorisations are :
+- can_read(repository) : You can read (=download) this file/folder.
 - can_create(repository) : You can create a file/folder on the repository (if repository is nil, you can create).
 - can_update(repository) : You can update a file/folder
 - can_delete(repository) : You can delete a repository
 - can_share(repository) : You can share a repository
+
+To check if a user has one of this authorisation, you juste have to write : `user.can_read(repository)`.
 
 This method returns true if you can do the action, else false. All these methods are using get_authorisations method:
 ```ruby
@@ -143,6 +180,16 @@ This method returns true if you can do the action, else false. All these methods
 #Return true if the repository is nil (he as all authorisations on his own rep)
 def get_authorisations(repository=nil)
 ```
+
+#### Share permissions
+
+You can manage the permission of an instance in a share. The owner of the share has all the permissions. The permissions are:
+- can_add_to_share(share) : you can add a new instance in this share.
+- can_remove_to_share(share) : you can remove an instance from this share.
+
+To check if the instance can add or remove an instance in the share, just write : `group.can_add_to_share(share)`.
+
+Like with the repository authorisations, you can get the share authorisations with : `object.get_share_authorisations(share)`. It return true if object has all the authorisations, return an array if it has custum authorisations and false if it has no authorisation.
 
 ## TODO
 
