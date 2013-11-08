@@ -111,12 +111,20 @@ user1.share(repository, items, repo_permissions, share_permissions)
 
 ### How can I manage a share
 
-TODO : Comme dans un repo, on ne peux pas ajouter des permissions qu'on a pas.
 
 You can add and remove instance from a share user these methods
 ```ruby
 #@user1 want to add items to his share (the actions are done only if @user1 has the required permission)
-@user1.addItemsToShare(share, items)
+share_permissions = {can_add: true, can_remove: false}
+#Add items
+items = []
+items << user2
+items << group2
+...
+@user1.addItemsToShare(share, items, share_permissions)
+
+# Here the user2 and group2 can add instance in this share, but they can't remove an instance.
+# If user2 add an item in the share, he can chose if the permission can_add is true or false, but he can't put can_remove to true (because he don't have thise permission himself).
 
 # Or her wants to remove items
 @user1.removeItemsToShare(share, items)
@@ -125,14 +133,6 @@ You can add and remove instance from a share user these methods
 
 # Directly work with the share
 # WARNING, here there is no control of permissions !
-#Add items
-items = []
-items << user1
-items << group1
-...
-
-share_permissions = {can_add: false, can_remove: false}
-
 share.addItems(items, share_permissions)
 
 #Delete items
