@@ -82,14 +82,14 @@ You just have to call the method `createFile`, `createFolder`, or `deleteReposit
 # Create a root folder on the user1 repository (you can have how many roots as you want)
 sourceFolder = createFolder('Root folder')
 
-# We have :
+# user1 own repository :
 #   'Root folder'
 
 # sourceFolder is the directory in wich user1 wants to create the folder 'The new folder'
 name = 'The new folder'
 theFolder = user1.createFolder(name, sourceFolder)
 
-# We have :
+# user1 own repository :
 #   'Root folder'
 #     'The new folder'
 
