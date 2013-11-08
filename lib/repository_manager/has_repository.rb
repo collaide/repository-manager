@@ -1,12 +1,12 @@
 module RepositoryManager
-  module ActsAsRepository
+  module HasRepository
     extend ActiveSupport::Concern
 
     included do
     end
 
     module ClassMethods
-      def acts_as_repository(options = {})
+      def has_repository(options = {})
 
         has_many :shares, :through => :shares_items, dependent: :destroy
         has_many :shares_items, as: :item, dependent: :destroy
@@ -18,7 +18,7 @@ module RepositoryManager
         #self.yaffle_text_field = (options[:yaffle_text_field] || :last_squawk).to_s
         # your code will go here
 
-        include RepositoryManager::ActsAsRepository::LocalInstanceMethods
+        include RepositoryManager::HasRepository::LocalInstanceMethods
       end
     end
 
@@ -225,4 +225,4 @@ module RepositoryManager
   end
 end
 
-ActiveRecord::Base.send :include, RepositoryManager::ActsAsRepository
+ActiveRecord::Base.send :include, RepositoryManager::HasRepository

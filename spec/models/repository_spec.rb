@@ -57,4 +57,16 @@ describe 'Repository' do
     expect(@user1.repositories.count).to eq(2)
   end
 
+  it 'return all the own repositories' do
+    expect(@user1.repositories.count()).to eq(2)
+  end
+
+  it 'return only the own files' do
+    expect(@user1.repositories.files.count()).to eq(1)
+  end
+
+  it 'return only the own folders' do
+    expect(@user1.repositories.folders.count()).to eq(1)
+  end
+
 end

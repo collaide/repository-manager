@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "ActsAsRepository" do
+describe "HasRepository" do
 
   before do
     @user1 = FactoryGirl.create(:user)

@@ -1,4 +1,4 @@
-require 'repository_manager/acts_as_repository'
+require 'repository_manager/has_repository'
 
 module RepositoryManager
   module Models
