@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     repository_manager (0.0.1)
-      rails (~> 4.0.0)
+      rails (> 3.0.0)
 
 GEM
   remote: https://rubygems.org/
