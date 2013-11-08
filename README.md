@@ -127,6 +127,22 @@ file.name = File.open('somewhere')
 @user1.createFile(params[:file], folder)
 ```
 
+### Authorisations
+
+The owner of a repository (file or folder) has all the authorisations on it. The authorisations are :
+- can_create(repository) : You can create a file/folder on the repository (if repository is nil, you can create).
+- can_edit(repository) : You can edit a file/folder
+- can_delete(repository) : You can delete a repository
+- can_share(repository) : You can share a repository
+
+This method returns true if you can do the action, else false. All these methods are user get_authorisations method:
+```ruby
+#Return false if the entity has not the authorisation to share this rep
+#Return true if the entity can share this rep with all the authorisations
+#eturn an Array if the entity can share but with restriction
+#Return true if the repository is nil (he as all authorisations on his own rep)
+def get_authorisations(repository=nil)
+```
 
 ## TODO
 
