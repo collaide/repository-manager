@@ -148,6 +148,7 @@ share = user1.share(theFolder, items, repo_permissions, share_permissions)
 ```
 
 `share_permissions` specifies if the item who receive the share can add or remove items in this share.
+
 `repo_permissions` specifies what kind of permission do you give at this share. If all the params are false (as_default), the share is useless, because the items have no more permissions in the repository selectionned. 
 
 See the chapter Authorisations for more details.
