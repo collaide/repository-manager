@@ -135,7 +135,7 @@ The owner of a repository (file or folder) has all the authorisations on it. The
 - can_delete(repository) : You can delete a repository
 - can_share(repository) : You can share a repository
 
-This method returns true if you can do the action, else false. All these methods are user get_authorisations method:
+This method returns true if you can do the action, else false. All these methods are using get_authorisations method:
 ```ruby
 #Return false if the entity has not the authorisation to share this rep
 #Return true if the entity can share this rep with all the authorisations
