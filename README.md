@@ -33,7 +33,7 @@ $ bundle update
 Run install script:
 
 ```sh
-$ rails g RepositoryManager:install
+$ rails g repository_manager:install
 ```
 
 And don't forget to migrate your database:
