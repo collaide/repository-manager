@@ -1,10 +1,12 @@
-WORK ON PROGRESS, but it work.
+WORK ON PROGRESS, but it works.
 
 Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions). 
 
 # RepositoryManager
 
-This project is based on the need for a repository manager system for [Collaide](https://github.com/facenord-sud/collaide). Instead of creating my core repository manager system heavily
+This project is based on the need for a repository manager system for [Collaide](https://github.com/facenord-sud/collaide). A system for easily create/delete files and folders in a repository. For share these repositories easily with other object with a flexible and complete authorisations management. 
+
+Instead of creating my core repository manager system heavily
 dependent on our development, I'm trying to implement a generic and potent repository gem.
 
 After looking for a good gem to use I noticed the lack of repository gems
@@ -169,6 +171,7 @@ user2.shares_repositories.all
 
 
 If it has the authorisation, an object can add items to a share.
+
 ```ruby
 # user1 want to add items to his share (the actions are done only if user1 has the ':can_add' permission)
 user1.can_add_to_share(share) # => true
@@ -189,12 +192,14 @@ group2.can_remove_to_share(share) # => false
 ```
 
 If it has the authorisation, an object can remove items from a share.
+
 ```ruby
 # user1 want to remove group2 from this share
 user1.removeItemsToShare(share, group2)
 ```
 
 As admin, you can directly work with the share. Be carefull, there is NO authorisation verification !
+
 ```ruby
 # Add an item to the share
 share.addItems(item, share_permissions)
@@ -220,6 +225,7 @@ NOTICE : An object who can share a repository, can't set new permissions that it
 For instance, `user3` has a share of `repository1` with `:can_delete => false` and `:can_share => true`. He can share `repository1` with `user4`, but he can't put `:can_delete => true` in this new share.
 
 You can get all the authorisations with this method: `user1.get_authorisations(repository)`
+
 ```ruby
 # Returns false if the object has no authorisation in this repository
 # Returns true if the object has all the authorisations
