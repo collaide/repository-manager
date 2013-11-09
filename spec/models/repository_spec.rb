@@ -16,13 +16,13 @@ describe 'Repository' do
   it 'can create a folder in it own folder' do
     folder = @user1.createFolder('Folder1', @user1_folder)
 
-    expect(@user1_folder.has_children?).to eq(1)
+    expect(@user1_folder.has_children?).to eq(true)
   end
 
   it 'can\'t create a folder in another folder without permission' do
     folder = @user2.createFolder('Folder1', @user1_folder)
 
-    expect(@user1_folder.has_children?).to eq(nil)
+    expect(@user1_folder.has_children?).to eq(false)
     expect(folder).to eq(false)
   end
 
@@ -30,14 +30,14 @@ describe 'Repository' do
     file = FactoryGirl.build(:app_file)
     theFile = @user1.createFile(file, @user1_folder)
 
-    expect(@user1_folder.has_children?).to eq(1)
+    expect(@user1_folder.has_children?).to eq(true)
     expect(file).to eq(theFile)
   end
 
   it 'can\'t create a repo into a file' do
     file = @user2.createFolder('Folder1', @user1_file)
 
-    expect(@user1_file.has_children?).to eq(nil)
+    expect(@user1_file.has_children?).to eq(false)
     expect(file).to eq(false)
   end
 

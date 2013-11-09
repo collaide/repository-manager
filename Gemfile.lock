@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    repository-manager (0.0.3)
+    repository-manager (0.0.4)
       ancestry
       carrierwave
       enumerize
