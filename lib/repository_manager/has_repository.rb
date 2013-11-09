@@ -195,7 +195,7 @@ module RepositoryManager
       end
 
       # Return true if you can remove an item in this share, false else
-      def can_remove_to_share(share)
+      def can_remove_from_share(share)
         can_do_to_share('remove', share)
       end
 
@@ -213,8 +213,8 @@ module RepositoryManager
 
       # You can here add new items in the share
       # Param item could be an object or an array of object
-      def removeItemsToShare(share, items)
-        if can_remove_to_share(share)
+      def removeItemsFromShare(share, items)
+        if can_remove_from_share(share)
           share.removeItems(items)
         else
           return false

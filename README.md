@@ -195,7 +195,7 @@ If it has the authorisation, an object can remove items from a share.
 
 ```ruby
 # user1 want to remove group2 from this share
-user1.removeItemsToShare(share, group2)
+user1.removeItemsFromShare(share, group2)
 ```
 
 As admin, you can directly work with the share. Be carefull, there is NO authorisation verification !
@@ -244,7 +244,7 @@ You can manage the permissions of an instance in a share. The owner of the share
 - can_add_to_share(share) : The item can add a new instance in this share.
 - can_remove_to_share(share) : Can remove an instance from this share.
 
-To check if the object can add or remove an instance in the share, just write : `group1.can_add_to_share(share)` or `group1.can_remove_to_share(share)` (it returns `true` or `false`).
+To check if the object can add or remove an instance in the share, just write : `group1.can_add_to_share(share)` or `group1.can_remove_from_share(share)` (it returns `true` or `false`).
 
 Like the repository authorisations, you can get the share authorisations with : `group1.get_share_authorisations(share)`.
 
