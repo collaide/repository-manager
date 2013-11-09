@@ -8,19 +8,19 @@ module RepositoryManager
     module ClassMethods
       def has_repository(options = {})
 
-        has_many :shares, through: :shares_items, dependent: :destroy
-        has_many :shares_items, as: :item, dependent: :destroy
-        has_many :shares_owners, as: :owner, class_name: 'Share'
+        has_many :shares, :through => :shares_items, :dependent => :destroy
+        has_many :shares_items, :as => :item, :dependent => :destroy
+        has_many :shares_owners, :as => :owner, :class_name => 'Share'
 
         # The own repositories
-        has_many :repositories, as: :owner #, dependent: :destroy
+        has_many :repositories, :as => :owner #, dependent: :destroy
 
         # The repositories shares
         #if Rails::VERSION::MAJOR == 4
         #  has_many :shares_repositories, -> { where can_read: true }, as: :item, through: :shares_items, class_name: 'Repository'
         #else
           # Rails 3 does it this way
-        has_many :shares_repositories, through: :shares, source: :repository, class_name: 'Repository'
+        has_many :shares_repositories, :through => :shares, :source => :repository, :class_name => 'Repository'
         #end
 
         #scope :all_repositories, -> { self.repositories.shares_repositories }
@@ -72,7 +72,7 @@ module RepositoryManager
         # If he want to create a folder in a directory, we have to check if he have the authorisation
         if can_create(sourceFolder)
 
-          folder = Folder.new(name: name)
+          folder = Folder.new(:name => name)
           folder.owner = self
           folder.save
 
@@ -90,7 +90,7 @@ module RepositoryManager
       # Delete the repository
       def deleteRepository(repository)
         if can_delete(repository)
-          repository.destroy
+          repository.destroy!
         end
       end
 
@@ -139,16 +139,16 @@ module RepositoryManager
           # You can do what ever you want :)
           return true
           # Find if a share of this rep exist for the self instance
-        elsif s = self.shares.where(repository_id: repository.id).take
+        elsif s = self.shares.where(:repository_id => repository.id).take
           # Ok, give an array with the permission of the actual share
           # (we can't share with more permission then we have)
-          return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
+          return {:can_share => s.can_share, :can_read => s.can_read, :can_create => s.can_create, :can_update => s.can_update, :can_delete => s.can_delete}
         else
           # We look at the ancestor if there is a share
           ancestor_ids = repository.ancestor_ids
           # Check the nearest share if it exist
-          if s = self.shares.where(repository_id: ancestor_ids).last
-            return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
+          if s = self.shares.where(:repository_id => ancestor_ids).last
+            return {:can_share => s.can_share, :can_read => s.can_read, :can_create => s.can_create, :can_update => s.can_update, :can_delete => s.can_delete}
           end
         end
         # Else, false
