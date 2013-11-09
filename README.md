@@ -1,3 +1,5 @@
+WORK ON PROGRESS, ACTUALY DON'T WORK.
+
 Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions). 
 
 # RepositoryManager
