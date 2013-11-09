@@ -14,14 +14,8 @@ module RepositoryManager
 
         # The own repositories
         has_many :repositories, as: :owner #, dependent: :destroy
-
-        # The repositories shares
-        #if Rails::VERSION::MAJOR == 4
-        #  has_many :shares_repositories, -> { where can_read: true }, as: :item, through: :shares_items, class_name: 'Repository'
-        #else
-        # Rails 3 does it this way
+        # The share repositories
         has_many :shares_repositories, through: :shares, source: :repository, class_name: 'Repository'
-        #end
 
         #scope :all_repositories, -> { self.repositories.shares_repositories }
 
@@ -33,6 +27,7 @@ module RepositoryManager
     end
 
     module LocalInstanceMethods
+
       # Share the repository with the items, with the repo_permissions
       # repo_permissions contains :
       #   <tt>:can_read</tt> - Item can download the repository
@@ -68,7 +63,7 @@ module RepositoryManager
       # Create a folder with the name (name) in the directory (sourceFolder)
       # Returns the object of the folder created if it is ok
       # Returns false if the folder is not created (no authorisation)
-      def createFolder(name, sourceFolder = nil)
+      def createFolder(name = 'New folder', sourceFolder = nil)
         # If he want to create a folder in a directory, we have to check if he have the authorisation
         if can_create(sourceFolder)
 

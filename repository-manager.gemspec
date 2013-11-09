@@ -11,9 +11,8 @@ Gem::Specification.new do |s|
   s.email       = ['texicitys@gmail.com']
   s.homepage    = 'https://github.com/Texicitys/repository-manager'
   s.summary     = "Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/shares)."
-  s.description = "This project is based on the need for a repository manager system for Collaide. Instead of creating my core repository manager system heavily dependent on our development, I'm trying to implement a generic and potent repository gem.
-                    After looking for a good gem to use I noticed the lack of repository gems and flexibility in them. RepositoryManager tries to be the more flexible possible. Each instance (users, groups, etc..) can have it own repositories (with files and folders). It can manage them easily (edit, remove, add, etc) and share them with other instance.
-                    This gem is my informatics project for the Master in University of Lausanne (CH)."
+  s.description = "This project is based on the need for a repository manager system for Collaide. A system for easily create/delete files and folders in a repository. For share these repositories easily with other object with a flexible and complete authorisations management.
+Each instance (users, groups, etc..) can have it own repositories (with files and folders). It can manage them easily (edit, remove, add, etc) and share them with other instance."
 
   #s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   s.files         = `git ls-files`.split("\n")
