@@ -90,7 +90,7 @@ module RepositoryManager
       # Delete the repository
       def deleteRepository(repository)
         if can_delete(repository)
-          repository.destroy!
+          repository.destroy
         end
       end
 
