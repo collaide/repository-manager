@@ -242,6 +242,15 @@ To check if the object can add or remove an instance in the share, just write : 
 
 Like the repository authorisations, you can get the share authorisations with : `group1.get_share_authorisations(share)`.
 
+## TODO
+
+- Can dowload a file or a folder (auto zip the folder)
+- Snapshot the file if possible
+- Flexible configuration of authorised extensions
+- Versioning
+- ...
+
+
 ## License
 
 This project rocks and uses MIT-LICENSE.
