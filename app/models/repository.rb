@@ -9,8 +9,14 @@ class Repository < ActiveRecord::Base
   has_many :shares, :dependent => :destroy
   #has_many :items, through: :shares
 
-  scope :files, -> { where type: 'AppFile' }
-  scope :folders, -> { where type: 'Folder' }
+  if Rails::VERSION::MAJOR == 4
+    scope :files, -> { where type: 'AppFile' }
+    scope :folders, -> { where type: 'Folder' }
+  else
+    # Rails 3 does it this way
+    scope :files, :where => "type = 'AppFile'"
+    scope :folders, :where => "type = 'Folder'"
+  end
 
   def copy(target_folder)
     #new_file = self.dup
