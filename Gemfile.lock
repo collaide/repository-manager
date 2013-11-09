@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    repository_manager (0.0.1)
+    repository-manager (0.0.1)
       rails (> 3.0.0)
 
 GEM
@@ -114,6 +114,6 @@ DEPENDENCIES
   carrierwave
   enumerize
   factory_girl_rails
-  repository_manager!
+  repository-manager!
   rspec-rails (~> 2.0)
   sqlite3
