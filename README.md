@@ -19,7 +19,7 @@ This gem is my informatics project for the Master in [University of Lausanne (CH
 Add to your Gemfile:
 
 ```ruby
-gem 'RepositoryManager'
+gem 'repository-manager'
 ```
 
 Then run:
