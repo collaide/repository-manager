@@ -14,8 +14,8 @@ class Repository < ActiveRecord::Base
     scope :folders, -> { where type: 'Folder' }
   else
     # Rails 3 does it this way
-    scope :files, :where => "type = 'AppFile'"
-    scope :folders, :where => "type = 'Folder'"
+    scope :files, where(type: 'AppFile')
+    scope :folders, where(type: 'Folder')
   end
 
   def copy(target_folder)

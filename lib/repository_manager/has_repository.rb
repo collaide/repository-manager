@@ -91,6 +91,8 @@ module RepositoryManager
       def deleteRepository(repository)
         if can_delete(repository)
           repository.destroy
+        else
+          return false
         end
       end
 
@@ -139,7 +141,7 @@ module RepositoryManager
           # You can do what ever you want :)
           return true
           # Find if a share of this rep exist for the self instance
-        elsif s = self.shares.where(repository_id: repository.id).take
+        elsif s = self.shares.where(repository_id: repository.id).first
           # Ok, give an array with the permission of the actual share
           # (we can't share with more permission then we have)
           return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
@@ -209,6 +211,8 @@ module RepositoryManager
         if can_add_to_share(share)
           share_permissions = make_share_permissions(share_permissions, authorisations)
           share.addItems(items, share_permissions)
+        else
+          return false
         end
       end
 
@@ -217,6 +221,8 @@ module RepositoryManager
       def removeItemsToShare(share, items)
         if can_remove_to_share(share)
           share.removeItems(items)
+        else
+          return false
         end
       end
 
