@@ -48,10 +48,10 @@ class Share < ActiveRecord::Base
     if items.kind_of?(Array)
       # Add each item to this share
       items.each do |item|
-        self.shares_items.where(item_id: item.id, item_type: item.class.base_class.to_s).take.destroy
+        self.shares_items.where(:item_id => item.id, :item_type => item.class.base_class.to_s).take.destroy
       end
     else
-      self.shares_items.where(item_id: items.id, item_type: items.class.base_class.to_s).take.destroy
+      self.shares_items.where(:item_id => items.id, :item_type => items.class.base_class.to_s).take.destroy
     end
   end
 
