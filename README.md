@@ -1,4 +1,4 @@
-WORK ON PROGRESS, ACTUALY DON'T WORK.
+WORK ON PROGRESS, but it work.
 
 Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions). 
 
