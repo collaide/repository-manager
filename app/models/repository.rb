@@ -1,4 +1,7 @@
 class Repository < ActiveRecord::Base
+  attr_accessible :type if RepositoryManager.protected_attributes?
+
+
   has_ancestry
 
   # Associate with the User Classe

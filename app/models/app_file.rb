@@ -1,4 +1,5 @@
 class AppFile < Repository
+  attr_accessible :name, :content_type, :file_size if RepositoryManager.protected_attributes?
 
   mount_uploader :name, RepositoryUploader
 

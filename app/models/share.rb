@@ -1,4 +1,7 @@
 class Share < ActiveRecord::Base
+  attr_accessible :can_read, :can_create, :can_update, :can_delete, :can_share if RepositoryManager.protected_attributes?
+
+
   has_many :shares_items, dependent: :destroy
   belongs_to :owner, :polymorphic => true
   belongs_to :repository
