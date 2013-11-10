@@ -167,6 +167,23 @@ user1.repositories.all # => You get the repository that user1 has created
 user2.shares_repositories.all
 ```
 
+A repository can be:
+- A file
+- A folder
+
+```ruby
+# We want to know if the object repository is a file or a folder:
+if repository.type == 'Folder'
+  repository.name #=> Returns the name of the folder ('New folder').
+elsif repository.type == 'AppFile'
+  repository.name #=> Returns the name of the file ('file.png').
+  # Here is the file
+  repository.file.url # => '/url/to/file.png'
+  repository.file.current_path # => 'path/to/file.png'
+  repository.file.identifier # => 'file.png'
+```
+
+
 ### How can I manage a share
 
 
