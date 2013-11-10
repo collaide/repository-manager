@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131025085844) do
+ActiveRecord::Schema.define(version: 20131025085845) do
 
   create_table "groups", force: true do |t|
     t.string   "name"
@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(version: 20131025085844) do
     t.string  "type"
     t.float   "file_size"
     t.string  "content_type"
+    t.string  "file"
   end
 
   create_table "shares", force: true do |t|

@@ -1,16 +1,20 @@
 class AppFile < Repository
-  attr_accessible :name, :content_type, :file_size if RepositoryManager.protected_attributes?
+  attr_accessible :file, :content_type, :file_size if RepositoryManager.protected_attributes?
 
-  mount_uploader :name, RepositoryUploader
-
+  validates :file, presence: true
+  mount_uploader :file, RepositoryUploader
   before_save :update_asset_attributes
+
+  def name
+    file.identifier
+  end
 
   private
 
   def update_asset_attributes
-    if name.present? && name_changed?
-      self.content_type = name.file.content_type
-      self.file_size = name.file.size
+    if file.present? && file_changed?
+      self.content_type = file.file.content_type
+      self.file_size = file.file.size
     end
   end
 

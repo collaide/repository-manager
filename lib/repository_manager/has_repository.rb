@@ -100,13 +100,13 @@ module RepositoryManager
         if can_create(sourceFolder)
           if file.class.name == 'File'
             appFile = AppFile.new
-            appFile.name = file
+            appFile.file = file
             appFile.owner = self
-            appFile.save!
+            appFile.save
           elsif file.class.name == 'AppFile'
             appFile = file
             appFile.owner = self
-            appFile.save!
+            appFile.save
           else
             return false
           end
