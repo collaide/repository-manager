@@ -15,9 +15,9 @@ module RepositoryManager
         # The own repositories
         has_many :repositories, as: :owner #, dependent: :destroy
         # The share repositories
-        has_many :shares_repositories, through: :shares, source: :repository, class_name: 'Repository'
+        has_many :shared_repositories, through: :shares, source: :repository, class_name: 'Repository'
 
-        #scope :all_repositories, -> { self.repositories.shares_repositories }
+        #scope :all_repositories, -> { self.repositories.shared_repositories }
 
         #All repositories (own and shares)
         #has_many :all_repositories
