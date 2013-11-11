@@ -70,20 +70,20 @@ describe 'Repository' do
   end
 
   it 'can return only the share repositories' do
-    #expect(@user2.shares_repositories.count).to eq(0)
+    #expect(@user2.shared_repositories.count).to eq(0)
     @user1.share(@user1_file, @user2)
-    expect(@user2.shares_repositories.count).to eq(1)
+    expect(@user2.shared_repositories.count).to eq(1)
   end
 
   it 'can download a file' do
-    #expect(@user2.shares_repositories.count).to eq(0)
+    #expect(@user2.shared_repositories.count).to eq(0)
     @user1_file.download
-    #expect(@user2.shares_repositories.count).to eq(1)
+    #expect(@user2.shared_repositories.count).to eq(1)
   end
 
   it 'user can download a file with permission' do
     @user1.download(@user1_file)
-    #expect(@user2.shares_repositories.count).to eq(1)
+    #expect(@user2.shared_repositories.count).to eq(1)
   end
 
   it 'user can\'t download a file without permission' do
