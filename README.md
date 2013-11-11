@@ -97,7 +97,7 @@ the_folder = user1.create_folder(name, sourceFolder)
 # Note : user1 needs the ':can_create => true' permission in the folder : the_folder.
 user1.create_file(params[:file], the_folder)
 # OR
-#user1.create_file(File.open('somewhere'), the_folder)
+user1.create_file(File.open('somewhere'), the_folder)
 
 # user1 own repository :
 #   'Root folder'
