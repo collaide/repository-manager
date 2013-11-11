@@ -80,7 +80,7 @@ You just have to call the method `createFile`, `createFolder`, or `deleteReposit
 # user1 wants to create a folder in his repository
 
 # Create a root folder on the user1 repository (you can have how many roots as you want)
-sourceFolder = createFolder('Root folder')
+sourceFolder = user1.createFolder('Root folder')
 
 # user1 own repository :
 #   'Root folder'
