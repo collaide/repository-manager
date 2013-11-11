@@ -164,7 +164,7 @@ There is two king of repository:
 user1.repositories.all # => You get the repository that user1 has created
 
 # user2 want to get his shared repository
-user2.shares_repositories.all
+user2.shared_repositories.all
 ```
 
 A repository can be:
