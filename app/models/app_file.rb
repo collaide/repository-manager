@@ -5,8 +5,16 @@ class AppFile < Repository
   mount_uploader :file, RepositoryUploader
   before_save :update_asset_attributes
 
+  # Return the name of the file with his extension
   def name
     file.identifier
+  end
+
+  # Downloading this file
+  def download(object = nil)
+    path = file.path
+    #render status: :bad_request and return unless File.exist?(path)
+    #send_file(path)
   end
 
   private

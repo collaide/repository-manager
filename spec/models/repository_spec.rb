@@ -77,8 +77,28 @@ describe 'Repository' do
 
   it 'can download a file' do
     #expect(@user2.shares_repositories.count).to eq(0)
-    #@user1.download(@user1_file)
+    @user1_file.download
     #expect(@user2.shares_repositories.count).to eq(1)
+  end
+
+  it 'user can download a file with permission' do
+    @user1.download(@user1_file)
+    #expect(@user2.shares_repositories.count).to eq(1)
+  end
+
+  it 'user can\'t download a file without permission' do
+    path = @user2.download(@user1_file)
+    expect(path).to eq(false)
+  end
+
+  it 'download the file if there is just one in a folder (no zip)' do
+    @user1_folder.addRepository(@user1_file)
+    @user1.download(@user1_folder)
+  end
+
+  it 'user can download a folder' do
+    folder = @user1.createFolder('Folder1', @user1_folder)
+
   end
 
 end

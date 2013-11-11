@@ -6,6 +6,7 @@ PATH
       carrierwave
       enumerize
       rails (> 3.0.0)
+      rubyzip
 
 GEM
   remote: https://rubygems.org/
@@ -90,6 +91,7 @@ GEM
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
+    rubyzip (0.9.9)
     sprockets (2.10.0)
       hike (~> 1.2)
       multi_json (~> 1.0)

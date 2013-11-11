@@ -152,6 +152,18 @@ module RepositoryManager
         return false
       end
 
+      # Download a repository if the object can_read it
+      # If it is a file, he download the file
+      # If it is a folder, we check witch repository is in it, and witch he can_read
+      # We zip all the content that the object has access.
+      def download(repository)
+        if can_download(repository)
+          repository.download(self)
+        else
+          false
+        end
+      end
+
       #Return the authorisations of the share (can_add, can_remove)
       def get_share_authorisations(share)
         share.get_authorisations(self)
