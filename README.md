@@ -74,37 +74,37 @@ end
 
 ### How can I create/delete a repository (file or folder)
 
-You just have to call the method `createFile`, `createFolder`, or `deleteRepository`.
+You just have to call the method `create_file`, `create_folder`, or `delete_repository`.
 
 ```ruby
 # user1 wants to create a folder in his repository
 
 # Create a root folder on the user1 repository (you can have how many roots as you want)
-sourceFolder = createFolder('Root folder')
+source_folder = user1.create_folder('Root folder')
 
 # user1 own repository :
 #   'Root folder'
 
 # sourceFolder is the directory in wich user1 wants to create the folder 'The new folder'
 name = 'The new folder'
-theFolder = user1.createFolder(name, sourceFolder)
+the_folder = user1.create_folder(name, sourceFolder)
 
 # user1 own repository :
 #   'Root folder'
 #     'The new folder'
 
 # Now we want to add a file into theFolder 
-# Note : user1 needs the ':can_create => true' permission in the folder : theFolder
-user1.createFile(params[:file], theFolder)
+# Note : user1 needs the ':can_create => true' permission in the folder : the_folder.
+user1.create_file(params[:file], the_folder)
 # OR
-#user1.createFile(File.open('somewhere'), theFolder)
+#user1.create_file(File.open('somewhere'), the_folder)
 
 # user1 own repository :
 #   'Root folder'
 #     'The new folder'
 #        'file'
 
-file2 = user1.createFile(params[:file2])
+file2 = user1.create_file(params[:file2])
 
 # user1 own repository :
 #   'Root folder'
@@ -113,14 +113,14 @@ file2 = user1.createFile(params[:file2])
 #   'file2'
 
 # Delete a repository
-# Note : user1 needs the ':can_delete => true' permission in the folder : theFolder
-user1.deleteRepository(theFolder)
+# Note : user1 needs the ':can_delete => true' permission in the folder : the_folder
+user1.delete_repository(the_folder)
 
 # user1 own repository :
 #   'Root folder'
 #   'file2'
 
-user1.deleteRepository(file2)
+user1.delete_repository(file2)
 
 # user1 own repository :
 #   'Root folder'
@@ -132,7 +132,7 @@ user1.deleteRepository(file2)
 Now, user1 want to share his folder 'The new folder' with a Group object et another User object.
 
 ```ruby
-# user1 wants to share theFolder with group1 and user2
+# user1 wants to share the_folder with group1 and user2
 
 items = []
 # You can add other instance (who has_repository) in this array to share with more than one instance
@@ -144,7 +144,7 @@ share_permissions = {can_add: true, can_remove: true}
 # Default reposiroty permissions are: {can_read: false, can_create: false, can_update:false, can_delete:false, can_share: false}
 repo_permissions = {can_read: true, can_create: true, can_update:true, can_delete:true, can_share: true}
 
-share = user1.share(theFolder, items, repo_permissions, share_permissions)
+share = user1.share(the_folder, items, repo_permissions, share_permissions)
 ```
 
 `share_permissions` specifies if the item who receive the share can add or remove items in this share.
@@ -200,11 +200,11 @@ items = []
 items << user3
 items << group2
 ...
-@user1.addItemsToShare(share, items, share_permissions)
+@user1.add_items_to(share, items, share_permissions)
 
 # Here user3 and group2 can add items in this share, but they can't remove an item.
-group2.can_add_to_share(share) # => true
-group2.can_remove_to_share(share) # => false
+group2.can_add_to?(share) # => true
+group2.can_remove_from?(share) # => false
 
 # If user2 add an item in the share, he can choose if the permission ':can_add' is true or false, but he can't put ':can_remove' to true (because he don't have this permission himself).
 ```
@@ -213,17 +213,17 @@ If it has the authorisation, an object can remove items from a share.
 
 ```ruby
 # user1 want to remove group2 from this share
-user1.removeItemsFromShare(share, group2)
+user1.remove_items_from(share, group2)
 ```
 
 As admin, you can directly work with the share. Be carefull, there is NO authorisation verification !
 
 ```ruby
 # Add an item to the share
-share.addItems(item, share_permissions)
+share.add_items(item, share_permissions)
 
 # Delete items from the share
-share.removeItems(items)
+share.remove_items(items)
 ```
 
 ### Authorisations
@@ -231,13 +231,13 @@ share.removeItems(items)
 #### Repository authorisations
 
 The owner of a repository (file or folder) has all the authorisations on it. When he share this repository, he can choose what authorisation he gives to the share. The authorisations are :
-- can_read(repository) : The item can read (=download) this file/folder.
-- can_create(repository) : Can create in the repository (if repository is nil (= root), always true).
-- can_update(repository) : Can update a repository.
-- can_delete(repository) : Can delete a repository.
-- can_share(repository) : Can share a repository.
+- can_read?(repository) : The item can read (=download) this file/folder.
+- can_create?(repository) : Can create in the repository (if repository is nil (= root), always true).
+- can_update?(repository) : Can update a repository.
+- can_delete?(repository) : Can delete a repository.
+- can_share?(repository) : Can share a repository.
 
-To check if a user has one of this authorisation, you just have to write : `user1.can_read(repository)`, `user1.can_share(repository)`, etc (it returns `true` or `false`).
+To check if a user has one of this authorisation, you just have to write : `user1.can_read?(repository)`, `user1.can_share?(repository)`, etc (it returns `true` or `false`).
 
 NOTICE : An object who can share a repository, can't set new permissions that it doesn't have. 
 For instance, `user3` has a share of `repository1` with `:can_delete => false` and `:can_share => true`. He can share `repository1` with `user4`, but he can't put `:can_delete => true` in this new share.
@@ -259,10 +259,10 @@ end
 #### Share permissions
 
 You can manage the permissions of an instance in a share. The owner of the share has all the permissions. The permissions are:
-- can_add_to_share(share) : The item can add a new instance in this share.
-- can_remove_to_share(share) : Can remove an instance from this share.
+- can_add_to?(share) : The item can add a new instance in this share.
+- can_remove_from(share) : Can remove an instance from this share.
 
-To check if the object can add or remove an instance in the share, just write : `group1.can_add_to_share(share)` or `group1.can_remove_from_share(share)` (it returns `true` or `false`).
+To check if the object can add or remove an instance in the share, just write : `group1.can_add_to?(share)` or `group1.can_remove_from?(share)` (it returns `true` or `false`).
 
 Like the repository authorisations, you can get the share authorisations with : `group1.get_share_authorisations(share)`.
 
