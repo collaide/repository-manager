@@ -44,7 +44,7 @@ class Folder < Repository
         end
       end
     elsif children_to_add.length == 1
-      pp children_to_add.first.file.path
+      children_to_add.first.file.path
     else
       # Nothing to download here
       false
