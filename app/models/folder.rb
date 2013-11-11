@@ -4,7 +4,7 @@ class Folder < Repository
   validates :name, presence: true
 
   # Add a repository in the folder.
-  def addRepository(repository)
+  def add_repository(repository)
     repository.update_attribute :parent, self
   end
 
@@ -24,7 +24,7 @@ class Folder < Repository
         # For all repositories, we check if the object has the permission to read it
         children.each do |child|
           # If he can read it, add to the array
-          children_to_add << child if object.can_read(child)
+          children_to_add << child if object.can_read?(child)
         end
       else
         # Simply add all

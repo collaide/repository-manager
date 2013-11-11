@@ -26,25 +26,25 @@ class Share < ActiveRecord::Base
   end
 
   # Add items to the share
-  def addItems(items, share_permissions=nil)
+  def add_items(items, share_permissions = nil)
     if items.kind_of?(Array)
       # Add each item to this share
       items.each do |i|
-        shareItem = SharesItem.new(share_permissions)
-        shareItem.item = i
+        share_item = SharesItem.new(share_permissions)
+        share_item.item = i
         # Add the shares items in the share
-        self.shares_items << shareItem
+        self.shares_items << share_item
       end
     else
-      shareItem = SharesItem.new(share_permissions)
-      shareItem.item = items
+      share_item = SharesItem.new(share_permissions)
+      share_item.item = items
       # Add the shares items in the share
-      self.shares_items << shareItem
+      self.shares_items << share_item
     end
   end
 
   # Remove items to the share
-  def removeItems(items)
+  def remove_items(items)
     if items.kind_of?(Array)
       # Add each item to this share
       items.each do |item|

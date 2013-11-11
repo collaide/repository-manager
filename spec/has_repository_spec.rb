@@ -14,7 +14,7 @@ describe "HasRepository" do
 
   it "should be associate with shares" do
     share = Share.create
-    @user1.shares<<share
+    @user1.shares << share
     expect(@user1.shares.last).to eq(share)
   end
 
@@ -197,14 +197,14 @@ describe "HasRepository" do
   it 'can share a repository with ancestor share permissions' do
     parent = FactoryGirl.create(:folder)
     parent.owner = @user3
-    middle = @user3.createFolder('Middle', parent)
-    children = @user3.createFolder('Children', middle)
+    middle = @user3.create_folder('Middle', parent)
+    children = @user3.create_folder('Children', middle)
 
     file = FactoryGirl.build(:app_file)
     file.owner = @user3
     file.save
 
-    children.addRepository(file)
+    children.add_repository(file)
 
     repo_permissions = {can_read: true, can_update: true, can_share: false}
     @user3.share(parent, @user1, repo_permissions)
@@ -219,14 +219,14 @@ describe "HasRepository" do
   end
 
   it "can create a folder" do
-    folder = @user1.createFolder('test folder')
+    folder = @user1.create_folder('test folder')
     #folder = @user1.repositories.last
     expect(folder.name).to eq('test folder')
     expect(folder.type).to eq('Folder')
   end
 
   it "can create a file" do
-    file = @user1.createFile(File.open("#{Rails.root}/../fixture/textfile.txt"))
+    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
     expect(file.name).to eq('textfile.txt')
     expect(@user1.repositories.count).to eq(1)
   end

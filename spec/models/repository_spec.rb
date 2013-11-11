@@ -14,13 +14,13 @@ describe 'Repository' do
   end
 
   it 'can create a folder in it own folder' do
-    folder = @user1.createFolder('Folder1', @user1_folder)
+    folder = @user1.create_folder('Folder1', @user1_folder)
 
     expect(@user1_folder.has_children?).to eq(true)
   end
 
   it 'can\'t create a folder in another folder without permission' do
-    folder = @user2.createFolder('Folder1', @user1_folder)
+    folder = @user2.create_folder('Folder1', @user1_folder)
 
     expect(@user1_folder.has_children?).to eq(false)
     expect(folder).to eq(false)
@@ -28,32 +28,32 @@ describe 'Repository' do
 
   it 'can create a file into a folder' do
     file = FactoryGirl.build(:app_file)
-    theFile = @user1.createFile(file, @user1_folder)
+    theFile = @user1.create_file(file, @user1_folder)
 
     expect(@user1_folder.has_children?).to eq(true)
     expect(file).to eq(theFile)
   end
 
   it 'can\'t create a repo into a file' do
-    file = @user2.createFolder('Folder1', @user1_file)
+    file = @user2.create_folder('Folder1', @user1_file)
 
     expect(@user1_file.has_children?).to eq(false)
     expect(file).to eq(false)
   end
 
   it 'can delete a file' do
-    @user1.deleteRepository(@user1_file)
+    @user1.delete_repository(@user1_file)
     expect(@user1.repositories.count).to eq(1)
   end
 
   it 'can delete a folder an his files' do
-    @user1_folder.addRepository(@user1_file)
-    @user1.deleteRepository(@user1_folder)
+    @user1_folder.add_repository(@user1_file)
+    @user1.delete_repository(@user1_folder)
     expect(@user1.repositories.count).to eq(0)
   end
 
   it 'can\'t delete a repository without permission' do
-    @user2.deleteRepository(@user1_file)
+    @user2.delete_repository(@user1_file)
     expect(@user1.repositories.count).to eq(2)
   end
 
@@ -92,12 +92,12 @@ describe 'Repository' do
   end
 
   it 'download the file if there is just one in a folder (no zip)' do
-    @user1_folder.addRepository(@user1_file)
+    @user1_folder.add_repository(@user1_file)
     @user1.download(@user1_folder)
   end
 
   it 'user can download a folder' do
-    folder = @user1.createFolder('Folder1', @user1_folder)
+    folder = @user1.create_folder('Folder1', @user1_folder)
 
   end
 

@@ -42,14 +42,14 @@ module RepositoryManager
         authorisations = get_authorisations(repository)
 
         # Here we look if the instance has the authorisation for making a share
-        if can_share(nil, authorisations)
+        if can_share?(nil, authorisations)
 
           repo_permissions = make_repo_permissions(repo_permissions, authorisations)
 
           share = Share.new(repo_permissions)
           share.owner = self
 
-          share.addItems(items, share_permissions)
+          share.add_items(items, share_permissions)
 
           repository.shares << share
           repository.save!
@@ -60,20 +60,20 @@ module RepositoryManager
         end
       end
 
-      # Create a folder with the name (name) in the directory (sourceFolder)
+      # Create a folder with the name (name) in the directory (source_folder)
       # Returns the object of the folder created if it is ok
       # Returns false if the folder is not created (no authorisation)
-      def createFolder(name = 'New folder', sourceFolder = nil)
+      def create_folder(name = 'New folder', source_folder = nil)
         # If he want to create a folder in a directory, we have to check if he have the authorisation
-        if can_create(sourceFolder)
+        if can_create?(source_folder)
 
           folder = Folder.new(name: name)
           folder.owner = self
           folder.save
 
           # If we want to create a folder in a folder, we have to check if we have the authorisation
-          if sourceFolder
-            sourceFolder.addRepository(folder)
+          if source_folder
+            source_folder.add_repository(folder)
           end
 
           return folder
@@ -83,40 +83,40 @@ module RepositoryManager
       end
 
       # Delete the repository
-      def deleteRepository(repository)
-        if can_delete(repository)
+      def delete_repository(repository)
+        if can_delete?(repository)
           repository.destroy
         else
           return false
         end
       end
 
-      # Create the file (file) in the directory (sourceFolder)
+      # Create the file (file) in the directory (source_folder)
       # Param file can be a File, or a instance of AppFile
       # Return the object of the file created if it is ok
       # Return false if the file is not created (no authorisation)
-      def createFile(file, sourceFolder = nil)
+      def create_file(file, source_folder = nil)
         # If he want to create a file in a directory, we have to check if he have the authorisation
-        if can_create(sourceFolder)
+        if can_create?(source_folder)
           if file.class.name == 'File'
-            appFile = AppFile.new
-            appFile.file = file
-            appFile.owner = self
-            appFile.save
+            app_file = AppFile.new
+            app_file.file = file
+            app_file.owner = self
+            app_file.save
           elsif file.class.name == 'AppFile'
-            appFile = file
-            appFile.owner = self
-            appFile.save
+            app_file = file
+            app_file.owner = self
+            app_file.save
           else
             return false
           end
 
-          # Add the file into the sourceFolder
-          if sourceFolder
-            sourceFolder.addRepository(file)
+          # Add the file into the source_folder
+          if source_folder
+            source_folder.add_repository(file)
           end
 
-          return appFile
+          return app_file
         else
           return false
         end
@@ -129,7 +129,7 @@ module RepositoryManager
       # Return true if the repository is nil (he as all authorisations on his own rep)
       def get_authorisations(repository=nil)
         # If repository is nil, he can do what he want
-        return true if repository==nil
+        return true if repository == nil
 
         # If the item is the owner, he can do what he want !
         if repository.owner == self
@@ -157,7 +157,7 @@ module RepositoryManager
       # If it is a folder, we check witch repository is in it, and witch he can_read
       # We zip all the content that the object has access.
       def download(repository)
-        if can_download(repository)
+        if can_download?(repository)
           repository.download(self)
         else
           false
@@ -171,53 +171,53 @@ module RepositoryManager
 
       # Return true if you can share the repo, else false
       # You can give the authorisations or the repository as params
-      def can_share(repository, authorisations = nil)
-        can_do('share', repository, authorisations)
+      def can_share?(repository, authorisations = nil)
+        can_do?('share', repository, authorisations)
       end
 
       # Return true if you can read the repo, else false
-      def can_read(repository, authorisations = nil)
-        can_do('read', repository, authorisations)
+      def can_read?(repository, authorisations = nil)
+        can_do?('read', repository, authorisations)
       end
 
       # Return true if you can download the repo, else false
       # Read = Download for the moment
-      def can_download(repository, authorisations = nil)
-        can_do('read', repository, authorisations)
+      def can_download?(repository, authorisations = nil)
+        can_do?('read', repository, authorisations)
       end
 
       # Return true if you can create in the repo, false else
-      def can_create(repository, authorisations = nil)
-        can_do('create', repository, authorisations)
+      def can_create?(repository, authorisations = nil)
+        can_do?('create', repository, authorisations)
       end
 
       # Return true if you can edit the repo, false else
-      def can_update(repository, authorisations = nil)
-        can_do('update', repository, authorisations)
+      def can_update?(repository, authorisations = nil)
+        can_do?('update', repository, authorisations)
       end
 
       # Return true if you can delete the repo, false else
-      def can_delete(repository, authorisations = nil)
-        can_do('delete', repository, authorisations)
+      def can_delete?(repository, authorisations = nil)
+        can_do?('delete', repository, authorisations)
       end
 
       # Return true if you can add an item in this share, false else
-      def can_add_to_share(share)
-        can_do_to_share('add', share)
+      def can_add_to?(share)
+        can_do_to?('add', share)
       end
 
       # Return true if you can remove an item in this share, false else
-      def can_remove_from_share(share)
-        can_do_to_share('remove', share)
+      def can_remove_from?(share)
+        can_do_to?('remove', share)
       end
 
       # You can here add new items in the share
       # Param item could be an object or an array of object
-      def addItemsToShare(share, items, share_permissions = nil)
+      def add_items_to(share, items, share_permissions = nil)
         authorisations = get_share_authorisations(share)
-        if can_add_to_share(share)
+        if can_add_to?(share)
           share_permissions = make_share_permissions(share_permissions, authorisations)
-          share.addItems(items, share_permissions)
+          share.add_items(items, share_permissions)
         else
           return false
         end
@@ -225,9 +225,9 @@ module RepositoryManager
 
       # You can here add new items in the share
       # Param item could be an object or an array of object
-      def removeItemsFromShare(share, items)
-        if can_remove_from_share(share)
-          share.removeItems(items)
+      def remove_items_from(share, items)
+        if can_remove_from?(share)
+          share.remove_items(items)
         else
           return false
         end
@@ -236,8 +236,8 @@ module RepositoryManager
       private
 
       # Return if you can do or not this action in the share
-      def can_do_to_share(what, share, authorisations = nil)
-        if authorisations === nil
+      def can_do_to?(what, share, authorisations = nil)
+        if authorisations == nil
           authorisations = share.get_authorisations(self)
         end
         case what
@@ -249,7 +249,7 @@ module RepositoryManager
       end
 
       # Return if you can do or not this action (what)
-      def can_do(what, repository, authorisations = nil)
+      def can_do?(what, repository, authorisations = nil)
         #If we pass no authorisations we have to get it
         if authorisations === nil
           authorisations = get_authorisations(repository)
