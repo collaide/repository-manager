@@ -93,7 +93,7 @@ the_folder = user1.create_folder(name, sourceFolder)
 #   'Root folder'
 #     'The new folder'
 
-# Now we want to add a file into theFolder 
+# Now we want to add a file into the_folder 
 # Note : user1 needs the ':can_create => true' permission in the folder : the_folder.
 user1.create_file(params[:file], the_folder)
 # OR
@@ -192,7 +192,7 @@ If it has the authorisation, an object can add items to a share.
 
 ```ruby
 # user1 want to add items to his share (the actions are done only if user1 has the ':can_add' permission)
-user1.can_add_to_share(share) # => true
+user1.can_add_to?(share) # => true
 
 share_permissions = {can_add: true, can_remove: false}
 # Add items
