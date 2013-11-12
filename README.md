@@ -154,7 +154,7 @@ share = user1.share(the_folder, items, options)
 
 `repo_permissions` specifies what kind of permission do you give at this share. If all the params are false, the share is useless, because the items have no more permissions in the repository selectionned. 
 
-See the chapter Authorisations for more details.
+See the chapter [Authorisations](#authorisations) for more details.
 
 ### How can I see my repository
 
