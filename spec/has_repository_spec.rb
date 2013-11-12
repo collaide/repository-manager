@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "HasRepository" do
+describe 'HasRepository' do
 
   before do
     @user1 = FactoryGirl.create(:user)
@@ -99,10 +99,10 @@ describe "HasRepository" do
     items << @user2
 
     #Here user3 let user2 share this repo too
-    repo_permissions = {can_share: true}
+    options = {repo_permissions: {can_share: true}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, items, repo_permissions)
+    @user3.share(rep, items, options)
     # here user2 should can share because he has the authorisation
     items = []
     items << @user1
@@ -121,10 +121,10 @@ describe "HasRepository" do
     items << @user2
 
     #Here user3 let user2 share this repo too
-    repo_permissions = {can_read: true, can_share: true}
+    options = {repo_permissions: {can_read: true, can_share: true}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, items, repo_permissions)
+    @user3.share(rep, items, options)
     # here user2 should can share because he has the authorisation
     # But he has only the authorisation of read (can_read = true), He can't share with more permissions
     items = []
@@ -134,9 +134,9 @@ describe "HasRepository" do
 
     share_of_user_1 = @user1.shares.last
 
-    expect(share_of_user_1.can_read).to eq(false)
-    expect(share_of_user_1.can_update).to eq(false)
-    expect(share_of_user_1.can_share).to eq(false)
+    expect(share_of_user_1.can_read?).to eq(false)
+    expect(share_of_user_1.can_update?).to eq(false)
+    expect(share_of_user_1.can_share?).to eq(false)
     #expect(@user1.shares.count).to eq(1)
     #expect(@user2.shares_owners.count).to eq(1)
   end
@@ -150,25 +150,25 @@ describe "HasRepository" do
     items << @user2
 
     #Here user3 let user2 share this repo too
-    repo_permissions = {can_read: true, can_share: true}
+    options = {repo_permissions: {can_read: true, can_share: true}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, items, repo_permissions)
+    @user3.share(rep, items, options)
     # here user2 should can share because he has the authorisation
     # But he has only the authorisation of read (can_read = true), He can't share with more permissions
     items = []
     items << @user1
 
-    repo_permissions = {can_read: true, can_update: true, can_share: true}
+    options = {repo_permissions: {can_read: true, can_update: true, can_share: true}}
 
     #Here the permissions should be : :can_read => true, :can_share => true and all others false
-    @user2.share(rep, items, repo_permissions)
+    @user2.share(rep, items, options)
 
     share_of_user_1 = @user1.shares.last
 
-    expect(share_of_user_1.can_read).to eq(true)
-    expect(share_of_user_1.can_update).to eq(false)
-    expect(share_of_user_1.can_share).to eq(true)
+    expect(share_of_user_1.can_read?).to eq(true)
+    expect(share_of_user_1.can_update?).to eq(false)
+    expect(share_of_user_1.can_share?).to eq(true)
     #expect(@user1.shares.count).to eq(1)
     #expect(@user2.shares_owners.count).to eq(1)
   end
@@ -181,15 +181,15 @@ describe "HasRepository" do
     items = []
     items << @user2
 
-    share_permissions = {can_add: true, can_remove: false}
+    options = {share_permissions: {can_add: true, can_remove: false}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, items, nil, share_permissions)
+    @user3.share(rep, items, options)
 
     share_item_of_user_2 = @user2.shares_items.last
 
-    expect(share_item_of_user_2.can_add).to eq(true)
-    expect(share_item_of_user_2.can_remove).to eq(false)
+    expect(share_item_of_user_2.can_add?).to eq(true)
+    expect(share_item_of_user_2.can_remove?).to eq(false)
     #expect(@user1.shares.count).to eq(1)
     #expect(@user2.shares_owners.count).to eq(1)
   end
@@ -206,11 +206,11 @@ describe "HasRepository" do
 
     children.add_repository(file)
 
-    repo_permissions = {can_read: true, can_update: true, can_share: false}
-    @user3.share(parent, @user1, repo_permissions)
+    options = {repo_permissions: {can_read: true, can_update: true, can_share: false}}
+    @user3.share(parent, @user1, options)
 
-    repo_permissions = {can_read: true, can_update: true, can_share: true}
-    @user3.share(children, @user1, repo_permissions)
+    options = {repo_permissions: {can_read: true, can_update: true, can_share: true}}
+    @user3.share(children, @user1, options)
 
     @user1.share(middle, @user2)
     expect(@user2.shares.count).to eq(0)

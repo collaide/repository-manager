@@ -13,6 +13,10 @@ module RepositoryManager #:nodoc:
       @prev_migration_nr.to_s
     end
 
+    def create_initializer_file
+      template 'initializer.rb', 'config/initializers/repository_manager.rb'
+    end
+
     # all public methods in here will be run in order
     #def copy_initializer_file
     #  copy_file "initializer.rb", "config/initializers/repository_manager_initializer.rb"
@@ -20,7 +24,8 @@ module RepositoryManager #:nodoc:
 
     def copy_migrations
       migrations = [["20131018214212_create_repository_manager.rb","create_repository_manager.rb"],
-                    ["20131025085844_add_file_to_repositories.rb","add_file_to_repositories.rb"]
+                    ["20131025085844_add_file_to_repositories.rb","add_file_to_repositories.rb"],
+                    ["20131025085845_add_file_to_files", "add_file_to_files.rb"]
                     ]
       migrations.each do |migration|
         migration_template "../../../../db/migrate/" + migration[0], "db/migrate/" + migration[1]

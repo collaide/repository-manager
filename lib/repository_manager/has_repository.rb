@@ -28,21 +28,31 @@ module RepositoryManager
 
     module LocalInstanceMethods
 
-      # Share the repository with the items, with the repo_permissions
-      # repo_permissions contains :
+      # Share the repository with the items, with the options
+      # options[:repo_permissions] contains :
       #   <tt>:can_read</tt> - Item can download the repository
       #   <tt>:can_create</tt> - Item can create a new repository on it
       #   <tt>:can_edit</tt> - Item can edit the repository
       #   <tt>:can_delete</tt> - Item can delete the repository
       #   <tt>:can_share</tt> - Item can share the repository
-      # share_permissions contains :
+      # options[:share_permissions] contains :
       #   <tt>:can_add</tt> - Specify if the item can add objects to the share
       #   <tt>:can_remove</tt> - Specify if the item can remove object to the share
-      def share(repository, items, repo_permissions = nil, share_permissions = nil)
+      def share(repository, items, options = nil)
         authorisations = get_authorisations(repository)
 
         # Here we look if the instance has the authorisation for making a share
         if can_share?(nil, authorisations)
+
+          # We put the default options
+          repo_permissions = RepositoryManager.default_repo_permissions
+          share_permissions = RepositoryManager.default_share_permissions
+
+          # If there is options, we have to take it
+          if options
+            repo_permissions = options[:repo_permissions] if options[:repo_permissions]
+            share_permissions = options[:share_permissions] if options[:share_permissions]
+          end
 
           repo_permissions = make_repo_permissions(repo_permissions, authorisations)
 
@@ -52,7 +62,7 @@ module RepositoryManager
           share.add_items(items, share_permissions)
 
           repository.shares << share
-          repository.save!
+          repository.save
           share
         else
           # No permission => No share
@@ -127,7 +137,7 @@ module RepositoryManager
       # Return true if the entity can share this rep with all the authorisations
       # Return an Array if the entity can share but with restriction
       # Return true if the repository is nil (he as all authorisations on his own rep)
-      def get_authorisations(repository=nil)
+      def get_authorisations(repository = nil)
         # If repository is nil, he can do what he want
         return true if repository == nil
 
