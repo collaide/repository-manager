@@ -1,4 +1,4 @@
-WORK ON PROGRESS, but it works.
+WORK IN PROGRESS, but it already works !
 
 Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions). 
 
@@ -97,7 +97,7 @@ the_folder = user1.create_folder(name, sourceFolder)
 # Note : user1 needs the ':can_create => true' permission in the folder : the_folder.
 user1.create_file(params[:file], the_folder)
 # OR
-#user1.create_file(File.open('somewhere'), the_folder)
+user1.create_file(File.open('somewhere'), the_folder)
 
 # user1 own repository :
 #   'Root folder'
@@ -260,7 +260,7 @@ end
 
 You can manage the permissions of an instance in a share. The owner of the share has all the permissions. The permissions are:
 - can_add_to?(share) : The item can add a new instance in this share.
-- can_remove_from(share) : Can remove an instance from this share.
+- can_remove_from?(share) : Can remove an instance from this share.
 
 To check if the object can add or remove an instance in the share, just write : `group1.can_add_to?(share)` or `group1.can_remove_from?(share)` (it returns `true` or `false`).
 
