@@ -87,7 +87,7 @@ source_folder = user1.create_folder('Root folder')
 
 # sourceFolder is the directory in wich user1 wants to create the folder 'The new folder'
 name = 'The new folder'
-the_folder = user1.create_folder(name, sourceFolder)
+the_folder = user1.create_folder(name, source_folder)
 
 # user1 own repository :
 #   'Root folder'
