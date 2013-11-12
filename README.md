@@ -201,13 +201,13 @@ If it has the authorisation, an object can add items to a share.
 # user1 want to add items to his share (the actions are done only if user1 has the ':can_add' permission)
 user1.can_add_to?(share) # => true
 
-share_permissions = {can_add: true, can_remove: false}
+options = {can_add: true, can_remove: false}
 # Add items
 items = []
 items << user3
 items << group2
 ...
-user1.add_items_to(share, items, share_permissions)
+user1.add_items_to(share, items, options)
 
 # Here user3 and group2 can add items in this share, but they can't remove an item.
 group2.can_add_to?(share) # => true
