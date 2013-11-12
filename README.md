@@ -142,7 +142,6 @@ items << user2
 share = user1.share(the_folder, items)
 
 # If you want to customize your share options, you can do it like this:
-
 share_permissions = {can_add: true, can_remove: true}
 repo_permissions = {can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true}
 
