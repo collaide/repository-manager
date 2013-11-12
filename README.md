@@ -57,7 +57,13 @@ RepositoryManager.setup do |config|
 end
 ```
 
-For instance, if you want that the default share is totaly free, just put all paramettres to true :
+For instance, if you want that a default share is totaly free, just put all default parameters to `true` :
+```ruby
+RepositoryManager.setup do |config|
+  config.default_repo_permissions = { can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true }
+  config.default_share_permissions = { can_add: true, can_remove: true }
+end
+```
 
 
 See the chapter [Authorisations](#authorisations) for more details about the permissions.
