@@ -42,6 +42,26 @@ And don't forget to migrate your database:
 $ rake db:migrate
 ```
 
+## Settings
+
+You can edit the RepositoryManager settings in the initializer (/config/initializer/repository_manager.rb).
+
+```ruby
+RepositoryManager.setup do |config|
+
+  # Default repository permissions that an object has on the repository after a share.
+  config.default_repo_permissions = { can_read: true, can_create: false, can_update:false, can_delete:false, can_share: false }
+
+  # Default share permissions thant an object has when he is added in a share.
+  config.default_share_permissions = { can_add: false, can_remove: false }
+end
+```
+
+For instance, if you want that the default share is totaly free, just put all paramettres to true :
+
+
+See the chapter [Authorisations](#authorisations) for more details about the permissions.
+
 ## Preparing your models
 
 You can choose wich model can have repository. 
