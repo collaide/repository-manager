@@ -87,7 +87,7 @@ source_folder = user1.create_folder('Root folder')
 
 # sourceFolder is the directory in wich user1 wants to create the folder 'The new folder'
 name = 'The new folder'
-the_folder = user1.create_folder(name, sourceFolder)
+the_folder = user1.create_folder(name, source_folder)
 
 # user1 own repository :
 #   'Root folder'
@@ -200,7 +200,7 @@ items = []
 items << user3
 items << group2
 ...
-@user1.add_items_to(share, items, share_permissions)
+user1.add_items_to(share, items, share_permissions)
 
 # Here user3 and group2 can add items in this share, but they can't remove an item.
 group2.can_add_to?(share) # => true
