@@ -74,7 +74,7 @@ end
 
 ### How can I create/delete a repository (file or folder)
 
-You just have to call the method `create_file`, `create_folder`, or `delete_repository`.
+You just have to call the `has_repository` methods `create_file`, `create_folder`, or `delete_repository`.
 
 ```ruby
 # user1 wants to create a folder in his repository
@@ -129,7 +129,7 @@ user1.delete_repository(file2)
 
 ### How can I share a repository (file/folder)
 
-Now, user1 want to share his folder 'The new folder' with a Group object et another User object.
+Now, user1 want to share his folder 'The new folder' with a Group object et another User object. You can use the `has_repository` method `share(repository, to, options = nil)`.
 
 ```ruby
 # user1 wants to share the_folder with group1 and user2
@@ -139,17 +139,24 @@ items = []
 item << group1
 items << user2
 
+share = user1.share(the_folder, items)
+
+
+# If you want to customize your share options, you can do it like this:
+
 # Default shares permisions are : {can_add: false, can_remove: false} 
 share_permissions = {can_add: true, can_remove: true}
-# Default reposiroty permissions are: {can_read: false, can_create: false, can_update:false, can_delete:false, can_share: false}
-repo_permissions = {can_read: true, can_create: true, can_update:true, can_delete:true, can_share: true}
+# Default reposiroty permissions are: {can_read: true, can_create: false, can_update: false, can_delete: false, can_share: false}
+repo_permissions = {can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true}
 
-share = user1.share(the_folder, items, repo_permissions, share_permissions)
+options = {share_permissions: share_permissions, repo_permissions: repo_permissions}
+
+share = user1.share(the_folder, items, options)
 ```
 
 `share_permissions` specifies if the item who receive the share can add or remove items in this share.
 
-`repo_permissions` specifies what kind of permission do you give at this share. If all the params are false (as_default), the share is useless, because the items have no more permissions in the repository selectionned. 
+`repo_permissions` specifies what kind of permission do you give at this share. If all the params are false, the share is useless, because the items have no more permissions in the repository selectionned. 
 
 See the chapter Authorisations for more details.
 
@@ -194,13 +201,13 @@ If it has the authorisation, an object can add items to a share.
 # user1 want to add items to his share (the actions are done only if user1 has the ':can_add' permission)
 user1.can_add_to?(share) # => true
 
-share_permissions = {can_add: true, can_remove: false}
+options = {can_add: true, can_remove: false}
 # Add items
 items = []
 items << user3
 items << group2
 ...
-user1.add_items_to(share, items, share_permissions)
+user1.add_items_to(share, items, options)
 
 # Here user3 and group2 can add items in this share, but they can't remove an item.
 group2.can_add_to?(share) # => true
