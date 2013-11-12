@@ -200,7 +200,7 @@ items = []
 items << user3
 items << group2
 ...
-@user1.add_items_to(share, items, share_permissions)
+user1.add_items_to(share, items, share_permissions)
 
 # Here user3 and group2 can add items in this share, but they can't remove an item.
 group2.can_add_to?(share) # => true
