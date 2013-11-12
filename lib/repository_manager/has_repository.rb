@@ -223,10 +223,10 @@ module RepositoryManager
 
       # You can here add new items in the share
       # Param item could be an object or an array of object
-      def add_items_to(share, items, share_permissions = nil)
+      def add_items_to(share, items, options = nil)
         authorisations = get_share_authorisations(share)
         if can_add_to?(share)
-          share_permissions = make_share_permissions(share_permissions, authorisations)
+          share_permissions = make_share_permissions(options, authorisations)
           share.add_items(items, share_permissions)
         else
           return false
