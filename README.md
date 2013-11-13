@@ -42,6 +42,32 @@ And don't forget to migrate your database:
 $ rake db:migrate
 ```
 
+## Settings
+
+You can edit the RepositoryManager settings in the initializer (/config/initializer/repository_manager.rb).
+
+```ruby
+RepositoryManager.setup do |config|
+
+  # Default repository permissions that an object has on the repository after a share.
+  config.default_repo_permissions = { can_read: true, can_create: false, can_update: false, can_delete: false, can_share: false }
+
+  # Default share permissions that an object has when he is added in a share.
+  config.default_share_permissions = { can_add: false, can_remove: false }
+end
+```
+
+For instance, if you want that a default share is totaly free, just put all default parameters to `true` :
+```ruby
+RepositoryManager.setup do |config|
+  config.default_repo_permissions = { can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true }
+  config.default_share_permissions = { can_add: true, can_remove: true }
+end
+```
+
+
+See the chapter [Authorisations](#authorisations) for more details about the permissions.
+
 ## Preparing your models
 
 You can choose wich model can have repository. 
@@ -94,7 +120,7 @@ the_folder = user1.create_folder(name, source_folder)
 #     'The new folder'
 
 # Now we want to add a file into the_folder 
-# Note : user1 needs the ':can_create => true' permission in the folder : the_folder.
+# Note : user1 needs the ':can_create => true' permission in the folder : the_folder (else the method returns `false`).
 user1.create_file(params[:file], the_folder)
 # OR
 user1.create_file(File.open('somewhere'), the_folder)
@@ -113,7 +139,7 @@ file2 = user1.create_file(params[:file2])
 #   'file2'
 
 # Delete a repository
-# Note : user1 needs the ':can_delete => true' permission in the folder : the_folder
+# Note : user1 needs the ':can_delete => true' permission in the folder : the_folder (else the method returns `false`).
 user1.delete_repository(the_folder)
 
 # user1 own repository :
@@ -141,12 +167,8 @@ items << user2
 
 share = user1.share(the_folder, items)
 
-
 # If you want to customize your share options, you can do it like this:
-
-# Default shares permisions are : {can_add: false, can_remove: false} 
 share_permissions = {can_add: true, can_remove: true}
-# Default reposiroty permissions are: {can_read: true, can_create: false, can_update: false, can_delete: false, can_share: false}
 repo_permissions = {can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true}
 
 options = {share_permissions: share_permissions, repo_permissions: repo_permissions}
@@ -154,11 +176,11 @@ options = {share_permissions: share_permissions, repo_permissions: repo_permissi
 share = user1.share(the_folder, items, options)
 ```
 
-`share_permissions` specifies if the item who receive the share can add or remove items in this share.
-
 `repo_permissions` specifies what kind of permission do you give at this share. If all the params are false, the share is useless, because the items have no more permissions in the repository selectionned. 
 
-See the chapter Authorisations for more details.
+`share_permissions` specifies if the item selectionned can add or remove items in this share.
+
+See the chapter [Authorisations](#authorisations) for more details.
 
 ### How can I see my repository
 
@@ -187,7 +209,6 @@ elsif repository.type == 'AppFile'
   # Here is the file
   repository.file.url # => '/url/to/file.png'
   repository.file.current_path # => 'path/to/file.png'
-  repository.file.identifier # => 'file.png'
 end
 ```
 
@@ -198,16 +219,22 @@ end
 If it has the authorisation, an object can add items to a share.
 
 ```ruby
-# user1 want to add items to his share (the actions are done only if user1 has the ':can_add' permission)
+# user1 want to add items to his share
+# NOTE: The action is done only if user1 has the ':can_add' permission, else the method returns `false`.
 user1.can_add_to?(share) # => true
 
-options = {can_add: true, can_remove: false}
 # Add items
 items = []
 items << user3
 items << group2
 ...
+
+user1.add_items_to(share, items)
+
+# You can change the default share permissions options :
+options = {can_add: true, can_remove: false}
 user1.add_items_to(share, items, options)
+
 
 # Here user3 and group2 can add items in this share, but they can't remove an item.
 group2.can_add_to?(share) # => true
@@ -216,20 +243,24 @@ group2.can_remove_from?(share) # => false
 # If user2 add an item in the share, he can choose if the permission ':can_add' is true or false, but he can't put ':can_remove' to true (because he don't have this permission himself).
 ```
 
-If it has the authorisation, an object can remove items from a share.
+If an object has the authorisation, it can remove items from a share, else the method return `false`.
 
 ```ruby
 # user1 want to remove group2 from this share
 user1.remove_items_from(share, group2)
 ```
 
-As admin, you can directly work with the share. Be carefull, there is NO authorisation verification !
+You can directly work with the `share`. Be carefull, there is NO authorisation control !
 
 ```ruby
 # Add an item to the share
-share.add_items(item, share_permissions)
+share.add_items(item)
+# Or with options :
+options = {can_add: true, can_remove: false}
+share.add_items(item, options)
 
-# Delete items from the share
+
+# Remove items from the share
 share.remove_items(items)
 ```
 
@@ -257,8 +288,8 @@ You can get all the authorisations with this method: `user1.get_authorisations(r
 # Returns a Hash if the entity has custums authorisations 
 #   Exemple
 #     {can_read: true, can_create: true, can_update:true, can_delete:false, can_share: true}
-# Returns true if the repository is nil (because an object has all authorisations on his root folder)
-def get_authorisations(repository=nil)
+# Returns true if the source repository is nil (because an object has all authorisations on his root folder)
+def get_authorisations(repository = nil)
     [...]
 end
 ```
