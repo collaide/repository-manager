@@ -209,7 +209,6 @@ elsif repository.type == 'AppFile'
   # Here is the file
   repository.file.url # => '/url/to/file.png'
   repository.file.current_path # => 'path/to/file.png'
-  repository.file.identifier # => 'file.png'
 end
 ```
 
