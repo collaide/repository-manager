@@ -204,7 +204,7 @@ describe 'HasRepository' do
     file.owner = @user3
     file.save
 
-    children.add_repository(file)
+    children.add(file)
 
     options = {repo_permissions: {can_read: true, can_update: true, can_share: false}}
     @user3.share(parent, @user1, options)

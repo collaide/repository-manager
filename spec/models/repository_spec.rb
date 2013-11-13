@@ -47,7 +47,7 @@ describe 'Repository' do
   end
 
   it 'can delete a folder an his files' do
-    @user1_folder.add_repository(@user1_file)
+    @user1_folder.add(@user1_file)
     @user1.delete_repository(@user1_folder)
     expect(@user1.repositories.count).to eq(0)
   end
@@ -91,14 +91,28 @@ describe 'Repository' do
     expect(path).to eq(false)
   end
 
-  it 'download the file if there is just one in a folder (no zip)' do
-    @user1_folder.add_repository(@user1_file)
-    @user1.download(@user1_folder)
-  end
+  #it 'download the file if there is just one in a folder (no zip)' do
+  #  @user1_folder.add(@user1_file)
+  #  @user1.download(@user1_folder)
+  #end
 
-  it 'user can download a folder' do
+  it 'user can download a folder with nested folder (zip)' do
     folder = @user1.create_folder('Folder1', @user1_folder)
+    folder2 = @user1.create_folder('Folder2', folder)
+    @user1.create_file(@user1_file, folder)
 
+    user1_file2 = FactoryGirl.build(:app_file)
+    user1_file2.owner = @user1
+    user1_file2.save
+    @user1.create_file(user1_file2, folder2)
+
+    user1_file3 = FactoryGirl.build(:app_file)
+    user1_file3.owner = @user1
+    user1_file3.save
+    @user1.create_file(user1_file3, @user1_folder)
+
+
+    pp @user1.download(@user1_folder)
   end
 
 end

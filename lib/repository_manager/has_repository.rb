@@ -83,7 +83,7 @@ module RepositoryManager
 
           # If we want to create a folder in a folder, we have to check if we have the authorisation
           if source_folder
-            source_folder.add_repository(folder)
+            source_folder.add(folder)
           end
 
           return folder
@@ -123,7 +123,7 @@ module RepositoryManager
 
           # Add the file into the source_folder
           if source_folder
-            source_folder.add_repository(file)
+            source_folder.add(file)
           end
 
           return app_file

@@ -7,7 +7,7 @@ class AppFile < Repository
 
   # Return the name of the file with his extension
   def name
-    file.identifier
+    file.url.split('/').last
   end
 
   # Downloading this file

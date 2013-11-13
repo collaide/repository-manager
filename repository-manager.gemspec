@@ -28,5 +28,5 @@ Each instance (users, groups, etc..) can have it own repositories (with files an
   s.add_runtime_dependency 'ancestry'
   s.add_runtime_dependency 'carrierwave'
   s.add_runtime_dependency 'enumerize'
-  s.add_runtime_dependency 'rubyzip'
+  s.add_runtime_dependency 'rubyzip'#, '< 1.0.0'#, :require => 'zip/zip'
 end
