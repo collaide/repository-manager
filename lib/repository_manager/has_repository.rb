@@ -66,6 +66,7 @@ module RepositoryManager
           share
         else
           # No permission => No share
+          #raise "share failed. You don't have the permission to share the repository '#{repository.name}'"
           false
         end
       end
@@ -81,13 +82,17 @@ module RepositoryManager
           folder.owner = self
           folder.save
 
-          # If we want to create a folder in a folder, we have to check if we have the authorisation
-          if source_folder
-            source_folder.add(folder)
+          # We have to look if it is ok to add the folder here
+          if source_folder == nil || source_folder.add(folder)
+            folder
+          else
+            # The add didn't works, we delete the folder
+            folder.destroy
+            #raise "create_folder failed. The folder '#{name}' already exist in folder '#{source_folder.name}'"
+            false
           end
-
-          return folder
         else
+          #raise "create_folder failed. You don't have the permission to create a folder in '#{source_folder.name}'"
           return false
         end
       end
@@ -97,6 +102,7 @@ module RepositoryManager
         if can_delete?(repository)
           repository.destroy
         else
+          #raise "delete_repository failed. You don't have the permission to delete the repository '#{repository.name}'"
           return false
         end
       end
@@ -117,17 +123,19 @@ module RepositoryManager
             app_file = file
             app_file.owner = self
             app_file.save
+          end
+
+          # We have to look if it is ok to add the file here
+          if source_folder == nil || source_folder.add(file)
+            return app_file
           else
+            # The add didn't works, we delete the file
+            file.destroy
+            #raise "create_file failed. The file '#{name}' already exist in folder '#{source_folder.name}'"
             return false
           end
-
-          # Add the file into the source_folder
-          if source_folder
-            source_folder.add(file)
-          end
-
-          return app_file
         else
+          #raise "create_file failed. You don't have the permission to create a file in the folder '#{source_folder.name}'"
           return false
         end
       end
@@ -170,6 +178,7 @@ module RepositoryManager
         if can_download?(repository)
           repository.download(self)
         else
+          #raise "download failed. You don't have the permission to download the repository '#{repository.name}'"
           false
         end
       end
@@ -229,6 +238,7 @@ module RepositoryManager
           share_permissions = make_share_permissions(options, authorisations)
           share.add_items(items, share_permissions)
         else
+          #raise "add items failed. You don't have the permission to add an item in this share"
           return false
         end
       end
@@ -239,6 +249,7 @@ module RepositoryManager
         if can_remove_from?(share)
           share.remove_items(items)
         else
+          #raise "remove items failed. You don't have the permission to remove an item on this share"
           return false
         end
       end

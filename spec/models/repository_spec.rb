@@ -115,4 +115,14 @@ describe 'Repository' do
     pp @user1.download(@user1_folder)
   end
 
+  it 'can\'t add a repository with the same name in a folder' do
+    folder = @user1.create_folder('Folder1', @user1_folder)
+    expect(@user1.repositories.count).to eq(3)
+    folder2 = @user1.create_folder('Folder1', @user1_folder)
+    expect(folder2).to eq(false)
+    expect(@user1.repositories.count).to eq(3)
+    folder3 = @user1.create_folder('Folder2', @user1_folder)
+    expect(@user1.repositories.count).to eq(4)
+  end
+
 end

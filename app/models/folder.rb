@@ -7,8 +7,13 @@ class Folder < Repository
 
   # Add a repository in the folder.
   def add(repository)
-    # TODO Verify if the file already exist on this folder
-    repository.update_attribute :parent, self
+    # We check if this name already exist
+    if Repository.where(name: repository.name).where(id: child_ids).first
+      #raise "add failed. The repository '#{repository.name}' already exist in the folder '#{name}'"
+      false
+    else
+      repository.update_attribute :parent, self
+    end
   end
 
   # Download this folder (zip it first)
@@ -17,7 +22,6 @@ class Folder < Repository
   def download(object = nil)
     # Get all the children
     children = Repository.find(child_ids)
-    pp "Descendant: #{child_ids}"
 
     # If something is in the array to add, we zip it
     if children.length > 0
@@ -27,6 +31,7 @@ class Folder < Repository
       }
     else
       # Nothing to download here
+      #raise "download failed. Folder #{name} is empty"
       false
     end
 
@@ -43,8 +48,7 @@ class Folder < Repository
       elsif child.type == 'Folder'
         # If this folder has children, we do it again with it children
         if child.has_children?
-          # We go in this new dir
-          #zf.dir.chdir(child.name)
+          # We go in this new directory and add it repositories
           add_repository_to_zip(Repository.find(child.child_ids), zf, object, "#{prefix}#{child.name}/")
         else
           # We just create the folder if it is empty
@@ -53,6 +57,4 @@ class Folder < Repository
       end
     end
   end
-
-
 end
