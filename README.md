@@ -99,11 +99,15 @@ end
 
 ## How to use RepositoryManager
 
-### How can I create/delete a repo_item (file or folder)
+### Introduction
 
 A `repo_item` is an item in a repository, it can be:
 - A file (`repo_file`, class name : `RepoFile`)
 - A folder (`repo_folder`, class name : `RepoFolder`).
+
+A folder can contains files and folders. Like in a real tree files and folders.
+
+### How can I create/delete a repo_item (file or folder)
 
 You just have to call the `has_repository` methods `create_file`, `create_folder`, or `delete_repo_item`.
 
