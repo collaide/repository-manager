@@ -202,6 +202,16 @@ user1.repo_items.all # => You get the repo_items that user1 has created
 user2.shared_repo_items.all
 ```
 
+If you only want to have the folders or the files, you can do it like that:
+
+```ruby
+# return only the own folders of user1
+user1.repo_items.folders.all # => You get the repo_folders that user1 has created
+
+# user2 want to get his shared repo_files
+user2.shared_repo_items.files.all
+```
+
 Recall: a repo_item can be:
 - A file
 - A folder
