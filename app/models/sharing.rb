@@ -26,7 +26,7 @@ class Sharing < ActiveRecord::Base
   end
 
   # Add members to the sharing
-  def add_members(members, sharing_permissions = nil)
+  def add_members(members, sharing_permissions = RepositoryManager.default_sharing_permissions)
     if members.kind_of?(Array)
       # Add each member to this sharing
       members.each do |i|

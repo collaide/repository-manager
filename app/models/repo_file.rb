@@ -11,7 +11,7 @@ class RepoFile < RepoItem
   end
 
   # Downloading this file
-  def download(object = nil)
+  def download(options = nil)
     path = file.path
     #render status: :bad_request and return unless File.exist?(path)
     #send_file(path)

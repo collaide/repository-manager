@@ -112,7 +112,7 @@ describe 'RepoItem' do
     @user1.create_file(user1_file3, @user1_folder)
 
 
-    pp @user1.download(@user1_folder)
+    pp @user1.download(@user1_folder, {path: ''})
   end
 
   it 'can\'t add a repo_item with the same name in a folder' do

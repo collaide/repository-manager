@@ -17,16 +17,29 @@ class RepoFolder < RepoItem
   end
 
   # Download this folder (zip it first)
-  # If object = nil, it download all the folder
-  # if object is set, it download only the folder that the object can_read.
-  def download(object = nil)
+  # options can have :
+  #     :object => Object : is the object that request the download
+  #         If object = nil, it download all the folder
+  #         if object is set, it download only the folder that the object `can_read`.
+  #     :path => 'path/to/zip/' is the path where the zip is generated
+  def download(options = nil)
     # Get all the children
     children = RepoItem.find(child_ids)
 
     # If something is in the array to add, we zip it
     if children.length > 0
+
+      # Default values
+      path = RepositoryManager.default_zip_path
+      object = nil
+
       # We create the zip here
-      Zip::File.open("#{name}.zip", Zip::File::CREATE) { |zf|
+      if options
+        path = options[:path] if options[:path]
+        object = options[:object] if options[:object]
+      end
+
+      Zip::File.open("#{path}#{name}.zip", Zip::File::CREATE) { |zf|
         add_repo_item_to_zip(children, zf, object)
       }
     else

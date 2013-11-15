@@ -5,4 +5,7 @@ RepositoryManager.setup do |config|
 
   # Default sharing permissions that an object has when he is added in a sharing.
   config.default_sharing_permissions = { can_add: false, can_remove: false }
+
+  # Default path for generating the zip file when a user want to download a folder
+  config.default_zip_path = 'downloads/tmp/'
 end

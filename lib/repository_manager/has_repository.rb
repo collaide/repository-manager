@@ -171,9 +171,14 @@ module RepositoryManager
       # If it is a file, he download the file
       # If it is a folder, we check witch repo_item is in it, and witch he can_read
       # We zip all the content that the object has access.
-      def download(repo_item)
+      # options
+      #   :path => 'path/to/zip'
+      def download(repo_item, options = nil)
         if can_download?(repo_item)
-          repo_item.download(self)
+          if options
+            path = options[:path] if options[:path]
+          end
+          repo_item.download({object: self, path: path})
         else
           #raise "download failed. You don't have the permission to download the repo_item '#{repo_item.name}'"
           false
@@ -229,7 +234,7 @@ module RepositoryManager
 
       # You can here add new members in the sharing
       # Param member could be an object or an array of object
-      def add_members_to(sharing, members, options = nil)
+      def add_members_to(sharing, members, options = RepositoryManager.default_sharing_permissions)
         authorisations = get_sharing_authorisations(sharing)
         if can_add_to?(sharing)
           sharing_permissions = make_sharing_permissions(options, authorisations)
