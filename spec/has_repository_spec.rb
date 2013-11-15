@@ -223,12 +223,14 @@ describe 'HasRepository' do
     #folder = @user1.repo_items.last
     expect(folder.name).to eq('test folder')
     expect(folder.type).to eq('RepoFolder')
+    expect(@user1.repo_items.folders.count).to eq(1)
   end
 
   it "can create a file" do
     file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
     expect(file.name).to eq('textfile.txt')
     expect(@user1.repo_items.count).to eq(1)
+    expect(@user1.repo_items.files.count).to eq(1)
   end
 
 end

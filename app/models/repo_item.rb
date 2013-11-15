@@ -4,7 +4,7 @@ class RepoItem < ActiveRecord::Base
 
   has_ancestry
 
-  # Associate with the User Classe
+  # Associate with the User Class
   belongs_to :owner, :polymorphic => true
   has_many :sharings, :dependent => :destroy
   #has_many :members, through: :sharings

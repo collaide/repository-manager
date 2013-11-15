@@ -35,7 +35,7 @@ module RepositoryManager
       # options[:sharing_permissions] contains :
       #   <tt>:can_add</tt> - Specify if the member can add objects to the sharing
       #   <tt>:can_remove</tt> - Specify if the member can remove object to the sharing
-      def share(repo_item, members, options = nil)
+      def share(repo_item, members, options = {})
         authorisations = get_authorisations(repo_item)
 
         # Here we look if the instance has the authorisation for making a sharing
@@ -46,10 +46,8 @@ module RepositoryManager
           sharing_permissions = RepositoryManager.default_sharing_permissions
 
           # If there is options, we have to take it
-          if options
-            repo_item_permissions = options[:repo_item_permissions] if options[:repo_item_permissions]
-            sharing_permissions = options[:sharing_permissions] if options[:sharing_permissions]
-          end
+          repo_item_permissions = options[:repo_item_permissions] if options[:repo_item_permissions]
+          sharing_permissions = options[:sharing_permissions] if options[:sharing_permissions]
 
           repo_item_permissions = make_repo_item_permissions(repo_item_permissions, authorisations)
 
@@ -173,11 +171,10 @@ module RepositoryManager
       # We zip all the content that the object has access.
       # options
       #   :path => 'path/to/zip'
-      def download(repo_item, options = nil)
+      def download(repo_item, options = {})
         if can_download?(repo_item)
-          if options
-            path = options[:path] if options[:path]
-          end
+          path = options[:path] if options[:path]
+
           repo_item.download({object: self, path: path})
         else
           #raise "download failed. You don't have the permission to download the repo_item '#{repo_item.name}'"
@@ -274,7 +271,7 @@ module RepositoryManager
       # Return if you can do or not this action (what)
       def can_do?(what, repo_item, authorisations = nil)
         #If we pass no authorisations we have to get it
-        if authorisations === nil
+        if authorisations == nil
           authorisations = get_authorisations(repo_item)
         end
 

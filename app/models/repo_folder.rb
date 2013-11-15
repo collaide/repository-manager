@@ -22,7 +22,7 @@ class RepoFolder < RepoItem
   #         If object = nil, it download all the folder
   #         if object is set, it download only the folder that the object `can_read`.
   #     :path => 'path/to/zip/' is the path where the zip is generated
-  def download(options = nil)
+  def download(options = {})
     # Get all the children
     children = RepoItem.find(child_ids)
 
@@ -34,14 +34,15 @@ class RepoFolder < RepoItem
       object = nil
 
       # We create the zip here
-      if options
-        path = options[:path] if options[:path]
-        object = options[:object] if options[:object]
-      end
+      path = options[:path] if options[:path]
+      object = options[:object] if options[:object]
 
-      Zip::File.open("#{path}#{name}.zip", Zip::File::CREATE) { |zf|
+      full_path = "#{path}#{name}.zip"
+
+      Zip::File.open(full_path, Zip::File::CREATE) { |zf|
         add_repo_item_to_zip(children, zf, object)
       }
+      return full_path
     else
       # Nothing to download here
       #raise "download failed. Folder #{name} is empty"
