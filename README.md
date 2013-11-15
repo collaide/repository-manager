@@ -1,17 +1,18 @@
 WORK IN PROGRESS, but it already works !
 
-Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions). 
+Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/sharing). 
 
 # RepositoryManager
 
-This project is based on the need for a repository manager system for [Collaide](https://github.com/facenord-sud/collaide). A system for easily create/delete files and folders in a repository. For sharing these repositories easily with other object with a flexible and complete authorisations management.
+This gem add fonctionality to manage easily repositories. Each instance (users, groups, etc..) can have it own repositories (with files and folders). It can manage them easily (edit, remove, add, etc) and share them with other instance.
 
-Instead of creating my core repository manager system heavily
+This project is based on the need for a repository manager system for [Collaide](https://github.com/facenord-sud/collaide). A system for easily create/delete files and folders in a repository. For sharing these "repo items" easily with other object with a flexible and complete authorisations management.
+
+Instead of creating my core repository manager system heavily 
 dependent on our development, I'm trying to implement a generic and potent repository gem.
 
 After looking for a good gem to use I noticed the lack of repository gems
 and flexibility in them. RepositoryManager tries to be the more flexible possible.
-Each instance (users, groups, etc..) can have it own repositories (with files and folders). It can manage them easily (edit, remove, add, etc) and sharing them with other instance.
 
 This gem is my informatics project for the Master in [University of Lausanne (CH)](http://www.unil.ch/index.html). 
 
@@ -49,10 +50,10 @@ You can edit the RepositoryManager settings in the initializer (/config/initiali
 ```ruby
 RepositoryManager.setup do |config|
 
-  # Default repository permissions that an object has on the repo_item after a sharing.
+  # Default permissions that an object has on the repo_item after a sharing.
   config.default_repo_item_permissions = { can_read: true, can_create: false, can_update: false, can_delete: false, can_sharing: false }
 
-  # Default sharing permissions that an object has when he is added in a sharing.
+  # Default permissions that an object has when he is added in a sharing.
   config.default_sharing_permissions = { can_add: false, can_remove: false }
 end
 ```
@@ -60,7 +61,7 @@ end
 For instance, if you want that a default sharing is totaly free, just put all default parameters to `true` :
 ```ruby
 RepositoryManager.setup do |config|
-  config.default_repo_item_permissions = { can_read: true, can_create: true, can_update: true, can_delete: true, can_sharing: true }
+  config.default_repo_item_permissions = { can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true }
   config.default_sharing_permissions = { can_add: true, can_remove: true }
 end
 ```
@@ -80,7 +81,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-You are not limited to the User model. You can use RepositoryManager in any other model and use it in serveral different models. If you have Groups and Houses in your application and you want to exchange repositories as if they were the same, just add `has_repository` to each one and you will be able to sharing files/folders groups-groups, groups-users, users-groups and users-users. Of course, you can extend it for as many classes as you need.
+You are not limited to the User model. You can use RepositoryManager in any other model and use it in serveral different models. If you have Groups and Houses in your application and you want to exchange `repo_items` as if they were the same, just add `has_repository` to each one and you will be able to sharing `repo_files`/`repo_folders` groups-groups, groups-users, users-groups and users-users. Of course, you can extend it for as many classes as you need.
 
 Example:
 
@@ -100,6 +101,10 @@ end
 
 ### How can I create/delete a repo_item (file or folder)
 
+A `repo_item` is an item in you repository, it can be:
+- A file (`repo_file`, class name : `RepoFile`)
+- A folder (`repo_folder`, class name : `RepoFolder`).
+
 You just have to call the `has_repository` methods `create_file`, `create_folder`, or `delete_repo_item`.
 
 ```ruby
@@ -109,94 +114,91 @@ You just have to call the `has_repository` methods `create_file`, `create_folder
 source_folder = user1.create_folder('Root folder')
 
 # user1 own repository :
-#   'Root folder'
+#   -- 'Root folder'
 
-# sourceFolder is the directory in wich user1 wants to create the folder 'The new folder'
-name = 'The new folder'
-the_folder = user1.create_folder(name, source_folder)
+# source_folder is the directory in wich user1 wants to create the folder 'The new folder'
+the_new_folder = user1.create_folder('The new folder', source_folder)
 
 # user1 own repository :
-#   'Root folder'
-#     'The new folder'
+#   |-- 'Root folder'
+#   |  |-- 'The new folder'
 
-# Now we want to add a file into the_folder 
-# Note : user1 needs the ':can_create => true' permission in the folder : the_folder (else the method returns `false`).
-user1.create_file(params[:file], the_folder)
+# Now we want to add a file into the_new_folder 
+# Note : user1 needs the ':can_create => true' permission in the folder : the_new_folder (else the method returns `false`).
+user1.create_file(params[:file], the_new_folder)
 # OR
-user1.create_file(File.open('somewhere'), the_folder)
+user1.create_file(File.open('somewhere'), the_new_folder)
 
 # user1 own repository :
-#   'Root folder'
-#     'The new folder'
-#        'file'
+#   |-- 'Root folder'
+#   |  |-- 'The new folder'
+#   |  |   |-- 'file'
 
+# user1 want to create a file on the root of his repository
 file2 = user1.create_file(params[:file2])
 
 # user1 own repository :
-#   'Root folder'
-#     'The new folder'
-#        'file'
-#   'file2'
+#   |-- 'Root folder'
+#   |  |-- 'The new folder'
+#   |  |   |-- 'file'
+#   |-- 'file2'
 
 # Delete a repo_item
-# Note : user1 needs the ':can_delete => true' permission in the folder : the_folder (else the method returns `false`).
-user1.delete_repo_item(the_folder)
+# Note : user1 needs the ':can_delete => true' permission in the folder : the_new_folder (else the method returns `false`).
+user1.delete_repo_item(the_new_folder)
 
 # user1 own repository :
-#   'Root folder'
-#   'file2'
+#   |-- 'Root folder'
+#   |-- 'file2'
 
 user1.delete_repo_item(file2)
 
 # user1 own repository :
-#   'Root folder'
+#   |-- 'Root folder'
 
 ```
 
 ### How can I share a repo_item (file/folder)
 
-Now, user1 want to share his folder 'The new folder' with a Group object et another User object. You can use the `has_repository` method `share(repository, to, options = nil)`.
+Now, user1 want to share his folder 'The new folder' with a Group object `group1` et another User object `user2`. You can use the `has_repository` method `share(repo_item, member, options = nil)`.
 
 ```ruby
-# user1 wants to share the_folder with group1 and user2
+# user1 wants to share the_new_folder with group1 and user2
 
 members = []
-# You can add other instance (who has_repository) in this array to share with more than one instance
+# You can add other instances (who `has_repository`) in this array to share with more than one instance
 member << group1
 members << user2
 
-sharing = user1.share(the_folder, members)
+sharing = user1.share(the_new_folder, members)
 
 # If you want to customize your sharing options, you can do it like this:
-sharing_permissions = {can_add: true, can_remove: true}
-repo_item_permissions = {can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true}
+options = {sharing_permissions: {can_add: true, can_remove: true}, repo_item_permissions: {can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true}}
 
-options = {sharing_permissions: sharing_permissions, repo_item_permissions: repo_item_permissions}
-
-sharing = user1.share(the_folder, members, options)
+sharing = user1.share(the_new_folder, members, options)
 ```
 
-`repo_item_permissions` specifies what kind of permission do you give at this sharing. If all the params are false, the sharing is useless, because the members have no more permissions in the repository selectionned.
+`repo_item_permissions` specifies what kind of permissions you give on the repo_item in a specific sharing.
 
-`sharing_permissions` specifies if the member selectionned can add or remove members in this sharing.
+`sharing_permissions` specifies if the member selectionned can add or remove other members in this sharing.
 
 See the chapter [Authorisations](#authorisations) for more details.
 
-### How can I see my repo_item
+### How can I see my repo_items
 
-There is two king of repository: 
+You can have two kind of repo_items: 
 - Your own repo_items
 - The repo_items shared with you.
 
 ```ruby
 # user1 want to get his own repository
-user1.repo_items.all # => You get the repository that user1 has created
+user1.repo_items.all # => You get the repo_items that user1 has created
 
-# user2 want to get his shared repo_item
+# user2 want to get his shared repo_items
 user2.shared_repo_items.all
 ```
 
-A repo_item can be:
+Recall: a repo_item can be:
 - A file
 - A folder
 
@@ -212,6 +214,8 @@ elsif repo_item.type == 'RepoFile'
 end
 ```
 
+For file informations, more infos on [the documentation of the carrierwave gem](https://github.com/carrierwaveuploader/carrierwave). 
+
 
 ### How can I manage a sharing
 
@@ -220,7 +224,7 @@ If it has the authorisation, an object can add members to a sharing.
 
 ```ruby
 # user1 want to add members to his sharing
-# NOTE: The action is done only if user1 has the ':can_add' permission, else the method returns `false`.
+# NOTE: The action is done only if user1 has the ':can_add' permission.
 user1.can_add_to?(sharing) # => true
 
 # Add members
@@ -246,31 +250,30 @@ group2.can_remove_from?(sharing) # => false
 If an object has the authorisation, it can remove members from a sharing, else the method return `false`.
 
 ```ruby
-# user1 want to remove group2 from this sharing
-user1.remove_members_from(sharing, group2)
+# user1 want to remove group2 from the sharing `sharing`
+user1.remove_members_from(sharing, group2) # The second parameter can be an object or an array of object
 ```
 
 You can directly work with the `sharing`. Be carefull, there is NO authorisation control !
 
 ```ruby
-# Add a member to the sharing
+# Add a member to the sharing `sharing`
 sharing.add_members(member)
 # Or with options :
-options = {can_add: true, can_remove: false}
-sharing.add_members(member, options)
+sharing.add_members(member, {can_add: true, can_remove: false})
 
 
 # Remove members from the sharing
-sharing.remove_members(members)
+sharing.remove_members({user2, group1})
 ```
 
 ### Authorisations
 
 #### Repository authorisations
 
-The owner of a repo_item (file or folder) has all the authorisations on it. When he share this repo_item, he can choose what authorisation he gives to the share. The authorisations are :
+The owner of a `repo_item` (file or folder) has all the authorisations on it. When he share this `repo_item`, he can choose what authorisation he gives to the share. The authorisations are :
 - can_read?(repo_item) : The member can read (=download) this file/folder.
-- can_create?(repo_item) : Can create in the repo_item (if repo_item is nil (= root), always true).
+- can_create?(repo_item) : Can create in the repo_item (Note: if repo_item is nil (= root), always true).
 - can_update?(repo_item) : Can update a repo_item.
 - can_delete?(repo_item) : Can delete a repo_item.
 - can_share?(repo_item) : Can share a repo_item.
@@ -278,25 +281,24 @@ The owner of a repo_item (file or folder) has all the authorisations on it. When
 To check if a user has one of this authorisation, you just have to write : `user1.can_read?(repo_item)`, `user1.can_share?(repo_item)`, etc (it returns `true` or `false`).
 
 NOTICE : An object who can share a repo_item, can't set new permissions that it doesn't have.
-For instance, `user3` has a sharing of `repo_item1` with `:can_delete => false` and `:can_share => true`. He can share `repo_item1` with `user4`, but he can't put `:can_delete => true` in this new share.
+For instance: `user3` has a sharing of `repo_item1` with `:can_delete => false` and `:can_share => true`. He can share `repo_item1` with `user4`, but he can't put `:can_delete => true` in this new share.
 
 You can get all the authorisations with this method: `user1.get_authorisations(repo_item)`
 
 ```ruby
-# Returns false if the object has no authorisation in this repo_item
-# Returns true if the object has all the authorisations
-# Returns a Hash if the entity has custums authorisations 
-#   Exemple
-#     {can_read: true, can_create: true, can_update:true, can_delete:false, can_share: true}
-# Returns true if the source repo_item is nil (because an object has all authorisations on his root folder)
-def get_authorisations(repo_item = nil)
-    [...]
-end
+      # Gets the repo authorisations
+      # Return false if the entity has not the authorisation to share this rep
+      # Return true if the entity can share this rep with all the authorisations
+      # Return an Array if the entity can share but with restriction
+      # Return true if the repo_item is nil (he as all authorisations on his own rep)
+      def get_authorisations(repo_item = nil)
+        [...]
+      end
 ```
 
 #### Sharing permissions
 
-You can manage the permissions of an instance in a sharing. The owner of the sharing has all the permissions. The permissions are:
+You can manage the permissions of a member in a sharing. The owner of the sharing has all the permissions. The permissions are:
 - can_add_to?(sharing) : The member can add a new instance in this sharing.
 - can_remove_from?(sharing) : Can remove an instance from this sharing.
 
