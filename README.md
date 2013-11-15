@@ -101,7 +101,7 @@ end
 
 ### How can I create/delete a repo_item (file or folder)
 
-A `repo_item` is an item in you repository, it can be:
+A `repo_item` is an item in a repository, it can be:
 - A file (`repo_file`, class name : `RepoFile`)
 - A folder (`repo_folder`, class name : `RepoFolder`).
 
