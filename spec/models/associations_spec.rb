@@ -4,47 +4,47 @@ describe "Associations" do
 
   it "test if user can have a own file" do
     user = FactoryGirl.build(:user)
-    file = Repository.new
+    file = RepoItem.new
     file.owner = user
     expect(file.owner).to eq(user)
   end
 
-  it "test if user can have a own share" do
+  it "test if user can have a own sharing" do
     user = User.new
-    share = Share.new
-    share.owner = user
-    expect(share.owner).to eq(user)
+    sharing = Sharing.new
+    sharing.owner = user
+    expect(sharing.owner).to eq(user)
   end
 
   it "should be possible for a user to share a file" do
 
     user = FactoryGirl.create(:user)
     user2 = FactoryGirl.create(:user)
-    expect(user2.shares.count).to eq(0)
-    expect(user.repositories.count).to eq(0)
+    expect(user2.sharings.count).to eq(0)
+    expect(user.repo_items.count).to eq(0)
 
-    file = Repository.new
+    file = RepoItem.new
     file.owner = user
 
-    #pp user.repositories
+    #pp user.repo_items
 
-    share = Share.new(can_read:true, can_create:true)
-    share.owner = user
-    file.shares << share
-    shareItem = SharesItem.new
-    shareItem.item=user2
-    share.shares_items << shareItem
+    sharing = Sharing.new(can_read:true, can_create:true)
+    sharing.owner = user
+    file.sharings << sharing
+    sharings_member = SharingsMember.new
+    sharings_member.member=user2
+    sharing.sharings_members << sharings_member
 
-    #expect(user2.shares.count).to eq(0)
-    #expect(file.shares.count).to eq(0)
+    #expect(user2.sharings.count).to eq(0)
+    #expect(file.sharings.count).to eq(0)
 
-    #shareItem.save
-    #share.save
+    #SharingsMember.save
+    #sharing.save
     file.save
 
-    expect(user.repositories.count).to eq(1)
-    expect(user2.shares.count).to eq(1)
-    expect(file.shares.count).to eq(1)
+    expect(user.repo_items.count).to eq(1)
+    expect(user2.sharings.count).to eq(1)
+    expect(file.sharings.count).to eq(1)
   end
 
   it "should be possible for a group to share a file" do
@@ -53,37 +53,37 @@ describe "Associations" do
     user2 = FactoryGirl.create(:user)
     group = FactoryGirl.create(:group)
     group2 = FactoryGirl.create(:group)
-    expect(group.shares.count).to eq(0)
-    expect(group.repositories.count).to eq(0)
+    expect(group.sharings.count).to eq(0)
+    expect(group.repo_items.count).to eq(0)
 
-    file = Repository.new
+    file = RepoItem.new
     file.owner = user
 
-    #pp user.repositories
+    #pp user.repo_items
 
-    share = Share.new(can_read:true, can_create:true)
-    share.owner = group
-    file.shares << share
-    shareItem = SharesItem.new
-    shareItem.item=group2
-    share.shares_items << shareItem
+    sharing = Sharing.new(can_read:true, can_create:true)
+    sharing.owner = group
+    file.sharings << sharing
+    sm = SharingsMember.new
+    sm.member=group2
+    sharing.sharings_members << sm
 
-    #expect(user2.shares.count).to eq(0)
-    #expect(file.shares.count).to eq(0)
+    #expect(user2.sharings.count).to eq(0)
+    #expect(file.sharings.count).to eq(0)
 
-    #shareItem.save
-    #share.save
+    #SharingsMember.save
+    #sharing.save
     file.save
 
-    expect(user.repositories.count).to eq(1)
-    expect(user2.shares.count).to eq(0)
-    expect(user.shares.count).to eq(0)
-    expect(group.repositories.count).to eq(0)
-    expect(group.shares.count).to eq(0)
-    #Il est auteur d'un share
-    expect(group.shares_owners.count).to eq(1)
-    expect(group2.shares.count).to eq(1)
-    expect(file.shares.count).to eq(1)
+    expect(user.repo_items.count).to eq(1)
+    expect(user2.sharings.count).to eq(0)
+    expect(user.sharings.count).to eq(0)
+    expect(group.repo_items.count).to eq(0)
+    expect(group.sharings.count).to eq(0)
+    #Il est auteur d'un sharing
+    expect(group.sharings_owners.count).to eq(1)
+    expect(group2.sharings.count).to eq(1)
+    expect(file.sharings.count).to eq(1)
   end
 
 end

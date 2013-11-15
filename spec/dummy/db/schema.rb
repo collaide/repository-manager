@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131025085845) do
+ActiveRecord::Schema.define(version: 20131018214212) do
 
   create_table "groups", force: true do |t|
     t.string   "name"
@@ -25,34 +25,34 @@ ActiveRecord::Schema.define(version: 20131025085845) do
     t.integer "user_id",  null: false
   end
 
-  create_table "repositories", force: true do |t|
+  create_table "repo_items", force: true do |t|
     t.integer "owner_id"
     t.string  "owner_type"
     t.string  "ancestry"
     t.string  "name"
-    t.string  "type"
     t.float   "file_size"
     t.string  "content_type"
     t.string  "file"
+    t.string  "type"
   end
 
-  create_table "shares", force: true do |t|
+  create_table "sharings", force: true do |t|
     t.integer "owner_id"
     t.string  "owner_type"
-    t.integer "repository_id"
-    t.boolean "can_create",    default: false
-    t.boolean "can_read",      default: false
-    t.boolean "can_update",    default: false
-    t.boolean "can_delete",    default: false
-    t.boolean "can_share",     default: false
+    t.integer "repo_item_id"
+    t.boolean "can_create",   default: false
+    t.boolean "can_read",     default: false
+    t.boolean "can_update",   default: false
+    t.boolean "can_delete",   default: false
+    t.boolean "can_share",    default: false
   end
 
-  create_table "shares_items", force: true do |t|
-    t.integer "share_id"
-    t.integer "item_id"
-    t.string  "item_type"
-    t.boolean "can_add",    default: false
-    t.boolean "can_remove", default: false
+  create_table "sharings_members", force: true do |t|
+    t.integer "sharing_id"
+    t.integer "member_id"
+    t.string  "member_type"
+    t.boolean "can_add",     default: false
+    t.boolean "can_remove",  default: false
   end
 
   create_table "users", force: true do |t|

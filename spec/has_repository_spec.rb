@@ -13,222 +13,222 @@ describe 'HasRepository' do
   end
 
   it "should be associate with shares" do
-    share = Share.create
-    @user1.shares << share
-    expect(@user1.shares.last).to eq(share)
+    sharing = Sharing.create
+    @user1.sharings << sharing
+    expect(@user1.sharings.last).to eq(sharing)
   end
 
-  it "can add a file to repository" do
+  it "can add a file to repo_item" do
     #TODO
   end
 
-  it "can add a folder to repository" do
+  it "can add a folder to repo_item" do
     #TODO
   end
 
-  it 'can share his own repository with other users' do
-    rep = FactoryGirl.create(:app_file)
+  it 'can share his own repo_item with other users' do
+    rep = FactoryGirl.create(:repo_file)
     rep.owner = @user1
     rep.save
 
-    #expect(@user1.shares.count).to eq(0)
-    #expect(@user2.shares.count).to eq(0)
-    #expect(@user3.shares.count).to eq(0)
-    #expect(@user1.shares_owners.count).to eq(0)
-    #expect(@user2.shares_owners.count).to eq(0)
-    #expect(@user3.shares_owners.count).to eq(0)
+    #expect(@user1.sharings.count).to eq(0)
+    #expect(@user2.sharings.count).to eq(0)
+    #expect(@user3.sharings.count).to eq(0)
+    #expect(@user1.sharings_owners.count).to eq(0)
+    #expect(@user2.sharings_owners.count).to eq(0)
+    #expect(@user3.sharings_owners.count).to eq(0)
 
-    #Add the 2 users to items
-    items = []
-    items << @user2
-    items << @user3
+    #Add the 2 users to members
+    members = []
+    members << @user2
+    members << @user3
 
-    @user1.share(rep, items)
+    @user1.share(rep, members)
 
-    #expect(@user1.shares.count).to eq(0)
-    expect(@user2.shares.count).to eq(1)
-    expect(@user3.shares.count).to eq(1)
-    expect(@user1.shares_owners.count).to eq(1)
-    expect(@user2.repositories.count).to eq(0)
-    #expect(@user2.shared_repositories.count).to eq(1)
+    #expect(@user1.sharings.count).to eq(0)
+    expect(@user2.sharings.count).to eq(1)
+    expect(@user3.sharings.count).to eq(1)
+    expect(@user1.sharings_owners.count).to eq(1)
+    expect(@user2.repo_items.count).to eq(0)
+    #expect(@user2.sharingd_repo_items.count).to eq(1)
 
-    #expect(@user2.shares_owners.count).to eq(0)
-    #expect(@user3.shares_owners.count).to eq(0)
+    #expect(@user2.sharings_owners.count).to eq(0)
+    #expect(@user3.sharings_owners.count).to eq(0)
 
   end
 
-  it 'can not share a repository without shares and without the permission' do
-    rep = FactoryGirl.create(:app_file)
+  it 'can not share a repo_item without sharings and without the permission' do
+    rep = FactoryGirl.create(:repo_file)
     rep.owner = @user3
     rep.save
 
-    items = []
-    items << @user2
+    members = []
+    members << @user2
 
-    @user1.share(rep, items)
+    @user1.share(rep, members)
 
-    expect(@user2.shares.count).to eq(0)
-    expect(@user1.shares_owners.count).to eq(0)
+    expect(@user2.sharings.count).to eq(0)
+    expect(@user1.sharings_owners.count).to eq(0)
   end
 
-  it 'can not share a repository with share but without the permission' do
-    rep = FactoryGirl.create(:folder)
+  it 'can not share a repo_item with sharing but without the permission' do
+    rep = FactoryGirl.create(:repo_folder)
     rep.owner = @user3
     rep.save
 
-    items = []
-    items << @user2
+    members = []
+    members << @user2
 
     # here user3 can share because he is the owner
-    @user3.share(rep, items)
+    @user3.share(rep, members)
     # here user2 should can share because he has the authorisation
-    items = []
-    items << @user1
-    @user2.share(rep, items)
+    members = []
+    members << @user1
+    @user2.share(rep, members)
 
-    expect(@user1.shares.count).to eq(0)
-    expect(@user2.shares_owners.count).to eq(0)
+    expect(@user1.sharings.count).to eq(0)
+    expect(@user2.sharings_owners.count).to eq(0)
   end
 
-  it 'can share a repository with share and with the permission' do
-    rep = FactoryGirl.create(:folder)
+  it 'can share a repo_item with sharing and with the permission' do
+    rep = FactoryGirl.create(:repo_folder)
     rep.owner = @user3
     rep.save
 
-    items = []
-    items << @user2
+    members = []
+    members << @user2
 
     #Here user3 let user2 share this repo too
-    options = {repo_permissions: {can_share: true}}
+    options = {repo_item_permissions: {can_share: true}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, items, options)
+    @user3.share(rep, members, options)
     # here user2 should can share because he has the authorisation
-    items = []
-    items << @user1
-    @user2.share(rep, items)
+    members = []
+    members << @user1
+    @user2.share(rep, members)
 
-    expect(@user1.shares.count).to eq(1)
-    expect(@user2.shares_owners.count).to eq(1)
+    expect(@user1.sharings.count).to eq(1)
+    expect(@user2.sharings_owners.count).to eq(1)
   end
 
-  it 'default shares permissions are to false' do
-    rep = FactoryGirl.create(:folder)
+  it 'default sharings permissions are to false' do
+    rep = FactoryGirl.create(:repo_folder)
     rep.owner = @user3
     rep.save
 
-    items = []
-    items << @user2
+    members = []
+    members << @user2
 
     #Here user3 let user2 share this repo too
-    options = {repo_permissions: {can_read: true, can_share: true}}
+    options = {repo_item_permissions: {can_read: true, can_share: true}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, items, options)
+    @user3.share(rep, members, options)
     # here user2 should can share because he has the authorisation
     # But he has only the authorisation of read (can_read = true), He can't share with more permissions
-    items = []
-    items << @user1
+    members = []
+    members << @user1
     #Here the permissions should be : :can_read => true, and all others false
-    @user2.share(rep, items)
+    @user2.share(rep, members)
 
-    share_of_user_1 = @user1.shares.last
+    sharing_of_user_1 = @user1.sharings.last
 
-    expect(share_of_user_1.can_read?).to eq(false)
-    expect(share_of_user_1.can_update?).to eq(false)
-    expect(share_of_user_1.can_share?).to eq(false)
-    #expect(@user1.shares.count).to eq(1)
-    #expect(@user2.shares_owners.count).to eq(1)
+    expect(sharing_of_user_1.can_read?).to eq(false)
+    expect(sharing_of_user_1.can_update?).to eq(false)
+    expect(sharing_of_user_1.can_share?).to eq(false)
+    #expect(@user1.sharings.count).to eq(1)
+    #expect(@user2.sharings_owners.count).to eq(1)
   end
 
-  it 'can share a repository with share and with restricted permissions' do
-    rep = FactoryGirl.create(:folder)
+  it 'can share a repo_item with sharing and with restricted permissions' do
+    rep = FactoryGirl.create(:repo_folder)
     rep.owner = @user3
     rep.save
 
-    items = []
-    items << @user2
+    members = []
+    members << @user2
 
     #Here user3 let user2 share this repo too
-    options = {repo_permissions: {can_read: true, can_share: true}}
+    options = {repo_item_permissions: {can_read: true, can_share: true}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, items, options)
+    @user3.share(rep, members, options)
     # here user2 should can share because he has the authorisation
     # But he has only the authorisation of read (can_read = true), He can't share with more permissions
-    items = []
-    items << @user1
+    members = []
+    members << @user1
 
-    options = {repo_permissions: {can_read: true, can_update: true, can_share: true}}
+    options = {repo_item_permissions: {can_read: true, can_update: true, can_share: true}}
 
     #Here the permissions should be : :can_read => true, :can_share => true and all others false
-    @user2.share(rep, items, options)
+    @user2.share(rep, members, options)
 
-    share_of_user_1 = @user1.shares.last
+    sharing_of_user_1 = @user1.sharings.last
 
-    expect(share_of_user_1.can_read?).to eq(true)
-    expect(share_of_user_1.can_update?).to eq(false)
-    expect(share_of_user_1.can_share?).to eq(true)
-    #expect(@user1.shares.count).to eq(1)
-    #expect(@user2.shares_owners.count).to eq(1)
+    expect(sharing_of_user_1.can_read?).to eq(true)
+    expect(sharing_of_user_1.can_update?).to eq(false)
+    expect(sharing_of_user_1.can_share?).to eq(true)
+    #expect(@user1.sharings.count).to eq(1)
+    #expect(@user2.sharings_owners.count).to eq(1)
   end
 
-  it 'can share a repository with share permissions' do
-    rep = FactoryGirl.create(:folder)
+  it 'can share a repo_item with sharing permissions' do
+    rep = FactoryGirl.create(:repo_folder)
     rep.owner = @user3
     rep.save
 
-    items = []
-    items << @user2
+    members = []
+    members << @user2
 
-    options = {share_permissions: {can_add: true, can_remove: false}}
+    options = {sharing_permissions: {can_add: true, can_remove: false}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, items, options)
+    @user3.share(rep, members, options)
 
-    share_item_of_user_2 = @user2.shares_items.last
+    sharing_member_of_user_2 = @user2.sharings_members.last
 
-    expect(share_item_of_user_2.can_add?).to eq(true)
-    expect(share_item_of_user_2.can_remove?).to eq(false)
-    #expect(@user1.shares.count).to eq(1)
-    #expect(@user2.shares_owners.count).to eq(1)
+    expect(sharing_member_of_user_2.can_add?).to eq(true)
+    expect(sharing_member_of_user_2.can_remove?).to eq(false)
+    #expect(@user1.sharings.count).to eq(1)
+    #expect(@user2.sharings_owners.count).to eq(1)
   end
 
-  it 'can share a repository with ancestor share permissions' do
-    parent = FactoryGirl.create(:folder)
+  it 'can share a repo_item with ancestor sharing permissions' do
+    parent = FactoryGirl.create(:repo_folder)
     parent.owner = @user3
     middle = @user3.create_folder('Middle', parent)
     children = @user3.create_folder('Children', middle)
 
-    file = FactoryGirl.build(:app_file)
+    file = FactoryGirl.build(:repo_file)
     file.owner = @user3
     file.save
 
     children.add(file)
 
-    options = {repo_permissions: {can_read: true, can_update: true, can_share: false}}
+    options = {repo_item_permissions: {can_read: true, can_update: true, can_share: false}}
     @user3.share(parent, @user1, options)
 
-    options = {repo_permissions: {can_read: true, can_update: true, can_share: true}}
+    options = {repo_item_permissions: {can_read: true, can_update: true, can_share: true}}
     @user3.share(children, @user1, options)
 
     @user1.share(middle, @user2)
-    expect(@user2.shares.count).to eq(0)
+    expect(@user2.sharings.count).to eq(0)
     @user1.share(file, @user2)
-    expect(@user2.shares.count).to eq(1)
+    expect(@user2.sharings.count).to eq(1)
   end
 
   it "can create a folder" do
     folder = @user1.create_folder('test folder')
-    #folder = @user1.repositories.last
+    #folder = @user1.repo_items.last
     expect(folder.name).to eq('test folder')
-    expect(folder.type).to eq('Folder')
+    expect(folder.type).to eq('RepoFolder')
   end
 
   it "can create a file" do
     file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
     expect(file.name).to eq('textfile.txt')
-    expect(@user1.repositories.count).to eq(1)
+    expect(@user1.repo_items.count).to eq(1)
   end
 
 end

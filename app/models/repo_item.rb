@@ -1,4 +1,4 @@
-class Repository < ActiveRecord::Base
+class RepoItem < ActiveRecord::Base
   attr_accessible :type if RepositoryManager.protected_attributes?
 
 
@@ -6,16 +6,16 @@ class Repository < ActiveRecord::Base
 
   # Associate with the User Classe
   belongs_to :owner, :polymorphic => true
-  has_many :shares, :dependent => :destroy
-  #has_many :items, through: :shares
+  has_many :sharings, :dependent => :destroy
+  #has_many :members, through: :sharings
 
   if Rails::VERSION::MAJOR == 4
-    scope :files, -> { where type: 'AppFile' }
-    scope :folders, -> { where type: 'Folder' }
+    scope :files, -> { where type: 'RepoFile' }
+    scope :folders, -> { where type: 'RepoFolder' }
   else
     # Rails 3 does it this way
-    scope :files, where(type: 'AppFile')
-    scope :folders, where(type: 'Folder')
+    scope :files, where(type: 'RepoFile')
+    scope :folders, where(type: 'RepoFolder')
   end
 
   def copy(target_folder)
@@ -30,10 +30,10 @@ class Repository < ActiveRecord::Base
     #new_file
   end
 
-  # Move the repository into the target_folder
-  # TODO à tester
+  # Move the repo_item into the target_folder
+  # TODO à faire
   def move(target_folder)
-    if target_folder.type == 'Folder'
+    if target_folder.type == 'RepoFolder'
       self.update_attribute :parent, target_folder
     end
   end

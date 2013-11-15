@@ -1,8 +1,8 @@
-class AppFile < Repository
+class RepoFile < RepoItem
   attr_accessible :file, :content_type, :file_size if RepositoryManager.protected_attributes?
 
   validates :file, presence: true
-  mount_uploader :file, RepositoryUploader
+  mount_uploader :file, RepoFileUploader
   before_save :update_asset_attributes
 
   # Return the name of the file with his extension
