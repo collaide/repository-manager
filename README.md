@@ -136,7 +136,7 @@ user1.create_file(File.open('somewhere'), the_new_folder)
 # user1 own repository :
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
-#   |  |   |-- 'file'
+#   |  |   |-- 'file.txt'
 
 # user1 want to create a file on the root of his repository
 file2 = user1.create_file(params[:file2])
@@ -144,8 +144,8 @@ file2 = user1.create_file(params[:file2])
 # user1 own repository :
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
-#   |  |   |-- 'file'
-#   |-- 'file2'
+#   |  |   |-- 'file.txt'
+#   |-- 'file2.jpg'
 
 # Delete a repo_item
 # Note : user1 needs the ':can_delete => true' permission in the folder : the_new_folder (else the method returns `false`).
@@ -153,7 +153,7 @@ user1.delete_repo_item(the_new_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
-#   |-- 'file2'
+#   |-- 'file2.jpg'
 
 user1.delete_repo_item(file2)
 
