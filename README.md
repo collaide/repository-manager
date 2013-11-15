@@ -136,7 +136,7 @@ user1.create_file(File.open('somewhere'), the_new_folder)
 # user1 own repository :
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
-#   |  |   |-- 'file'
+#   |  |   |-- 'file.txt'
 
 # user1 want to create a file on the root of his repository
 file2 = user1.create_file(params[:file2])
@@ -144,8 +144,8 @@ file2 = user1.create_file(params[:file2])
 # user1 own repository :
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
-#   |  |   |-- 'file'
-#   |-- 'file2'
+#   |  |   |-- 'file.txt'
+#   |-- 'file2.jpg'
 
 # Delete a repo_item
 # Note : user1 needs the ':can_delete => true' permission in the folder : the_new_folder (else the method returns `false`).
@@ -153,7 +153,7 @@ user1.delete_repo_item(the_new_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
-#   |-- 'file2'
+#   |-- 'file2.jpg'
 
 user1.delete_repo_item(file2)
 
@@ -276,11 +276,11 @@ sharing.remove_members({user2, group1})
 #### Repository authorisations
 
 The owner of a `repo_item` (file or folder) has all the authorisations on it. When he share this `repo_item`, he can choose what authorisation he gives to the share. The authorisations are :
-- can_read?(repo_item) : The member can read (=download) this file/folder.
-- can_create?(repo_item) : Can create in the repo_item (Note: if repo_item is nil (= root), always true).
-- can_update?(repo_item) : Can update a repo_item.
-- can_delete?(repo_item) : Can delete a repo_item.
-- can_share?(repo_item) : Can share a repo_item.
+- `can_read?(repo_item)` : The member can read (=download) this file/folder.
+- `can_create?(repo_item)` : Can create in the repo_item (Note: if repo_item is nil (= root), always true).
+- `can_update?(repo_item)` : Can update a repo_item.
+- `can_delete?(repo_item)` : Can delete a repo_item.
+- `can_share?(repo_item)` : Can share a repo_item.
 
 To check if a user has one of this authorisation, you just have to write : `user1.can_read?(repo_item)`, `user1.can_share?(repo_item)`, etc (it returns `true` or `false`).
 
@@ -303,8 +303,8 @@ You can get all the authorisations with this method: `user1.get_authorisations(r
 #### Sharing permissions
 
 You can manage the permissions of a member in a sharing. The owner of the sharing has all the permissions. The permissions are:
-- can_add_to?(sharing) : The member can add a new instance in this sharing.
-- can_remove_from?(sharing) : Can remove an instance from this sharing.
+- `can_add_to?(sharing)` : The member can add a new instance in this sharing.
+- `can_remove_from?(sharing)` : Can remove an instance from this sharing.
 
 To check if the object can add or remove an instance in the sharing, just write : `group1.can_add_to?(sharing)` or `group1.can_remove_from?(sharing)` (it returns `true` or `false`).
 
