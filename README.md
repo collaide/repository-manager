@@ -314,7 +314,6 @@ Like the repo_item authorisations, you can get the sharing authorisations with :
 
 - Can dowload a file or a folder (auto zip the folder)
 - Snapshot the file if possible
-- Flexible configuration of authorised extensions
 - Versioning
 - ...
 
