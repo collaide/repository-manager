@@ -323,6 +323,7 @@ Like the repo_item authorisations, you can get the sharing authorisations with :
 ## TODO
 
 - Can dowload a file or a folder (auto zip the folder)
+- Write the methods : move, copy, share_link, rename.
 - Snapshot the file if possible
 - Versioning
 - ...
