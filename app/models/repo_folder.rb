@@ -8,6 +8,7 @@ class RepoFolder < RepoItem
   # Add a repo_item in the folder.
   def add(repo_item)
     # We check if this name already exist
+    #if repo_item.children.exists?(:name => repo_item.name)
     if RepoItem.where(name: repo_item.name).where(id: child_ids).first
       #raise "add failed. The repo_item '#{repo_item.name}' already exist in the folder '#{name}'"
       false
@@ -17,6 +18,7 @@ class RepoFolder < RepoItem
   end
 
   # Download this folder (zip it first)
+  # Return the path to the folder.zip
   # options can have :
   #     :object => Object : is the object that request the download
   #         If object = nil, it download all the folder
@@ -30,14 +32,21 @@ class RepoFolder < RepoItem
     if children.length > 0
 
       # Default values
-      path = RepositoryManager.default_zip_path
       object = nil
-
-      # We create the zip here
-      path = options[:path] if options[:path]
       object = options[:object] if options[:object]
 
+      path = get_default_download_path(object) if RepositoryManager.default_zip_path == nil
+      path = options[:path] if options[:path]
+
       full_path = "#{path}#{name}.zip"
+
+        # Create the directory if not exist
+        dir = File.dirname(full_path)
+        unless File.directory?(dir)
+          FileUtils.mkdir_p(dir)
+        end
+      # Delete the zip if it already exist
+      File.delete(full_path) if File.exist?(full_path)
 
       Zip::File.open(full_path, Zip::File::CREATE) { |zf|
         add_repo_item_to_zip(children, zf, object)
@@ -51,7 +60,28 @@ class RepoFolder < RepoItem
 
   end
 
+  # Remove the zip file
+  # Note : Only works when default_zip_path == nil
+  def remove_zip(options = {})
+    object = nil
+    object = options[:object] if options[:object]
+
+    path = get_default_download_path(object) if RepositoryManager.default_zip_path == nil
+    path = options[:path] if options[:path]
+
+    full_path = "#{path}#{name}.zip"
+
+    # Delete the zip if it already exist
+    File.delete(full_path) if File.exist?(full_path)
+  end
+
   private
+
+  def get_default_download_path(object)
+    add_to_path = ''
+    add_to_path = "#{object.class.to_s.underscore}/#{object.id}/" if object
+    "download/#{self.class.to_s.underscore}/#{self.id}/#{add_to_path}"
+  end
 
   def add_repo_item_to_zip(children, zf, object = nil, prefix = nil)
     children.each do |child|

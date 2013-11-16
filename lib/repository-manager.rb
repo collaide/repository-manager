@@ -9,7 +9,7 @@ module RepositoryManager
   @@default_sharing_permissions = { can_add: false, can_remove: false }
 
   mattr_accessor :default_zip_path
-  @@default_zip_path = 'downloads/tmp/'
+  @@default_zip_path = nil
 
   class << self
     def setup

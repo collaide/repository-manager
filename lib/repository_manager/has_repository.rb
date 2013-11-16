@@ -148,16 +148,11 @@ module RepositoryManager
         if repo_item.owner == self
           # You can do what ever you want :)
           return true
-          # Find if a sharing of this rep exist for the self instance
-        elsif s = self.sharings.where(repo_item_id: repo_item.id).first
-          # Ok, give an array with the permission of the actual sharing
-          # (we can't share with more permission then we have)
-          return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
+        # Find if a sharing of this rep exist for the self instance or it ancestors
         else
-          # We look at the ancestor if there is a sharing
-          ancestor_ids = repo_item.ancestor_ids
+          path_ids = repo_item.path_ids
           # Check the nearest sharing if it exist
-          if s = self.sharings.where(repo_item_id: ancestor_ids).last
+          if s = self.sharings.where(repo_item_id: path_ids).last
             return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
           end
         end
@@ -217,6 +212,11 @@ module RepositoryManager
       # Return true if you can delete the repo, false else
       def can_delete?(repo_item, authorisations = nil)
         can_do?('delete', repo_item, authorisations)
+      end
+
+      # Return true it has a sharing in the repo_item
+      def has_sharing?(repo_item)
+
       end
 
       # Return true if you can add a member in this sharing, false else
