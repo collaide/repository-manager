@@ -136,7 +136,7 @@ user1.create_file(File.open('somewhere'), the_new_folder)
 # user1 own repository :
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
-#   |  |   |-- 'file.txt'
+#   |  |  |-- 'file.txt'
 
 # user1 want to create a file on the root of his repository
 file2 = user1.create_file(params[:file2])
@@ -144,7 +144,7 @@ file2 = user1.create_file(params[:file2])
 # user1 own repository :
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
-#   |  |   |-- 'file.txt'
+#   |  |  |-- 'file.txt'
 #   |-- 'file2.jpg'
 
 # user1 want to create a folder on the root of his repository
@@ -153,7 +153,7 @@ test_folder = user1.create_folder('Test folder')
 # user1 own repository :
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
-#   |  |   |-- 'file.txt'
+#   |  |  |-- 'file.txt'
 #   |-- 'file2.jpg'
 #   |-- 'Test folder'
 
@@ -165,7 +165,7 @@ user1.move(the_new_folder, test_folder)
 #   |-- 'file2.jpg'
 #   |-- 'Test folder'
 #   |  |-- 'The new folder'
-#   |  |   |-- 'file.txt'
+#   |  |  |-- 'file.txt'
 
 # Delete a repo_item
 # Note : user1 needs the ':can_delete => true' permission in the folder : the_new_folder (else the method returns `false`).
@@ -339,6 +339,11 @@ You can manage the permissions of a member in a sharing. The owner of the sharin
 To check if the object can add or remove an instance in the sharing, just write : `group1.can_add_to?(sharing)` or `group1.can_remove_from?(sharing)` (it returns `true` or `false`).
 
 Like the repo_item authorisations, you can get the sharing authorisations with : `group1.get_sharing_authorisations(sharing)`.
+
+### Download a repository
+
+RepositoryManager make the download of a repo_item easy. If the user want to download a file, it is easy, the `user.download(repo_item)` method returns you the path off file (if the user `can_read` it).
+If it want to download a folder, it automaticaly genere a zip file with all the contant that the user can_read. The method returns the path of this zip file.
 
 ## TODO
 
