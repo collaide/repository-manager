@@ -369,7 +369,6 @@ the_folder.delete_zip
 
 ## TODO
 
-- Can dowload a file or a folder (auto zip the folder)
 - Write the methods : move, copy, share_link, rename.
 - Snapshot the file if possible
 - Versioning
