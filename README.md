@@ -107,7 +107,7 @@ A `repo_item` is an item in a repository, it can be:
 
 A folder can contains files and folders. Like in a real tree files and folders.
 
-### How can I create/delete a repo_item (file or folder)
+### How can I create/delete/move a repo_item (file or folder)
 
 You just have to call the `has_repository` methods `create_file`, `create_folder`, or `delete_repo_item`.
 
@@ -147,9 +147,29 @@ file2 = user1.create_file(params[:file2])
 #   |  |   |-- 'file.txt'
 #   |-- 'file2.jpg'
 
+# user1 want to create a folder on the root of his repository
+test_folder = user1.create_folder('Test folder')
+
+# user1 own repository :
+#   |-- 'Root folder'
+#   |  |-- 'The new folder'
+#   |  |   |-- 'file.txt'
+#   |-- 'file2.jpg'
+#   |-- 'Test folder'
+
+# user1 want to move 'The new folder' in 'Test folder'
+user1.move(the_new_folder, test_folder)
+
+# user1 own repository :
+#   |-- 'Root folder'
+#   |-- 'file2.jpg'
+#   |-- 'Test folder'
+#   |  |-- 'The new folder'
+#   |  |   |-- 'file.txt'
+
 # Delete a repo_item
 # Note : user1 needs the ':can_delete => true' permission in the folder : the_new_folder (else the method returns `false`).
-user1.delete_repo_item(the_new_folder)
+user1.delete_repo_item(test_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
