@@ -345,6 +345,28 @@ Like the repo_item authorisations, you can get the sharing authorisations with :
 RepositoryManager make the download of a repo_item easy. If the user want to download a file, the `user.download(repo_item)` method returns you the path of the file (if the user `can_read` it).
 If it want to download a folder, it automaticaly genere a zip file with all the contant that the user can_read. The method returns the path of this zip file.
 
+```ruby
+# user1 want to download the_folder
+path_to_zip = user1.download(the_folder)
+
+# Then you can do what you want with this path, you can use the send_file method from rails in your controller
+send_file path_to_zip
+
+# Don't forget to delete the zip file after the user has downloaded it (when his session end for instance)
+# I created a method how delete all the download file path
+user1.delete_download_path()
+```
+
+You can directly download the folder (without permission control):
+
+```ruby
+# Directly download all the folder
+path = the_folder.download
+
+# You can delete the zip file with
+the_folder.delete_zip
+```
+
 ## TODO
 
 - Can dowload a file or a folder (auto zip the folder)
