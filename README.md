@@ -342,7 +342,7 @@ Like the repo_item authorisations, you can get the sharing authorisations with :
 
 ### Download a repository
 
-RepositoryManager make the download of a repo_item easy. If the user want to download a file, it is easy, the `user.download(repo_item)` method returns you the path off file (if the user `can_read` it).
+RepositoryManager make the download of a repo_item easy. If the user want to download a file, the `user.download(repo_item)` method returns you the path of the file (if the user `can_read` it).
 If it want to download a folder, it automaticaly genere a zip file with all the contant that the user can_read. The method returns the path of this zip file.
 
 ## TODO
