@@ -107,7 +107,7 @@ A `repo_item` is an item in a repository, it can be:
 
 A folder can contains files and folders. Like in a real tree files and folders.
 
-### How can I create/delete a repo_item (file or folder)
+### How can I create/delete/move a repo_item (file or folder)
 
 You just have to call the `has_repository` methods `create_file`, `create_folder`, or `delete_repo_item`.
 
@@ -136,7 +136,7 @@ user1.create_file(File.open('somewhere'), the_new_folder)
 # user1 own repository :
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
-#   |  |   |-- 'file.txt'
+#   |  |  |-- 'file.txt'
 
 # user1 want to create a file on the root of his repository
 file2 = user1.create_file(params[:file2])
@@ -144,12 +144,32 @@ file2 = user1.create_file(params[:file2])
 # user1 own repository :
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
-#   |  |   |-- 'file.txt'
+#   |  |  |-- 'file.txt'
 #   |-- 'file2.jpg'
+
+# user1 want to create a folder on the root of his repository
+test_folder = user1.create_folder('Test folder')
+
+# user1 own repository :
+#   |-- 'Root folder'
+#   |  |-- 'The new folder'
+#   |  |  |-- 'file.txt'
+#   |-- 'file2.jpg'
+#   |-- 'Test folder'
+
+# user1 want to move 'The new folder' in 'Test folder'
+user1.move(the_new_folder, test_folder)
+
+# user1 own repository :
+#   |-- 'Root folder'
+#   |-- 'file2.jpg'
+#   |-- 'Test folder'
+#   |  |-- 'The new folder'
+#   |  |  |-- 'file.txt'
 
 # Delete a repo_item
 # Note : user1 needs the ':can_delete => true' permission in the folder : the_new_folder (else the method returns `false`).
-user1.delete_repo_item(the_new_folder)
+user1.delete_repo_item(test_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
@@ -320,9 +340,36 @@ To check if the object can add or remove an instance in the sharing, just write 
 
 Like the repo_item authorisations, you can get the sharing authorisations with : `group1.get_sharing_authorisations(sharing)`.
 
+### Download a repository
+
+RepositoryManager make the download of a repo_item easy. If the user want to download a file, the `user.download(repo_item)` method returns you the path of the file (if the user `can_read` it).
+If it want to download a folder, it automaticaly genere a zip file with all the contant that the user can_read. The method returns the path of this zip file.
+
+```ruby
+# user1 want to download the_folder
+path_to_zip = user1.download(the_folder)
+
+# Then you can do what you want with this path, you can use the send_file method from rails in your controller
+send_file path_to_zip
+
+# Don't forget to delete the zip file after the user has downloaded it (when his session end for instance)
+# I created a method how delete all the download file path
+user1.delete_download_path()
+```
+
+You can directly download the folder (without permission control):
+
+```ruby
+# Directly download all the folder
+path = the_folder.download
+
+# You can delete the zip file with
+the_folder.delete_zip
+```
+
 ## TODO
 
-- Can dowload a file or a folder (auto zip the folder)
+- Qu'on ne puisse pas créer un deuxième sous partage pour le même user (évite beaucoup de soucis)
 - Write the methods : move, copy, share_link, rename.
 - Snapshot the file if possible
 - Versioning
