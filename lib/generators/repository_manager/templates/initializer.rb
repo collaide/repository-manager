@@ -7,6 +7,6 @@ RepositoryManager.setup do |config|
   config.default_sharing_permissions = { can_add: false, can_remove: false }
 
   # Default path for generating the zip file when a user want to download a folder
-  # Default is : "download/#{self.class.to_s.underscore}/#{self.id}"
-  #config.default_zip_path = nil
+  # Default is : "download/#{member.class.to_s.underscore}/#{member.id}/#{self.class.to_s.underscore}/#{self.id}/"
+  #config.default_zip_path = true
 end

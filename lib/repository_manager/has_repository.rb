@@ -177,6 +177,25 @@ module RepositoryManager
         end
       end
 
+      # Move the repo_item in the target_folder
+      def move_repo_item(repo_item, target_folder)
+        unless can_delete?(repo_item)
+          # Raise : you must have the permission to delete the repo_item: repo_item.name
+          false
+        end
+        unless can_create?(target_folder)
+          # Raise : you must have the permission to create in the targer folder
+          false
+        end
+        # If it has the permission, we move the repo_item in the target_folder
+        repo_item.move(target_folder)
+      end
+
+      # Delete the download folder of the user
+      def delete_download_path
+        FileUtils.rm_rf(self.get_default_download_path())
+      end
+
       #Return the authorisations of the sharing (can_add, can_remove)
       def get_sharing_authorisations(sharing)
         sharing.get_authorisations(self)
@@ -251,6 +270,11 @@ module RepositoryManager
           #raise "remove members failed. You don't have the permission to remove a member on this sharing"
           return false
         end
+      end
+
+      # Get the download path of the member
+      def get_default_download_path(prefix = 'download/')
+        "#{prefix}#{self.class.to_s.underscore}/#{self.id}/"
       end
 
       private

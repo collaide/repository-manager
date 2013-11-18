@@ -32,10 +32,9 @@ class RepoFolder < RepoItem
     if children.length > 0
 
       # Default values
-      object = nil
-      object = options[:object] if options[:object]
+      options[:object]? object = options[:object]: object = nil
 
-      path = get_default_download_path(object) if RepositoryManager.default_zip_path == nil
+      RepositoryManager.default_zip_path == true ? path = get_default_download_path(object): path = RepositoryManager.default_zip_path
       path = options[:path] if options[:path]
 
       full_path = "#{path}#{name}.zip"
@@ -60,27 +59,23 @@ class RepoFolder < RepoItem
 
   end
 
-  # Remove the zip file
-  # Note : Only works when default_zip_path == nil
-  def remove_zip(options = {})
-    object = nil
-    object = options[:object] if options[:object]
-
-    path = get_default_download_path(object) if RepositoryManager.default_zip_path == nil
+  # Delete the zip file
+  def delete_zip(options = {})
+    options[:object]? object = options[:object]: object = nil
+    RepositoryManager.default_zip_path == true ? path = get_default_download_path(object): path = RepositoryManager.default_zip_path
     path = options[:path] if options[:path]
 
-    full_path = "#{path}#{name}.zip"
-
-    # Delete the zip if it already exist
-    File.delete(full_path) if File.exist?(full_path)
+    # Delete the path
+    FileUtils.rm_rf(path)
   end
 
   private
 
-  def get_default_download_path(object)
-    add_to_path = ''
-    add_to_path = "#{object.class.to_s.underscore}/#{object.id}/" if object
-    "download/#{self.class.to_s.underscore}/#{self.id}/#{add_to_path}"
+  # Returns the default path of the zip file
+  # object is the object that want to download this file
+  def get_default_download_path(object = nil)
+    object ? add_to_path = object.get_default_download_path(''): add_to_path = ''
+    "download/#{add_to_path}#{self.class.to_s.underscore}/#{self.id}/"
   end
 
   def add_repo_item_to_zip(children, zf, object = nil, prefix = nil)

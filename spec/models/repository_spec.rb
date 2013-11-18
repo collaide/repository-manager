@@ -111,12 +111,28 @@ describe 'RepoItem' do
     user1_file3.save
     @user1.create_file(user1_file3, @user1_folder)
 
-    pp @user1.download(@user1_folder)
-    pp @user1.download(@user1_folder)
-    pp @user1_folder.download
+    @user1.download(@user1_folder)
+    @user1.download(@user1_folder)
+    @user1_folder.download
+
+    @user1_folder.delete_zip
+    @user1.delete_download_path()
   end
 
   it 'can\'t add a repo_item with the same name in a folder' do
+    root_folder = @user1.create_folder('Root folder')
+    root_folder.add(@user1_folder)
+
+    root_test_folder = @user1.create_folder('root test folder')
+    test_folder = @user1.create_folder('Test folder', root_test_folder)
+    @user1.create_folder('Nested test folder', test_folder)
+
+    @user1.move_repo_item(test_folder, @user1_folder)
+
+    expect(test_folder.parent_id).to eq(@user1_folder.id)
+  end
+
+  it 'can move a folder into another folder' do
     folder = @user1.create_folder('Folder1', @user1_folder)
     expect(@user1.repo_items.count).to eq(3)
     folder2 = @user1.create_folder('Folder1', @user1_folder)

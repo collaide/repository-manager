@@ -30,11 +30,13 @@ class RepoItem < ActiveRecord::Base
     #new_file
   end
 
-  # Move the repo_item into the target_folder
-  # TODO à faire
+  # Move itself into the target_folder
   def move(target_folder)
     if target_folder.type == 'RepoFolder'
       self.update_attribute :parent, target_folder
+    else
+      # target_folder can't be a file.
+      false
     end
   end
 
