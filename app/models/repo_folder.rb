@@ -6,25 +6,33 @@ class RepoFolder < RepoItem
   validates :name, presence: true
 
   # Add a repo_item in the folder.
-  def add(repo_item)
+  def add!(repo_item)
     # We check if this name already exist
     #if repo_item.children.exists?(:name => repo_item.name)
     if RepoItem.where(name: repo_item.name).where(id: child_ids).first
-      #raise "add failed. The repo_item '#{repo_item.name}' already exist in the folder '#{name}'"
+      raise RepositoryManager::RepositoryManagerException.new("add failed. The repo_item '#{repo_item.name}' already exist in the folder '#{name}'")
       false
     else
       repo_item.update_attribute :parent, self
     end
   end
 
-  # Download this folder (zip it first)
+  def add(repo_item)
+    begin
+      add!(repo_item)
+    rescue RepositoryManager::RepositoryManagerException
+      false
+    end
+  end
+
+    # Download this folder (zip it first)
   # Return the path to the folder.zip
   # options can have :
   #     :object => Object : is the object that request the download
   #         If object = nil, it download all the folder
   #         if object is set, it download only the folder that the object `can_read`.
   #     :path => 'path/to/zip/' is the path where the zip is generated
-  def download(options = {})
+  def download!(options = {})
     # Get all the children
     children = RepoItem.find(child_ids)
 
@@ -53,13 +61,20 @@ class RepoFolder < RepoItem
       return full_path
     else
       # Nothing to download here
-      #raise "download failed. Folder #{name} is empty"
-      false
+      raise RepositoryManager::RepositoryManagerException.new("download failed. Folder #{name} is empty")
     end
-
   end
 
-  # Delete the zip file
+  def download(options = {})
+    begin
+      download!(options)
+    rescue RepositoryManager::RepositoryManagerException
+      false
+    end
+  end
+
+
+    # Delete the zip file
   def delete_zip(options = {})
     options[:object]? object = options[:object]: object = nil
     RepositoryManager.default_zip_path == true ? path = get_default_download_path(object): path = RepositoryManager.default_zip_path

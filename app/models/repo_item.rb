@@ -31,14 +31,21 @@ class RepoItem < ActiveRecord::Base
   end
 
   # Move itself into the target_folder
-  def move(target_folder)
+  def move!(target_folder)
     if target_folder.type == 'RepoFolder'
       self.update_attribute :parent, target_folder
     else
-      # target_folder can't be a file.
-      false
+      raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{name}' can't be a file")
     end
   end
 
+  def move(target_folder)
+    begin
+      move!(target_folder)
+    rescue RepositoryManager::RepositoryManagerException
+      false
+    end
 
-end
+  end
+
+  end

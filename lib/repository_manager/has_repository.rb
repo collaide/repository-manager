@@ -35,7 +35,7 @@ module RepositoryManager
       # options[:sharing_permissions] contains :
       #   <tt>:can_add</tt> - Specify if the member can add objects to the sharing
       #   <tt>:can_remove</tt> - Specify if the member can remove object to the sharing
-      def share(repo_item, members, options = {})
+      def share!(repo_item, members, options = {})
         authorisations = get_authorisations(repo_item)
 
         # Here we look if the instance has the authorisation for making a sharing
@@ -61,7 +61,14 @@ module RepositoryManager
           sharing
         else
           # No permission => No sharing
-          #raise "sharing failed. You don't have the permission to share the repo_item '#{repo_item.name}'"
+          raise RepositoryManager::AuthorisationException.new("sharing failed. You don't have the permission to share the repo_item '#{repo_item.name}'")
+        end
+      end
+
+      def share(repo_item, members, options = {})
+        begin
+          share!(repo_item, members, options)
+        rescue RepositoryManager::AuthorisationException
           false
         end
       end
@@ -69,7 +76,7 @@ module RepositoryManager
       # Create a folder with the name (name) in the directory (source_folder)
       # Returns the object of the folder created if it is ok
       # Returns false if the folder is not created (no authorisation)
-      def create_folder(name = 'New folder', source_folder = nil)
+      def create_folder!(name = 'New folder', source_folder = nil)
         # If he want to create a folder in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
 
@@ -83,22 +90,35 @@ module RepositoryManager
           else
             # The add didn't works, we delete the folder
             folder.destroy
-            #raise "create_folder failed. The folder '#{name}' already exist in folder '#{source_folder.name}'"
-            false
+            raise RepositoryManager::RepositoryManagerException.new("create_folder failed. The folder '#{name}' already exist in folder '#{source_folder.name}'")
           end
         else
-          #raise "create_folder failed. You don't have the permission to create a folder in '#{source_folder.name}'"
-          return false
+          raise RepositoryManager::AuthorisationException.new("create_folder failed. You don't have the permission to create a folder in '#{source_folder.name}'")
+        end
+      end
+
+      def create_folder(name = 'New folder', source_folder = nil)
+        begin
+          create_folder!(name, source_folder)
+        rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException
+          false
         end
       end
 
       # Delete the repo_item
-      def delete_repo_item(repo_item)
+      def delete_repo_item!(repo_item)
         if can_delete?(repo_item)
           repo_item.destroy
         else
-          #raise "delete_repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'"
-          return false
+          raise RepositoryManager::AuthorisationException.new("delete_repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
+        end
+      end
+
+      def delete_repo_item(repo_item)
+        begin
+          delete_repo_item!(repo_item)
+        rescue RepositoryManager::AuthorisationException
+          false
         end
       end
 
@@ -106,7 +126,7 @@ module RepositoryManager
       # Param file can be a File, or a instance of RepoFile
       # Return the object of the file created if it is ok
       # Return false if the file is not created (no authorisation)
-      def create_file(file, source_folder = nil)
+      def create_file!(file, source_folder = nil)
         # If he want to create a file in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
           if file.class.name == 'File'
@@ -126,12 +146,19 @@ module RepositoryManager
           else
             # The add didn't works, we delete the file
             file.destroy
-            #raise "create_file failed. The file '#{name}' already exist in folder '#{source_folder.name}'"
-            return false
+            raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file '#{name}' already exist in folder '#{source_folder.name}'")
           end
         else
           #raise "create_file failed. You don't have the permission to create a file in the folder '#{source_folder.name}'"
-          return false
+          raise RepositoryManager::AuthorisationException.new("create_file failed. The file '#{name}' already exist in folder '#{source_folder.name}'")
+        end
+      end
+
+      def create_file(file, source_folder = nil)
+        begin
+          create_file!(file, source_folder)
+        rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException
+          false
         end
       end
 
@@ -166,29 +193,42 @@ module RepositoryManager
       # We zip all the content that the object has access.
       # options
       #   :path => 'path/to/zip'
-      def download(repo_item, options = {})
+      def download!(repo_item, options = {})
         if can_download?(repo_item)
           path = options[:path] if options[:path]
 
           repo_item.download({object: self, path: path})
         else
-          #raise "download failed. You don't have the permission to download the repo_item '#{repo_item.name}'"
+          raise RepositoryManager::AuthorisationException.new("download failed. You don't have the permission to download the repo_item '#{repo_item.name}'")
+        end
+      end
+
+      def download(repo_item, options = {})
+        begin
+          download!(repo_item, options)
+        rescue RepositoryManager::AuthorisationException
           false
         end
       end
 
       # Move the repo_item in the target_folder
-      def move_repo_item(repo_item, target_folder)
+      def move_repo_item!(repo_item, target_folder)
         unless can_delete?(repo_item)
-          # Raise : you must have the permission to delete the repo_item: repo_item.name
-          false
+          raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
         end
         unless can_create?(target_folder)
-          # Raise : you must have the permission to create in the targer folder
-          false
+          raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to create in the target_folder '#{target_folder.name}'")
         end
         # If it has the permission, we move the repo_item in the target_folder
         repo_item.move(target_folder)
+      end
+
+      def move_repo_item(repo_item, target_folder)
+        begin
+          move_repo_item!(repo_item, target_folder)
+        rescue RepositoryManager::AuthorisationException
+          false
+        end
       end
 
       # Delete the download folder of the user
@@ -250,29 +290,43 @@ module RepositoryManager
 
       # You can here add new members in the sharing
       # Param member could be an object or an array of object
-      def add_members_to(sharing, members, options = RepositoryManager.default_sharing_permissions)
+      def add_members_to!(sharing, members, options = RepositoryManager.default_sharing_permissions)
         authorisations = get_sharing_authorisations(sharing)
         if can_add_to?(sharing)
           sharing_permissions = make_sharing_permissions(options, authorisations)
           sharing.add_members(members, sharing_permissions)
         else
-          #raise "add members failed. You don't have the permission to add a member in this sharing"
-          return false
+          raise RepositoryManager::AuthorisationException.new("add members failed. You don't have the permission to add a member in this sharing")
         end
       end
 
-      # You can here add new members in the sharing
+      def add_members_to(sharing, members, options = RepositoryManager.default_sharing_permissions)
+        begin
+          add_members_to!(sharing, members, options = RepositoryManager.default_sharing_permissions)
+        rescue RepositoryManager::AuthorisationException
+          false
+        end
+      end
+
+        # You can here add new members in the sharing
       # Param member could be an object or an array of object
-      def remove_members_from(sharing, members)
+      def remove_members_from!(sharing, members)
         if can_remove_from?(sharing)
           sharing.remove_members(members)
         else
-          #raise "remove members failed. You don't have the permission to remove a member on this sharing"
-          return false
+          raise RepositoryManager::AuthorisationException.new("remove members failed. You don't have the permission to remove a member on this sharing")
         end
       end
 
-      # Get the download path of the member
+      def remove_members_from(sharing, members)
+        begin
+          remove_members_from!(sharing, members)
+        rescue RepositoryManager::AuthorisationException
+          false
+        end
+      end
+
+        # Get the download path of the member
       def get_default_download_path(prefix = 'download/')
         "#{prefix}#{self.class.to_s.underscore}/#{self.id}/"
       end

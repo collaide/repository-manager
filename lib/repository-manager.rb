@@ -24,3 +24,4 @@ module RepositoryManager
 end
 
 require 'repository_manager/engine'
+require 'repository_manager/exceptions'
