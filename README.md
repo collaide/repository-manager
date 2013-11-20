@@ -111,7 +111,7 @@ A `repo_item` is an item in a repository, it can be:
 
 A folder can contains files and folders. Like in a real tree files and folders.
 
-Methods thats can raise errors are written in two ways :
+A few methods are written in two ways :
 - method(arg, options)
 - method!(arg, options) (note the "!")
 
