@@ -55,6 +55,10 @@ RepositoryManager.setup do |config|
 
   # Default permissions that an object has when he is added in a sharing.
   config.default_sharing_permissions = { can_add: false, can_remove: false }
+  
+  # Default path for generating the zip file when a user want to download a folder
+  # Default is : "download/#{member.class.to_s.underscore}/#{member.id}/#{self.class.to_s.underscore}/#{self.id}/"
+  #config.default_zip_path = true
 end
 ```
 
@@ -106,6 +110,12 @@ A `repo_item` is an item in a repository, it can be:
 - A folder (`repo_folder`, class name : `RepoFolder`).
 
 A folder can contains files and folders. Like in a real tree files and folders.
+
+Methods thats can raise errors are written in two ways :
+- method(arg, options)
+- method!(arg, options) (note the "!")
+
+The two method do the same, but the one with the "!" returns a raise error if it is a problem (authorisation error for instance) and the method without "!" return false if it has a problem.
 
 ### How can I create/delete/move a repo_item (file or folder)
 
