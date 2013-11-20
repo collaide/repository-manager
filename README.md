@@ -115,7 +115,7 @@ A few methods are written in two ways :
 - method(arg, options)
 - method!(arg, options) (note the "!")
 
-The two method do the same, but the one with the "!" returns a raise error if it is a problem (authorisation error for instance) and the method without "!" return false if it has a problem.
+The two methods do the same, but the one with the "!" returns a raise error if it is a problem (authorisation error for instance) and the method without "!" return false if it has a problem.
 
 ### How can I create/delete/move a repo_item (file or folder)
 
