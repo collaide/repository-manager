@@ -45,7 +45,6 @@ class RepoItem < ActiveRecord::Base
     rescue RepositoryManager::RepositoryManagerException
       false
     end
-
   end
 
   end

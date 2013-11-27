@@ -11,6 +11,9 @@ module RepositoryManager
   mattr_accessor :default_zip_path
   @@default_zip_path = true
 
+  mattr_accessor :accept_nested_sharing
+  @@accept_nested_share = false
+
   class << self
     def setup
       yield self

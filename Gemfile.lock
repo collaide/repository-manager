@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    repository-manager (0.0.8)
+    repository-manager (0.0.9)
       ancestry
       carrierwave
       rails (> 3.0.0)

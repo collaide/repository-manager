@@ -49,6 +49,7 @@ module RepositoryManager
           repo_item_permissions = options[:repo_item_permissions] if options[:repo_item_permissions]
           sharing_permissions = options[:sharing_permissions] if options[:sharing_permissions]
 
+          # Correct the item permission with accepted permissions
           repo_item_permissions = make_repo_item_permissions(repo_item_permissions, authorisations)
 
           sharing = Sharing.new(repo_item_permissions)
@@ -348,7 +349,7 @@ module RepositoryManager
 
       # Return if you can do or not this action (what)
       def can_do?(what, repo_item, authorisations = nil)
-        #If we pass no authorisations we have to get it
+        # If we pass no authorisations we have to get it
         if authorisations == nil
           authorisations = get_authorisations(repo_item)
         end
@@ -357,13 +358,25 @@ module RepositoryManager
           when 'read'
             authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_read] == true)
           when 'delete'
-            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_delete] == true)
+            if RepositoryManager.accept_nested_sharing
+              # TODO implement to look if he can delete all the folder
+            else
+              authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_delete] == true)
+            end
           when 'update'
             authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_update] == true)
           when 'share'
-            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_share] == true)
+            if RepositoryManager.accept_nested_sharing
+              # TODO implement to look if he can delete all the folder
+            else
+              authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_share] == true)
+            end
           when 'create'
-            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_create] == true)
+            if RepositoryManager.accept_nested_sharing
+              # TODO implement to look if he can delete all the folder
+            else
+              authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_create] == true)
+            end
           else
             false
         end

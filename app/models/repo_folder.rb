@@ -98,7 +98,7 @@ class RepoFolder < RepoItem
       # If this is a file, we just add this file to the zip
       if child.type == 'RepoFile'
         # Add the file in the zip if the object is authorised to read it.
-        zf.add("#{prefix}#{child.name}", child.file.current_path) if object == nil || object.can_read?(child)
+        zf.add("#{prefix}#{child.name}", child.file.current_path) if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)
       elsif child.type == 'RepoFolder'
         # If this folder has children, we do it again with it children
         if child.has_children?
@@ -106,7 +106,7 @@ class RepoFolder < RepoItem
           add_repo_item_to_zip(RepoItem.find(child.child_ids), zf, object, "#{prefix}#{child.name}/")
         else
           # We just create the folder if it is empty
-          zf.mkdir(child.name) if object == nil || object.can_read?(child)
+          zf.mkdir(child.name) if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)
         end
       end
     end
