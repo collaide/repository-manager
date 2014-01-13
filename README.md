@@ -55,10 +55,14 @@ RepositoryManager.setup do |config|
 
   # Default permissions that an object has when he is added in a sharing.
   config.default_sharing_permissions = { can_add: false, can_remove: false }
+  
+  # Default path for generating the zip file when a user want to download a folder
+  # Default is : "download/#{member.class.to_s.underscore}/#{member.id}/#{self.class.to_s.underscore}/#{self.id}/"
+  #config.default_zip_path = true
 end
 ```
 
-For instance, if you want that a default sharing is totaly free, just put all default parameters to `true` :
+For instance, if you want that a default sharing is totaly free (for edit, delete, etc), just put all default parameters to `true` :
 ```ruby
 RepositoryManager.setup do |config|
   config.default_repo_item_permissions = { can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true }
@@ -106,6 +110,12 @@ A `repo_item` is an item in a repository, it can be:
 - A folder (`repo_folder`, class name : `RepoFolder`).
 
 A folder can contains files and folders. Like in a real tree files and folders.
+
+A few methods are written in those two ways :
+- method(arg, options)
+- method!(arg, options) (note the "!")
+
+The two methods do the same, but the one with the "!" returns an Exeption error if it is a problem (AuthorisationException for instance) and the method without "!" return false if it has a problem.
 
 ### How can I create/delete/move a repo_item (file or folder)
 
@@ -186,6 +196,7 @@ user1.delete_repo_item(file2)
 
 Now, user1 want to share his folder 'The new folder' with a Group object `group1` et another User object `user2`. You can use the `has_repository` method `share(repo_item, member, options = nil)`.
 
+
 ```ruby
 # user1 wants to share the_new_folder with group1 and user2
 
@@ -207,6 +218,33 @@ sharing = user1.share(the_new_folder, members, options)
 `sharing_permissions` specifies if the member selectionned can add or remove other members in this sharing.
 
 See the chapter [Authorisations](#authorisations) for more details.
+
+### Repository Manager and the nested sharing
+
+Repository Manager actualy don't accept nested sharing.
+
+```ruby
+
+parent = @user1.create_folder('Parent')
+nested = @user1.create_folder('Nested', parent)
+children = @user1.create_folder('Children', nested)
+
+# @user1 own repository :
+#   |-- 'Parent'
+#   |  |-- 'Nested'
+#   |  |  |-- 'Children'
+
+@user1.share(nested, @user2)
+
+nested.has_nested_sharing? # Returns false (because `nested` is shared but there is no nested sharing)
+parent.has_nested_sharing? # Returns true (because there is a sharing on one of his descendants)
+children.has_nested_sharing? # Returns true (because there is a sharing on one of his ancestors)
+
+# Here we can't share 'Parent' or 'Children' because it already exist a nested sharing.
+@user1.share(parent, @user2) # Returns false
+@user1.share!(parent, @user2) # Raise a NestedSharingException (note the "!")
+@user1.share!(children, @user2) # Raise a NestedSharingException  (note the "!")
+```
 
 ### How can I see my repo_items
 
@@ -239,9 +277,9 @@ Recall: a repo_item can be:
 ```ruby
 # We want to know if the object repo_item is a file or a folder:
 if repo_item.type == 'RepoFolder'
-  repo_item.name #=> Returns the name of the folder ('New folder').
+  repo_item.name #=> Returns the name of the folder (for instance : 'New folder').
 elsif repo_item.type == 'RepoFile'
-  repo_item.name #=> Returns the name of the file ('file.png').
+  repo_item.name #=> Returns the name of the file (for instance : 'file.png').
   # Here is the file
   repo_item.file.url # => '/url/to/file.png'
   repo_item.file.current_path # => 'path/to/file.png'
