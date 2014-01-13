@@ -407,7 +407,6 @@ the_folder.delete_zip
 
 ## TODO
 
-- Qu'on ne puisse pas créer un deuxième sous partage pour le même user (évite beaucoup de soucis)
 - Write the methods : move, copy, share_link, rename.
 - Snapshot the file if possible
 - Versioning
