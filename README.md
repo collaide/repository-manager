@@ -240,7 +240,7 @@ nested.has_nested_sharing? # Returns false (because `nested` is shared but there
 parent.has_nested_sharing? # Returns true (because there is a sharing on one of his descendants)
 children.has_nested_sharing? # Returns true (because there is a sharing on one of his ancestors)
 
-# Here we can't share 'Parent' or 'Children' becose it already existe a nested sharing.
+# Here we can't share 'Parent' or 'Children' because it already exist a nested sharing.
 @user1.share(parent, @user2) # Returns false
 @user1.share!(parent, @user2) # Raise a NestedSharingException (note the "!")
 @user1.share!(children, @user2) # Raise a NestedSharingException  (note the "!")
