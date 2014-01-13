@@ -20,12 +20,12 @@ Each instance (users, groups, etc..) can have it own repositories (with files an
   #s.test_files = Dir["spec/**/*"]
   s.license = 'MIT'
 
-  s.add_runtime_dependency 'rails', '> 3.0.0'
+  s.add_runtime_dependency 'rails', '~> 3.0', '>= 3.0.0'
 
-  s.add_development_dependency 'factory_girl_rails'
-  s.add_development_dependency 'sqlite3'
+  s.add_development_dependency 'factory_girl_rails', '~> 0'
+  s.add_development_dependency 'sqlite3', '~> 0'
   s.add_development_dependency 'rspec-rails', '~> 2.0'
-  s.add_runtime_dependency 'ancestry'
-  s.add_runtime_dependency 'carrierwave'
-  s.add_runtime_dependency 'rubyzip'#, '< 1.0.0'#, :require => 'zip/zip'
+  s.add_runtime_dependency 'ancestry', '~> 0'
+  s.add_runtime_dependency 'carrierwave', '~> 0'
+  s.add_runtime_dependency 'rubyzip', '~> 0'#, '< 1.0.0'#, :require => 'zip/zip'
 end
