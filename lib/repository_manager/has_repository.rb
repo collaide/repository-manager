@@ -36,6 +36,15 @@ module RepositoryManager
       #   <tt>:can_add</tt> - Specify if the member can add objects to the sharing
       #   <tt>:can_remove</tt> - Specify if the member can remove object to the sharing
       def share!(repo_item, members, options = {})
+
+        # Nested sharing are not accepted
+        if !RepositoryManager.accept_nested_sharing
+          # Check if no other sharing exist in the path
+          if repo_item.has_nested_sharing?
+            raise RepositoryManager::NestedSharingException.new("sharing failed. Another sharing already exist on the subtree or an ancestor '#{repo_item.name}'")
+          end
+        end
+
         authorisations = get_authorisations(repo_item)
 
         # Here we look if the instance has the authorisation for making a sharing
@@ -69,14 +78,16 @@ module RepositoryManager
       def share(repo_item, members, options = {})
         begin
           share!(repo_item, members, options)
-        rescue RepositoryManager::AuthorisationException
+        rescue RepositoryManager::AuthorisationException, RepositoryManager::NestedSharingException
           false
         end
       end
 
       # Create a folder with the name (name) in the directory (source_folder)
       # Returns the object of the folder created if it is ok
-      # Returns false if the folder is not created (no authorisation)
+      # Returns an Exception if the folder is not created
+      #     RepositoryManagerException if the name already exist
+      #     AuthorisationException if the object don't have the permission
       def create_folder!(name = 'New folder', source_folder = nil)
         # If he want to create a folder in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
@@ -91,7 +102,7 @@ module RepositoryManager
           else
             # The add didn't works, we delete the folder
             folder.destroy
-            raise RepositoryManager::RepositoryManagerException.new("create_folder failed. The folder '#{name}' already exist in folder '#{source_folder.name}'")
+            raise RepositoryManager::RepositoryManagerException.new("create_folder failed. The folder name '#{name}' already exist in folder '#{source_folder.name}'")
           end
         else
           raise RepositoryManager::AuthorisationException.new("create_folder failed. You don't have the permission to create a folder in '#{source_folder.name}'")
@@ -264,20 +275,31 @@ module RepositoryManager
         can_do?('create', repo_item, authorisations)
       end
 
-      # Return true if you can edit the repo, false else
+      # Returns true if you can edit the repo, false else
       def can_update?(repo_item, authorisations = nil)
         can_do?('update', repo_item, authorisations)
       end
 
-      # Return true if you can delete the repo, false else
+      # Returns true if you can delete the repo, false else
       def can_delete?(repo_item, authorisations = nil)
         can_do?('delete', repo_item, authorisations)
       end
 
-      # Return true it has a sharing in the repo_item
-      def has_sharing?(repo_item)
-
-      end
+      ## Returns true if  it exist a sharing in the ancestors of descendant_ids of the repo_item (without itself)
+      #def has_sharing?(repo_item)
+      #  # An array with the ids of all ancestors and descendants
+      #  ancestor_and_descendant_ids = []
+      #  ancestor_and_descendant_ids << repo_item.descendant_ids if !repo_item.descendant_ids.empty?
+      #  ancestor_and_descendant_ids << repo_item.ancestor_ids if !repo_item.ancestor_ids.empty?
+      #
+      #  # If it is a sharing, it returns true
+      #  if self.sharings.where(repo_item_id: ancestor_and_descendant_ids).count > 0
+      #    true
+      #  else
+      #    false
+      #  end
+      #
+      #end
 
       # Return true if you can add a member in this sharing, false else
       def can_add_to?(sharing)

@@ -47,4 +47,19 @@ class RepoItem < ActiveRecord::Base
     end
   end
 
+  # Returns true if it exist a sharing in the ancestors of descendant_ids of the repo_item (without itself)
+  def has_nested_sharing?
+    # An array with the ids of all ancestors and descendants
+    ancestor_and_descendant_ids = []
+    ancestor_and_descendant_ids << self.descendant_ids if !self.descendant_ids.empty?
+    ancestor_and_descendant_ids << self.ancestor_ids if !self.ancestor_ids.empty?
+
+    # If it is a sharing, it returns true
+    if Sharing.where(repo_item_id: ancestor_and_descendant_ids).count > 0
+      true
+    else
+      false
+    end
   end
+
+end

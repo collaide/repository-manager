@@ -166,6 +166,7 @@ describe 'HasRepository' do
 
     sharing_of_user_1 = @user1.sharings.last
 
+    # TODO correct this, sharing is nil
     expect(sharing_of_user_1.can_read?).to eq(true)
     expect(sharing_of_user_1.can_update?).to eq(false)
     expect(sharing_of_user_1.can_share?).to eq(true)
@@ -194,7 +195,52 @@ describe 'HasRepository' do
     #expect(@user2.sharings_owners.count).to eq(1)
   end
 
-  it 'can share a repo_item with ancestor sharing permissions' do
+  # Todo implement with accepting nested set to true
+  #it 'can share a repo_item with ancestor sharing permissions' do
+  #  parent = FactoryGirl.create(:repo_folder)
+  #  parent.owner = @user3
+  #  middle = @user3.create_folder('Middle', parent)
+  #  children = @user3.create_folder('Children', middle)
+  #
+  #  file = FactoryGirl.build(:repo_file)
+  #  file.owner = @user3
+  #  file.save
+  #
+  #  children.add(file)
+  #
+  #  options = {repo_item_permissions: {can_read: true, can_update: true, can_share: false}}
+  #  @user3.share(parent, @user1, options)
+  #
+  #  options = {repo_item_permissions: {can_read: true, can_update: true, can_share: true}}
+  #  @user3.share(children, @user1, options)
+  #
+  #  @user1.share(middle, @user2)
+  #  expect(@user2.sharings.count).to eq(0)
+  #  @user1.share(file, @user2)
+  #  expect(@user2.sharings.count).to eq(1)
+  #end
+
+  it 'can\'t share a nested sharing' do
+    parent = @user1.create_folder('Parent')
+    nested = @user1.create_folder('Nested', parent)
+    children = @user1.create_folder('Children', nested)
+
+    # @user1 own repository :
+    #   |-- 'Parent'
+    #   |  |-- 'Nested'
+    #   |  |  |-- 'Children'
+
+    @user1.share(nested, @user2)
+
+    expect(nested.has_nested_sharing?).to eq(false) # Returns false (because `nested` is shared but there is no nested sharing)
+    expect(parent.has_nested_sharing?).to eq(true) # Returns true (because there is a sharing on one of his descendants)
+    expect(parent.has_nested_sharing?).to eq(true) # Returns true (because there is a sharing on one of his ancestors)
+
+    # Here we can't share 'Parent' or 'Children' because it already exist a nested sharing.
+    expect(@user1.share(parent, @user2)).to eq(false) # Returns false
+  end
+
+  it 'can\'t share a repo_item with ancestor sharing permissions' do
     parent = FactoryGirl.create(:repo_folder)
     parent.owner = @user3
     middle = @user3.create_folder('Middle', parent)
@@ -206,7 +252,7 @@ describe 'HasRepository' do
 
     children.add(file)
 
-    options = {repo_item_permissions: {can_read: true, can_update: true, can_share: false}}
+    options = {repo_item_permissions: {can_read: true, can_update: true, can_share: true}}
     @user3.share(parent, @user1, options)
 
     options = {repo_item_permissions: {can_read: true, can_update: true, can_share: true}}
@@ -215,7 +261,7 @@ describe 'HasRepository' do
     @user1.share(middle, @user2)
     expect(@user2.sharings.count).to eq(0)
     @user1.share(file, @user2)
-    expect(@user2.sharings.count).to eq(1)
+    expect(@user2.sharings.count).to eq(0)
   end
 
   it "can create a folder" do
