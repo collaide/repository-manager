@@ -20,6 +20,7 @@ Each instance (users, groups, etc..) can have it own repositories (with files an
   #s.test_files = Dir["spec/**/*"]
   s.license = 'MIT'
 
+
   s.add_runtime_dependency 'rails', '~> 4.0.0'
 
   s.add_development_dependency 'factory_girl_rails'
