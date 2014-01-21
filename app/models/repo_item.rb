@@ -51,7 +51,7 @@ class RepoItem < ActiveRecord::Base
   def has_nested_sharing?
     # An array with the ids of all ancestors and descendants
     ancestor_and_descendant_ids = []
-    ancestor_and_descendant_ids << self.descendant_ids if !self.descendant_ids.empty?
+    ancestor_and_descendant_ids << self.descendant_ids if self.type == 'RepoFolder' && !self.descendant_ids.empty?
     ancestor_and_descendant_ids << self.ancestor_ids if !self.ancestor_ids.empty?
 
     # If it is a sharing, it returns true
@@ -61,5 +61,4 @@ class RepoItem < ActiveRecord::Base
       false
     end
   end
-
 end

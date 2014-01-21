@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    repository-manager (0.0.10)
+    repository-manager (0.0.12)
       ancestry
       carrierwave
-      rails (> 3.0.0)
+      rails (~> 4.0.0)
       rubyzip
 
 GEM
@@ -56,7 +56,7 @@ GEM
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
-    mime-types (1.25)
+    mime-types (1.25.1)
     minitest (4.7.5)
     multi_json (1.8.2)
     polyglot (0.3.3)
