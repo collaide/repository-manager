@@ -140,6 +140,24 @@ describe 'RepoItem' do
     expect(@user1.repo_items.count).to eq(3)
     folder3 = @user1.create_folder('Folder2', @user1_folder)
     expect(@user1.repo_items.count).to eq(4)
+    # TODO
   end
 
+  it 'can rename it own folder' do
+    # TODO
+  end
+
+  it 'can rename it own file' do
+    #Todo implement
+  end
+
+  it 'can rename item with share update permission' do
+    # TODO
+
+  end
+
+  it 'can\'t rename item without share update permission' do
+    # TODO
+
+  end
 end

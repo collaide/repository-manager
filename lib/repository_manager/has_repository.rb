@@ -223,6 +223,23 @@ module RepositoryManager
         end
       end
 
+      # Rename the repo_item with the new_name
+      def rename_repo_item!(repo_item, new_name)
+        unless can_update?(repo_item)
+          raise RepositoryManager::AuthorisationException.new("rename repo_item failed. You don't have the permission to update the repo_item '#{repo_item.name}'")
+        end
+        repo_item.rename(new_name)
+      end
+
+      # Rename the repo_item with the new_name
+      def rename_repo_item(repo_item, new_name)
+        begin
+          rename_repo_item!(repo_item, new_name)
+        rescue RepositoryManager::AuthorisationException
+          false
+        end
+      end
+
       # Move the repo_item in the target_folder
       def move_repo_item!(repo_item, target_folder)
         unless can_delete?(repo_item)

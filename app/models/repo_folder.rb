@@ -11,7 +11,6 @@ class RepoFolder < RepoItem
     #if repo_item.children.exists?(:name => repo_item.name)
     if RepoItem.where(name: repo_item.name).where(id: child_ids).first
       raise RepositoryManager::RepositoryManagerException.new("add failed. The repo_item '#{repo_item.name}' already exist in the folder '#{name}'")
-      false
     else
       repo_item.update_attribute :parent, self
     end
@@ -20,6 +19,27 @@ class RepoFolder < RepoItem
   def add(repo_item)
     begin
       add!(repo_item)
+    rescue RepositoryManager::RepositoryManagerException
+      false
+    end
+  end
+
+  # Rename the item
+  def rename!(new_name)
+    # We take all siblings without itself
+    sibling_ids_without_itself = self.sibling_ids.delete(self.id)
+    # We check if another item has the same name
+    if RepoItem.where(name: self.name).where(id: sibling_ids_without_itself).first
+      raise RepositoryManager::RepositoryManagerException.new("rename failed. The repo_item '#{new_name}' already exist.'")
+    else
+      self.name = new_name
+    end
+  end
+
+  # Rename the item
+  def rename(new_name)
+    begin
+      rename!(new_name)
     rescue RepositoryManager::RepositoryManagerException
       false
     end

@@ -278,5 +278,4 @@ describe 'HasRepository' do
     expect(@user1.repo_items.count).to eq(1)
     expect(@user1.repo_items.files.count).to eq(1)
   end
-
 end

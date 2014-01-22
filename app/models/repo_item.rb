@@ -18,6 +18,7 @@ class RepoItem < ActiveRecord::Base
     scope :folders, where(type: 'RepoFolder')
   end
 
+  # Copy itself into the target_folder
   def copy(target_folder)
     #new_file = self.dup
     #new_file.folder = target_folder
@@ -54,7 +55,7 @@ class RepoItem < ActiveRecord::Base
     ancestor_and_descendant_ids << self.descendant_ids if self.type == 'RepoFolder' && !self.descendant_ids.empty?
     ancestor_and_descendant_ids << self.ancestor_ids if !self.ancestor_ids.empty?
 
-    # If it is a sharing, it returns true
+    # If it exist a sharing, it returns true
     if Sharing.where(repo_item_id: ancestor_and_descendant_ids).count > 0
       true
     else
