@@ -119,7 +119,7 @@ The two methods do the same, but the one with the "!" returns an Exeption error 
 
 ### How can I create/delete/move a repo_item (file or folder)
 
-You just have to call the `has_repository` methods `create_file`, `create_folder`, or `delete_repo_item`.
+You just have to call the `has_repository` methods `create_file`, `create_folder`, `move_repo_item` or `delete_repo_item`.
 
 ```ruby
 # user1 wants to create a folder in his repository
@@ -168,7 +168,7 @@ test_folder = user1.create_folder('Test folder')
 #   |-- 'Test folder'
 
 # user1 want to move 'The new folder' in 'Test folder'
-user1.move(the_new_folder, test_folder)
+user1.move_repo_item(the_new_folder, test_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
@@ -407,7 +407,10 @@ the_folder.delete_zip
 
 ## TODO
 
-- Write the methods : move, copy, share_link, rename.
+- Test the rename folder method
+- Do the rename file method
+- Write the documentation for the rename method
+- Write the methods : copy, share_link.
 - Snapshot the file if possible
 - Versioning
 - ...
