@@ -408,6 +408,8 @@ the_folder.delete_zip
 ## TODO
 
 - Test the rename folder method
+- Donner un nom UNIQUE de dossier par default
+- Verifier que le nom du dossier n'existe pas dans la racine du repo
 - Do the rename file method
 - Write the documentation for the rename method
 - Write the methods : copy, share_link.
