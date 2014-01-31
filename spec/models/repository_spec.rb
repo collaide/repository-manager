@@ -160,4 +160,13 @@ describe 'RepoItem' do
     # TODO
 
   end
+
+  it 'can create a new folder with different name' do
+    folder1 = @user1.create_folder()
+    folder2 = @user1.create_folder()
+
+    # TODO add translate in gem
+    expect(folder1.name).to eq('translation missing: en.repository_manager.models.repo_folder.name')
+    expect(folder2.name).to eq('translation missing: en.repository_manager.models.repo_folder.name2')
+  end
 end

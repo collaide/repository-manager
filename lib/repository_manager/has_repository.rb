@@ -88,7 +88,7 @@ module RepositoryManager
       # Returns an Exception if the folder is not created
       #     RepositoryManagerException if the name already exist
       #     AuthorisationException if the object don't have the permission
-      def create_folder!(name, source_folder = nil)
+      def create_folder!(name = '', source_folder = nil)
         # If he want to create a folder in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
 
@@ -109,7 +109,7 @@ module RepositoryManager
         end
       end
 
-      def create_folder(name, source_folder = nil)
+      def create_folder(name = '', source_folder = nil)
         begin
           create_folder!(name, source_folder)
         rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException
