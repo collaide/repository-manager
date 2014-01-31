@@ -138,6 +138,7 @@ class RepoFolder < RepoItem
   def default_name
     if name.empty?
       i = ''
+      self.name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
       # We take all siblings without itself
       sibling_ids_without_itself = self.sibling_ids.delete(self.id)
       # We check if another item has the same name
