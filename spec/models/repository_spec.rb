@@ -174,4 +174,11 @@ describe 'RepoItem' do
     expect(folder4.name).to eq('translation missing: en.repository_manager.models.repo_folder.name2')
 
   end
+
+  it 'can\'t create a folder with the same name at root' do
+    @user1.create_folder('test')
+    folder2 = @user1.create_folder('test')
+
+    expect(folder2).to eq(false)
+  end
 end

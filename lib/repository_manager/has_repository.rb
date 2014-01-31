@@ -100,12 +100,17 @@ module RepositoryManager
           end
           folder.owner = self
 
-          # Soit il a une source_folder, donc on l'ajoute et on le sauve et ça fonctionne pas => ERREUR
-          # Soit il n'a pas de source_folder et le save ne va pas => ERREUR
-          unless (folder.save && source_folder && source_folder.add(folder)) || (!source_folder && folder.save)
-            folder.destroy
+          # If we are in root path we check if we can add this folder name
+          if !source_folder && repo_item_name_exist_in_root?(name)
+            raise RepositoryManager::RepositoryManagerException.new("create folder failed. The repo_item '#{name}' already exist in the root folder.")
+          end
+
+          unless folder.save
             raise RepositoryManager::RepositoryManagerException.new("create_folder failed. Can\'t save the folder '#{name}'.")
           end
+
+          # It raise an error if name already exist and destroy the folder
+          source_folder.add!(folder, true) if source_folder
         else
           raise RepositoryManager::AuthorisationException.new("create_folder failed. You don't have the permission to create a folder in '#{source_folder.name}'")
         end
@@ -378,6 +383,11 @@ module RepositoryManager
         "#{prefix}#{self.class.to_s.underscore}/#{self.id}/"
       end
 
+      # Returns true of false if the name exist in the root path of this instance
+      def repo_item_name_exist_in_root?(name)
+        RepoItem.where(name: name).where(owner: self).where(ancestry: nil).first ? true : false
+      end
+
       private
 
       # Return if you can do or not this action in the sharing
@@ -478,7 +488,7 @@ module RepositoryManager
 
         if source_folder
           # We check if another item has the same name
-          until !RepoItem.where(name: name).where(id: source_folder.child_ids).first do
+          until !source_folder.name_exist_in_children?(name) do
             if i == ''
               i = 1
             end
@@ -488,7 +498,7 @@ module RepositoryManager
 
         else
           # Si il n'a pas de parent, racine
-          until !RepoItem.where(name: name).where(owner: self).where(ancestry: nil).first do
+          until !repo_item_name_exist_in_root?(name) do
             if i == ''
               i = 1
             end

@@ -6,10 +6,13 @@ class RepoFolder < RepoItem
   validates :name, presence: true
 
   # Add a repo_item in the folder.
-  def add!(repo_item)
+  # second param destroy the repo_item if it can move it.
+  def add!(repo_item, destroy_if_fail = false)
     # We check if this name already exist
     #if repo_item.children.exists?(:name => repo_item.name)
-    if RepoItem.where(name: repo_item.name).where(id: child_ids).first
+    if name_exist_in_children?(repo_item.name)
+      # we delete the repo if asked
+      repo_item.destroy if destroy_if_fail
       raise RepositoryManager::RepositoryManagerException.new("add failed. The repo_item '#{repo_item.name}' already exist in the folder '#{name}'")
     else
       repo_item.update_attribute :parent, self
@@ -26,13 +29,12 @@ class RepoFolder < RepoItem
 
   # Rename the item
   def rename!(new_name)
-    # We take all siblings without itself
-    sibling_ids_without_itself = self.sibling_ids.delete(self.id)
-    # We check if another item has the same name
-    if RepoItem.where(name: self.name).where(id: sibling_ids_without_itself).first
+    if name_exist_in_siblings?(new_name)
       raise RepositoryManager::RepositoryManagerException.new("rename failed. The repo_item '#{new_name}' already exist.'")
     else
       self.name = new_name
+      # TODO see if I have to save or not
+      save!
     end
   end
 
@@ -103,6 +105,21 @@ class RepoFolder < RepoItem
     # Delete the path
     FileUtils.rm_rf(path)
   end
+
+  # Returns true or false if the name exist in this folder
+  def name_exist_in_children?(name)
+    RepoItem.where(name: name).where(id: child_ids).first ? true : false
+  end
+
+  # Returns true or false if the name exist in siblings
+  def name_exist_in_siblings?(name)
+    # We take all siblings without itself
+    sibling_ids_without_itself = self.sibling_ids.delete(self.id)
+    # We check if another item has the same name
+    RepoItem.where(name: name).where(id: sibling_ids_without_itself).first ? true : false
+  end
+
+
 
   private
 
