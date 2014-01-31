@@ -92,21 +92,23 @@ module RepositoryManager
         # If he want to create a folder in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
 
+          unless name
+            name = default_folder_name(source_folder)
+          end
+
           folder = RepoFolder.new(name: name)
           folder.owner = self
-          folder.save
 
-          # We have to look if it is ok to add the folder here
-          if source_folder == nil || source_folder.add(folder)
-            folder
-          else
-            # The add didn't works, we delete the folder
+          # Soit il a une source_folder, donc on l'ajoute et on le sauve et ça fonctionne pas => ERREUR
+          # Soit il n'a pas de source_folder et le save ne va pas => ERREUR
+          unless (folder.save && source_folder && source_folder.add(folder)) || (!source_folder && folder.save)
             folder.destroy
-            raise RepositoryManager::RepositoryManagerException.new("create_folder failed. The folder name '#{name}' already exist in folder '#{source_folder.name}'")
+            raise RepositoryManager::RepositoryManagerException.new("create_folder failed. Can\'t save the folder '#{name}'.")
           end
         else
           raise RepositoryManager::AuthorisationException.new("create_folder failed. You don't have the permission to create a folder in '#{source_folder.name}'")
         end
+        folder
       end
 
       def create_folder(name = '', source_folder = nil)
@@ -465,6 +467,35 @@ module RepositoryManager
           end
         end
         return wanted_permissions
+      end
+
+      # Put a deflault name if none is given
+      def default_folder_name(source_folder)
+        i = ''
+        name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
+        # We check if another item has the same name
+
+        if source_folder
+          # We check if another item has the same name
+          until !RepoItem.where(name: name).where(id: source_folder.child_ids).first do
+            if i == ''
+              i = 1
+            end
+            i += 1
+            name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
+          end
+
+        else
+          # Si il n'a pas de parent, racine
+          until !RepoItem.where(name: name).where(owner: self).where(ancestry: nil).first do
+            if i == ''
+              i = 1
+            end
+            i += 1
+            name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
+          end
+
+        end
       end
 
     end

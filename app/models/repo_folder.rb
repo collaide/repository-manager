@@ -5,8 +5,6 @@ class RepoFolder < RepoItem
 
   validates :name, presence: true
 
-  before_validation :default_name
-
   # Add a repo_item in the folder.
   def add!(repo_item)
     # We check if this name already exist
@@ -130,22 +128,6 @@ class RepoFolder < RepoItem
           # We just create the folder if it is empty
           zf.mkdir(child.name) if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)
         end
-      end
-    end
-  end
-
-  private
-  def default_name
-    if name.empty?
-      i = ''
-      self.name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
-      # We check if another item has the same name
-      until !RepoItem.where(name: self.name).where(owner: self.owner).first do
-        if i == ''
-          i = 0
-        end
-        i += 1
-        self.name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
       end
     end
   end
