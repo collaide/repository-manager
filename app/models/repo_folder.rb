@@ -146,9 +146,9 @@ class RepoFolder < RepoItem
         if i == ''
           i = 0
         end
-        i = i + 1
+        i += 1
+        self.name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
       end
-      self.name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
     end
   end
 end
