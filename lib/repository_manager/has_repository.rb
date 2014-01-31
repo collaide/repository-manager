@@ -152,30 +152,30 @@ module RepositoryManager
           if file.class.name == 'RepoFile'
             repo_file = file
             repo_file.owner = self
-            unless repo_file.save
-              raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file '#{name}' can't be save")
-            end
           else
             repo_file = RepoFile.new
             repo_file.file = file
             repo_file.owner = self
-            unless repo_file.save
-              raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file '#{name}' can't be save")
-            end
           end
 
-          # We have to look if it is ok to add the file here
-          if source_folder == nil || source_folder.add(file)
-            return repo_file
-          else
-            # The add didn't works, we delete the file
-            file.destroy
-            raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file '#{name}' already exist in folder '#{source_folder.name}'")
+          puts repo_file.name
+
+          # If we are in root path we check if we can add this file name
+          if !source_folder && repo_item_name_exist_in_root?(repo_file.name)
+            raise RepositoryManager::RepositoryManagerException.new("create file failed. The repo_item '#{name}' already exist in the root folder.")
           end
+
+
+          unless repo_file.save
+            raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file '#{name}' can't be save")
+          end
+
+          # It raise an error if name already exist and destroy the file
+          source_folder.add!(repo_file, true) if source_folder
         else
-          #raise "create_file failed. You don't have the permission to create a file in the folder '#{source_folder.name}'"
           raise RepositoryManager::AuthorisationException.new("create_file failed. The file '#{name}' already exist in folder '#{source_folder.name}'")
         end
+        repo_file
       end
 
       def create_file(file, source_folder = nil)
@@ -384,7 +384,9 @@ module RepositoryManager
       end
 
       # Returns true of false if the name exist in the root path of this instance
+      # TODO DONT WORK WITH REPO_FILES !!!!
       def repo_item_name_exist_in_root?(name)
+        # add : or file : name
         RepoItem.where(name: name).where(owner: self).where(ancestry: nil).first ? true : false
       end
 
