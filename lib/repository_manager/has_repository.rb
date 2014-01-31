@@ -88,7 +88,7 @@ module RepositoryManager
       # Returns an Exception if the folder is not created
       #     RepositoryManagerException if the name already exist
       #     AuthorisationException if the object don't have the permission
-      def create_folder!(name = 'New folder', source_folder = nil)
+      def create_folder!(name, source_folder = nil)
         # If he want to create a folder in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
 
@@ -109,7 +109,7 @@ module RepositoryManager
         end
       end
 
-      def create_folder(name = 'New folder', source_folder = nil)
+      def create_folder(name, source_folder = nil)
         begin
           create_folder!(name, source_folder)
         rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException
@@ -141,15 +141,19 @@ module RepositoryManager
       def create_file!(file, source_folder = nil)
         # If he want to create a file in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
-          if file.class.name == 'File'
+          if file.class.name == 'RepoFile'
+            repo_file = file
+            repo_file.owner = self
+            unless repo_file.save
+              raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file '#{name}' can't be save")
+            end
+          else
             repo_file = RepoFile.new
             repo_file.file = file
             repo_file.owner = self
-            repo_file.save
-          elsif file.class.name == 'RepoFile'
-            repo_file = file
-            repo_file.owner = self
-            repo_file.save
+            unless repo_file.save
+              raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file '#{name}' can't be save")
+            end
           end
 
           # We have to look if it is ok to add the file here
