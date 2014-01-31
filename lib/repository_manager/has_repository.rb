@@ -92,11 +92,12 @@ module RepositoryManager
         # If he want to create a folder in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
 
-          unless name
-            name = default_folder_name(source_folder)
+          folder = RepoFolder.new
+          if name == ''
+            folder.name = default_folder_name(source_folder)
+          else
+            folder.name = name
           end
-
-          folder = RepoFolder.new(name: name)
           folder.owner = self
 
           # Soit il a une source_folder, donc on l'ajoute et on le sauve et ça fonctionne pas => ERREUR
@@ -469,7 +470,7 @@ module RepositoryManager
         return wanted_permissions
       end
 
-      # Put a deflault name if none is given
+      # Put a default name if none is given
       def default_folder_name(source_folder)
         i = ''
         name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
@@ -496,6 +497,7 @@ module RepositoryManager
           end
 
         end
+        name
       end
 
     end
