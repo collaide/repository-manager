@@ -1,5 +1,8 @@
 fr:
   repository_manager:
+    models:
+      repo_folder:
+        name: Nouveau dossier
     success:
       repo_folder:
         created: Le dossier a été créé avec succès !

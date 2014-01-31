@@ -5,7 +5,7 @@ class RepoFolder < RepoItem
 
   validates :name, presence: true
 
-  after_initialize :default_name
+  before_validation :default_name
 
   # Add a repo_item in the folder.
   def add!(repo_item)
@@ -136,12 +136,18 @@ class RepoFolder < RepoItem
 
   private
   def default_name
-    #if name.empty?
-    #  if RepoItem.where(name: repo_item.name).where(id: child_ids).first
-    #    raise RepositoryManager::RepositoryManagerException.new("add failed. The repo_item '#{repo_item.name}' already exist in the folder '#{name}'")
-    #  else
-    #    repo_item.update_attribute :parent, self
-    #  end
-    #end
+    if name.empty?
+      i = ''
+      # We take all siblings without itself
+      sibling_ids_without_itself = self.sibling_ids.delete(self.id)
+      # We check if another item has the same name
+      until RepoItem.where(name: self.name).where(id: sibling_ids_without_itself).first
+        if i == ''
+          i = 0
+        end
+        i = i + 1
+      end
+      self.name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
+    end
   end
 end
