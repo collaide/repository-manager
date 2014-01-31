@@ -141,7 +141,7 @@ class RepoFolder < RepoItem
       # We take all siblings without itself
       sibling_ids_without_itself = self.sibling_ids.delete(self.id)
       # We check if another item has the same name
-      until RepoItem.where(name: self.name).where(id: sibling_ids_without_itself).first
+      until !RepoItem.where(name: self.name).where(id: sibling_ids_without_itself).first
         if i == ''
           i = 0
         end
