@@ -18,6 +18,10 @@ if ActiveSupport::TestCase.method_defined?(:fixture_path=)
   ActiveSupport::TestCase.fixture_path = File.expand_path("../fixtures", __FILE__)
 end
 
+RSpec.configure do |config|
+  config.include SpecTestHelper#, :type => :controller
+end
+
 
 #
 #class ActiveSupport::TestCase
