@@ -384,7 +384,6 @@ module RepositoryManager
       end
 
       # Returns true of false if the name exist in the root path of this instance
-      # TODO DONT WORK WITH REPO_FILES !!!!
       def repo_item_name_exist_in_root?(name)
         # add : or file : name
         #RepoItem.where(name: name).where(owner: self).where(ancestry: nil).first ? true : false
@@ -494,6 +493,7 @@ module RepositoryManager
         # We check if another item has the same name
 
         if source_folder
+          #TODO Optimiser, récupérer tout les instances contenants le nom, puis faire la boucle (pas boucle de requete)
           # We check if another item has the same name
           until !source_folder.name_exist_in_children?(name) do
             if i == ''
@@ -502,8 +502,8 @@ module RepositoryManager
             i += 1
             name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
           end
-
         else
+          #TODO Optimiser, récupérer tout les instances contenants le nom, puis faire la boucle (pas boucle de requete)
           # Si il n'a pas de parent, racine
           until !repo_item_name_exist_in_root?(name) do
             if i == ''
