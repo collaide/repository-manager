@@ -161,21 +161,19 @@ module RepositoryManager
           repo_file.owner = self
           repo_file.user = current_user if RepositoryManager.user_model
 
-          #puts repo_file.name
-
           # If we are in root path we check if we can add this file name
-          if !source_folder && repo_item_name_exist_in_root?(repo_file.name)
-            raise RepositoryManager::RepositoryManagerException.new("create file failed. The repo_item '#{name}' already exist in the root folder.")
+          if !source_folder && repo_item_name_exist_in_root?(repo_file.file.identifier)
+            raise RepositoryManager::RepositoryManagerException.new("create file failed. The repo_item '#{repo_file.file.identifier}' already exist in the root folder.")
           end
 
           unless repo_file.save
-            raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file '#{name}' can't be save")
+            raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file can't be save")
           end
 
           # It raise an error if name already exist and destroy the file
           source_folder.add!(repo_file, true) if source_folder
         else
-          raise RepositoryManager::AuthorisationException.new("create_file failed. The file '#{name}' already exist in folder '#{source_folder.name}'")
+          raise RepositoryManager::AuthorisationException.new("create_file failed. You don't have the permission to create a file")
         end
         repo_file
       end
@@ -389,7 +387,12 @@ module RepositoryManager
       # TODO DONT WORK WITH REPO_FILES !!!!
       def repo_item_name_exist_in_root?(name)
         # add : or file : name
-        RepoItem.where(name: name).where(owner: self).where(ancestry: nil).first ? true : false
+        #RepoItem.where(name: name).where(owner: self).where(ancestry: nil).first ? true : false
+        #puts RepoItem.where('name = ? OR file = ?', name, name).where(owner: self).where(ancestry: nil).first.inspect
+        #puts self.inspect
+
+        RepoItem.where('name = ? OR file = ?', name, name).where(owner: self).where(ancestry: nil).first ? true : false
+
       end
 
       private

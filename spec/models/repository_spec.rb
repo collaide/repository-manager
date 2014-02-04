@@ -183,9 +183,9 @@ describe 'RepoItem' do
   end
 
   it "can't create too file with the same name at root" do
-    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
+    file = @user2.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
     expect(file.name).to eq('textfile.txt')
-    file2 = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
+    file2 = @user2.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
     expect(file2).to eq(false)
 
     #@user1.create_file!(File.open("#{Rails.root}/../fixture/textfile.txt"))
