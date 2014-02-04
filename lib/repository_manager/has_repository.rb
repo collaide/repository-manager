@@ -63,7 +63,7 @@ module RepositoryManager
 
           sharing = Sharing.new(repo_item_permissions)
           sharing.owner = self
-          sharing.user = current_user if RepositoryManager.user_model
+          sharing.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
 
           sharing.add_members(members, sharing_permissions)
 
@@ -100,7 +100,7 @@ module RepositoryManager
             folder.name = name
           end
           folder.owner = self
-          folder.user = current_user if RepositoryManager.user_model
+          folder.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
 
           # If we are in root path we check if we can add this folder name
           if !source_folder && repo_item_name_exist_in_root?(name)
@@ -159,7 +159,8 @@ module RepositoryManager
           end
 
           repo_file.owner = self
-          repo_file.user = current_user if RepositoryManager.user_model
+          repo_file.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
+
 
           # If we are in root path we check if we can add this file name
           if !source_folder && repo_item_name_exist_in_root?(repo_file.file.identifier)

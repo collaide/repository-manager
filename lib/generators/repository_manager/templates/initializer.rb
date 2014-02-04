@@ -6,7 +6,7 @@ RepositoryManager.setup do |config|
   # Default sharing permissions that an object has when he is added in a sharing.
   config.default_sharing_permissions = { can_add: false, can_remove: false }
 
-  # Note here the user model. Default : 'User'
+  # Note here the user model. Default : false
   # Def false if you don't want to register the user
   #config.user_model = 'User'
 
