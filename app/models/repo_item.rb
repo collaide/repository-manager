@@ -1,13 +1,13 @@
 class RepoItem < ActiveRecord::Base
   attr_accessible :type if RepositoryManager.protected_attributes?
 
-
   has_ancestry
 
   # Associate with the User Class
   belongs_to :owner, :polymorphic => true
   has_many :sharings, :dependent => :destroy
   #has_many :members, through: :sharings
+  belongs_to :user, class_name: RepositoryManager.user_model if RepositoryManager.user_model
 
   if Rails::VERSION::MAJOR == 4
     scope :files, -> { where type: 'RepoFile' }

@@ -63,6 +63,7 @@ module RepositoryManager
 
           sharing = Sharing.new(repo_item_permissions)
           sharing.owner = self
+          sharing.user = current_user if RepositoryManager.user_model
 
           sharing.add_members(members, sharing_permissions)
 
@@ -99,6 +100,7 @@ module RepositoryManager
             folder.name = name
           end
           folder.owner = self
+          folder.user = current_user if RepositoryManager.user_model
 
           # If we are in root path we check if we can add this folder name
           if !source_folder && repo_item_name_exist_in_root?(name)
@@ -151,20 +153,20 @@ module RepositoryManager
         if can_create?(source_folder)
           if file.class.name == 'RepoFile'
             repo_file = file
-            repo_file.owner = self
           else
             repo_file = RepoFile.new
             repo_file.file = file
-            repo_file.owner = self
           end
 
-          puts repo_file.name
+          repo_file.owner = self
+          repo_file.user = current_user if RepositoryManager.user_model
+
+          #puts repo_file.name
 
           # If we are in root path we check if we can add this file name
           if !source_folder && repo_item_name_exist_in_root?(repo_file.name)
             raise RepositoryManager::RepositoryManagerException.new("create file failed. The repo_item '#{name}' already exist in the root folder.")
           end
-
 
           unless repo_file.save
             raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file '#{name}' can't be save")

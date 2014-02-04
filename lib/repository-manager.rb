@@ -14,6 +14,10 @@ module RepositoryManager
   mattr_accessor :accept_nested_sharing
   @@accept_nested_share = false
 
+  mattr_accessor :user_model
+  #@@user_model = 'User'
+  @@user_model = false
+
   class << self
     def setup
       yield self

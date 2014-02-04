@@ -7,9 +7,6 @@ describe 'HasRepository' do
     @user2 = FactoryGirl.create(:user)
     @user3 = FactoryGirl.create(:user)
     @group1 = FactoryGirl.create(:group)
-    #@group2 = FactoryGirl.create(:group)
-    #@group3 = FactoryGirl.create(:group)
-    #@fileAlone = FactoryGirl.create(:app_file)
   end
 
   it "should be associate with shares" do

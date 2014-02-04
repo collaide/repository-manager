@@ -1,10 +1,11 @@
 class Sharing < ActiveRecord::Base
   attr_accessible :can_read, :can_create, :can_update, :can_delete, :can_share if RepositoryManager.protected_attributes?
 
-
   has_many :sharings_members, :dependent => :destroy
   belongs_to :owner, :polymorphic => true
   belongs_to :repo_item
+  belongs_to :user, class_name: RepositoryManager.user_model if RepositoryManager.user_model
+
 
   #scope :recipient, lambda { |recipient|
   #  joins(:receipts).where('receipts.receiver_id' => recipient.id,'receipts.receiver_type' => recipient.class.base_class.to_s)

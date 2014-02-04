@@ -3,8 +3,9 @@ class CreateRepositoryManager < ActiveRecord::Migration
   def change
 
     create_table :sharings do |t|
-      t.references :owner, polymorphic: true
-      t.references :repo_item
+      t.references :owner, polymorphic: true, index: true
+      t.references :user, index: true
+      t.references :repo_item, index: true
       t.boolean :can_create, :default => false
       t.boolean :can_read, :default => false
       t.boolean :can_update, :default => false
@@ -20,9 +21,10 @@ class CreateRepositoryManager < ActiveRecord::Migration
     end
 
     create_table :repo_items do |t|
-      t.references :owner, polymorphic: true
+      t.references :owner, polymorphic: true, index: true
+      t.references :user, index: true
       t.string :ancestry
-      t.integer :ancestry_depth, :default => 0
+      #t.integer :ancestry_depth, :default => 0
       t.string :name
       t.float :file_size
       t.string :content_type
