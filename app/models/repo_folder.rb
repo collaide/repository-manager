@@ -121,8 +121,6 @@ class RepoFolder < RepoItem
     RepoItem.where(name: name).where(id: sibling_ids_without_itself).first ? true : false
   end
 
-
-
   private
 
   # Returns the default path of the zip file
