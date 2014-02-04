@@ -25,9 +25,11 @@ ActiveRecord::Schema.define(version: 20131018214212) do
     t.integer "user_id",  null: false
   end
 
-  create_table "repo_items", force: true do |t|
+  create_table "rm_repo_items", force: true do |t|
     t.integer "owner_id"
     t.string  "owner_type"
+    t.integer "sender_id"
+    t.string  "sender_type"
     t.string  "ancestry"
     t.string  "name"
     t.float   "file_size"
@@ -36,7 +38,7 @@ ActiveRecord::Schema.define(version: 20131018214212) do
     t.string  "type"
   end
 
-  create_table "sharings", force: true do |t|
+  create_table "rm_sharings", force: true do |t|
     t.integer "owner_id"
     t.string  "owner_type"
     t.integer "repo_item_id"
@@ -47,7 +49,7 @@ ActiveRecord::Schema.define(version: 20131018214212) do
     t.boolean "can_share",    default: false
   end
 
-  create_table "sharings_members", force: true do |t|
+  create_table "rm_sharings_members", force: true do |t|
     t.integer "sharing_id"
     t.integer "member_id"
     t.string  "member_type"

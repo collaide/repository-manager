@@ -6,7 +6,7 @@ describe 'Sharing' do
     @user1 = FactoryGirl.create(:user)
     @user2 = FactoryGirl.create(:user)
     @user3 = FactoryGirl.create(:user)
-    @user1_file = FactoryGirl.build(:repo_file)
+    @user1_file = FactoryGirl.build(:rm_repo_file)
     @user1_file.owner = @user1
     @user1_file.save
   end

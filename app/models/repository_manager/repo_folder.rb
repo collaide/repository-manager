@@ -1,6 +1,6 @@
 require 'zip'
 
-class RepoFolder < RepoItem
+class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   attr_accessible :name if RepositoryManager.protected_attributes?
 
   validates :name, presence: true
@@ -56,7 +56,7 @@ class RepoFolder < RepoItem
   #     :path => 'path/to/zip/' is the path where the zip is generated
   def download!(options = {})
     # Get all the children
-    children = RepoItem.find(child_ids)
+    children = RepositoryManager::RepoItem.find(child_ids)
 
     # If something is in the array to add, we zip it
     if children.length > 0
@@ -108,8 +108,8 @@ class RepoFolder < RepoItem
 
   # Returns true or false if the name exist in this folder
   def name_exist_in_children?(name)
-    #RepoItem.where(name: name).where(id: child_ids).first ? true : false
-    RepoItem.where('name = ? OR file = ?', name, name).where(id: child_ids).first ? true : false
+    #RepositoryManager::RepoItem.where(name: name).where(id: child_ids).first ? true : false
+    RepositoryManager::RepoItem.where('name = ? OR file = ?', name, name).where(id: child_ids).first ? true : false
   end
 
   # Returns true or false if the name exist in siblings
@@ -117,8 +117,8 @@ class RepoFolder < RepoItem
     # We take all siblings without itself
     sibling_ids_without_itself = self.sibling_ids.delete(self.id)
     # We check if another item has the same name
-    #RepoItem.where(name: name).where(id: sibling_ids_without_itself).first ? true : false
-    RepoItem.where('name = ? OR file = ?', name, name).where(id: sibling_ids_without_itself).first ? true : false
+    #RepositoryManager::RepoItem.where(name: name).where(id: sibling_ids_without_itself).first ? true : false
+    RepositoryManager::RepoItem.where('name = ? OR file = ?', name, name).where(id: sibling_ids_without_itself).first ? true : false
   end
 
   private
@@ -133,14 +133,14 @@ class RepoFolder < RepoItem
   def add_repo_item_to_zip(children, zf, object = nil, prefix = nil)
     children.each do |child|
       # If this is a file, we just add this file to the zip
-      if child.type == 'RepoFile'
+      if child.type == 'RepositoryManager::RepoFile'
         # Add the file in the zip if the object is authorised to read it.
         zf.add("#{prefix}#{child.name}", child.file.current_path) if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)
-      elsif child.type == 'RepoFolder'
+      elsif child.type == 'RepositoryManager::RepoFolder'
         # If this folder has children, we do it again with it children
         if child.has_children?
           # We go in this new directory and add it repo_items
-          add_repo_item_to_zip(RepoItem.find(child.child_ids), zf, object, "#{prefix}#{child.name}/")
+          add_repo_item_to_zip(RepositoryManager::RepoItem.find(child.child_ids), zf, object, "#{prefix}#{child.name}/")
         else
           # We just create the folder if it is empty
           zf.mkdir(child.name) if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)

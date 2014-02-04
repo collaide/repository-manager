@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :repo_folder do
+  factory :rm_repo_folder, :class => RepositoryManager::RepoFolder do
     sequence :name do |n|
       'Folder'
     end

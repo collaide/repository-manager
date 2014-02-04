@@ -4,14 +4,14 @@ describe "Associations" do
 
   it "test if user can have a own file" do
     user = FactoryGirl.build(:user)
-    file = RepoItem.new
+    file = RepositoryManager::RepoItem.new
     file.owner = user
     expect(file.owner).to eq(user)
   end
 
   it "test if user can have a own sharing" do
-    user = User.new
-    sharing = Sharing.new
+    user = FactoryGirl.build(:user)
+    sharing = RepositoryManager::Sharing.new
     sharing.owner = user
     expect(sharing.owner).to eq(user)
   end
@@ -23,22 +23,24 @@ describe "Associations" do
     expect(user2.sharings.count).to eq(0)
     expect(user.repo_items.count).to eq(0)
 
-    file = RepoItem.new
+    file = RepositoryManager::RepoItem.new
     file.owner = user
+    file.save
 
     #pp user.repo_items
 
-    sharing = Sharing.new(can_read:true, can_create:true)
+    sharing = RepositoryManager::Sharing.new(can_read:true, can_create:true)
     sharing.owner = user
+    sharing.save
     file.sharings << sharing
-    sharings_member = SharingsMember.new
+    sharings_member = RepositoryManager::SharingsMember.new
     sharings_member.member=user2
     sharing.sharings_members << sharings_member
 
     #expect(user2.sharings.count).to eq(0)
     #expect(file.sharings.count).to eq(0)
 
-    #SharingsMember.save
+    #RepositoryManager::SharingsMember.save
     #sharing.save
     file.save
 
@@ -56,22 +58,25 @@ describe "Associations" do
     expect(group.sharings.count).to eq(0)
     expect(group.repo_items.count).to eq(0)
 
-    file = RepoItem.new
+    file = RepositoryManager::RepoItem.new
     file.owner = user
+    file.save
 
     #pp user.repo_items
 
-    sharing = Sharing.new(can_read:true, can_create:true)
+    sharing = RepositoryManager::Sharing.new(can_read:true, can_create:true)
     sharing.owner = group
+    sharing.save
     file.sharings << sharing
-    sm = SharingsMember.new
+    sm = RepositoryManager::SharingsMember.new
     sm.member=group2
+    sm.save
     sharing.sharings_members << sm
 
     #expect(user2.sharings.count).to eq(0)
     #expect(file.sharings.count).to eq(0)
 
-    #SharingsMember.save
+    #RepositoryManager::SharingsMember.save
     #sharing.save
     file.save
 

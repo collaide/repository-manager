@@ -5,14 +5,14 @@ module RepositoryManager
     module ClassMethods
       def has_repository(options = {})
 
-        has_many :sharings, through: :sharings_members
-        has_many :sharings_members, as: :member, dependent: :destroy
-        has_many :sharings_owners, as: :owner, class_name: 'Sharing'
+        has_many :sharings, through: :sharings_members, class_name: 'RepositoryManager::Sharing'
+        has_many :sharings_members, class_name: 'RepositoryManager::SharingsMember', as: :member, dependent: :destroy
+        has_many :sharings_owners, as: :owner, class_name: 'RepositoryManager::Sharing'
 
         # The own repo_items
-        has_many :repo_items, as: :owner #, dependent: :destroy
+        has_many :repo_items, as: :owner, class_name: 'RepositoryManager::RepoItem' #, dependent: :destroy
         # The sharing repo_items
-        has_many :shared_repo_items, through: :sharings, source: :repo_item, class_name: 'RepoItem'
+        has_many :shared_repo_items, through: :sharings, source: :repo_item, class_name: 'RepositoryManager::RepoItem'
 
         #scope :all_repo_items, -> { self.repo_items.shared_repo_items }
 
@@ -61,9 +61,9 @@ module RepositoryManager
           # Correct the item permission with accepted permissions
           repo_item_permissions = make_repo_item_permissions(repo_item_permissions, authorisations)
 
-          sharing = Sharing.new(repo_item_permissions)
+          sharing = RepositoryManager::Sharing.new(repo_item_permissions)
           sharing.owner = self
-          sharing.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
+          #sharing.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
 
           sharing.add_members(members, sharing_permissions)
 
@@ -89,7 +89,9 @@ module RepositoryManager
       # Returns an Exception if the folder is not created
       #     RepositoryManagerException if the name already exist
       #     AuthorisationException if the object don't have the permission
-      def create_folder!(name = '', source_folder = nil)
+      def create_folder!(name = '', options = {})
+        source_folder = options[:source_folder]
+
         # If he want to create a folder in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
 
@@ -100,7 +102,7 @@ module RepositoryManager
             folder.name = name
           end
           folder.owner = self
-          folder.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
+          #folder.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
 
           # If we are in root path we check if we can add this folder name
           if !source_folder && repo_item_name_exist_in_root?(name)
@@ -119,9 +121,9 @@ module RepositoryManager
         folder
       end
 
-      def create_folder(name = '', source_folder = nil)
+      def create_folder(name = '', options = {})
         begin
-          create_folder!(name, source_folder)
+          create_folder!(name, options)
         rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException
           false
         end
@@ -148,18 +150,19 @@ module RepositoryManager
       # Param file can be a File, or a instance of RepoFile
       # Return the object of the file created if it is ok
       # Return false if the file is not created (no authorisation)
-      def create_file!(file, source_folder = nil)
+      def create_file!(file, options = {})
+        source_folder = options[:source_folder]
         # If he want to create a file in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
-          if file.class.name == 'RepoFile'
+          if file.class.name == 'RepositoryManager::RepoFile'
             repo_file = file
           else
-            repo_file = RepoFile.new
+            repo_file = RepositoryManager::RepoFile.new
             repo_file.file = file
           end
 
           repo_file.owner = self
-          repo_file.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
+          #repo_file.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
 
 
           # If we are in root path we check if we can add this file name
@@ -179,9 +182,9 @@ module RepositoryManager
         repo_file
       end
 
-      def create_file(file, source_folder = nil)
+      def create_file(file, options = {})
         begin
-          create_file!(file, source_folder)
+          create_file!(file, options)
         rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException
           false
         end

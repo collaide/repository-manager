@@ -5,37 +5,38 @@ describe 'RepoItem' do
   before do
     @user1 = FactoryGirl.create(:user)
     @user2 = FactoryGirl.create(:user)
-    @user1_file = FactoryGirl.build(:repo_file)
+    @user1_file = FactoryGirl.build(:rm_repo_file)
     @user1_file.owner = @user1
-    @user1_folder = FactoryGirl.build(:repo_folder)
+    @user1_file.save
+    @user1_folder = FactoryGirl.build(:rm_repo_folder)
     @user1_folder.owner = @user1
     @user1_folder.save
     @user1_file.save
   end
 
   it 'can create a folder in it own folder' do
-    folder = @user1.create_folder('Folder1', @user1_folder)
+    folder = @user1.create_folder('Folder1', source_folder: @user1_folder)
 
     expect(@user1_folder.has_children?).to eq(true)
   end
 
   it 'can\'t create a folder in another folder without permission' do
-    folder = @user2.create_folder('Folder1', @user1_folder)
+    folder = @user2.create_folder('Folder1', source_folder: @user1_folder)
 
     expect(@user1_folder.has_children?).to eq(false)
     expect(folder).to eq(false)
   end
 
   it 'can create a file into a folder' do
-    file = FactoryGirl.build(:repo_file)
-    theFile = @user1.create_file(file, @user1_folder)
+    file = FactoryGirl.build(:rm_repo_file)
+    theFile = @user1.create_file(file, source_folder: @user1_folder)
 
     expect(@user1_folder.has_children?).to eq(true)
     expect(file).to eq(theFile)
   end
 
   it 'can\'t create a repo into a file' do
-    file = @user2.create_folder('Folder1', @user1_file)
+    file = @user2.create_folder('Folder1', source_folder: @user1_file)
 
     expect(@user1_file.has_children?).to eq(false)
     expect(file).to eq(false)
@@ -97,19 +98,19 @@ describe 'RepoItem' do
   #end
 
   it 'user can download a folder with nested folder (zip)' do
-    folder = @user1.create_folder('Folder1', @user1_folder)
-    folder2 = @user1.create_folder('Folder2', folder)
-    @user1.create_file(@user1_file, folder)
+    folder = @user1.create_folder('Folder1', source_folder: @user1_folder)
+    folder2 = @user1.create_folder('Folder2', source_folder: folder)
+    @user1.create_file(@user1_file, source_folder: folder)
 
-    user1_file2 = FactoryGirl.build(:repo_file)
+    user1_file2 = FactoryGirl.build(:rm_repo_file)
     user1_file2.owner = @user1
     user1_file2.save
-    @user1.create_file(user1_file2, folder2)
+    @user1.create_file(user1_file2, source_folder: folder2)
 
-    user1_file3 = FactoryGirl.build(:repo_file)
+    user1_file3 = FactoryGirl.build(:rm_repo_file)
     user1_file3.owner = @user1
     user1_file3.save
-    @user1.create_file(user1_file3, @user1_folder)
+    @user1.create_file(user1_file3, source_folder: @user1_folder)
 
     @user1.download(@user1_folder)
     @user1.download(@user1_folder)
@@ -124,8 +125,8 @@ describe 'RepoItem' do
     root_folder.add(@user1_folder)
 
     root_test_folder = @user1.create_folder('root test folder')
-    test_folder = @user1.create_folder('Test folder', root_test_folder)
-    @user1.create_folder('Nested test folder', test_folder)
+    test_folder = @user1.create_folder('Test folder', source_folder: root_test_folder)
+    @user1.create_folder('Nested test folder', source_folder: test_folder)
 
     @user1.move_repo_item(test_folder, @user1_folder)
 
@@ -133,12 +134,12 @@ describe 'RepoItem' do
   end
 
   it 'can move a folder into another folder' do
-    folder = @user1.create_folder('Folder1', @user1_folder)
+    folder = @user1.create_folder('Folder1', source_folder: @user1_folder)
     expect(@user1.repo_items.count).to eq(3)
-    folder2 = @user1.create_folder('Folder1', @user1_folder)
+    folder2 = @user1.create_folder('Folder1', source_folder: @user1_folder)
     expect(folder2).to eq(false)
     expect(@user1.repo_items.count).to eq(3)
-    folder3 = @user1.create_folder('Folder2', @user1_folder)
+    folder3 = @user1.create_folder('Folder2', source_folder: @user1_folder)
     expect(@user1.repo_items.count).to eq(4)
     # TODO
   end
@@ -163,8 +164,8 @@ describe 'RepoItem' do
 
   it 'can create a new folder with different name' do
     folder1 = @user1.create_folder()
-    folder3 = @user1.create_folder('', folder1)
-    folder4 = @user1.create_folder('', folder1)
+    folder3 = @user1.create_folder('', source_folder: folder1)
+    folder4 = @user1.create_folder('', source_folder: folder1)
     folder2 = @user1.create_folder()
 
     # TODO add translate in gem
@@ -192,11 +193,11 @@ describe 'RepoItem' do
   end
 
   it "can't create too file with the same name in folder" do
-    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), @user1_folder)
+    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
     expect(file.name).to eq('textfile.txt')
-    file2 = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"),@user1_folder)
+    file2 = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
     expect(file2).to eq(false)
 
-    #@user1.create_file!(File.open("#{Rails.root}/../fixture/textfile.txt"), @user1_folder)
+    #@user1.create_file!(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
   end
 end

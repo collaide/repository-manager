@@ -1,11 +1,13 @@
-class Sharing < ActiveRecord::Base
+class RepositoryManager::Sharing < ActiveRecord::Base
+  self.table_name = :rm_sharings
+
   attr_accessible :can_read, :can_create, :can_update, :can_delete, :can_share if RepositoryManager.protected_attributes?
 
-  has_many :sharings_members, :dependent => :destroy
-  belongs_to :owner, :polymorphic => true
-  belongs_to :repo_item
-  belongs_to :user, class_name: RepositoryManager.user_model if RepositoryManager.user_model
+  has_many :sharings_members, :class_name => 'RepositoryManager::SharingsMember', :dependent => :destroy
+  belongs_to :owner, polymorphic: true
+  belongs_to :repo_item, :class_name => 'RepositoryManager::RepoItem'
 
+  validates_presence_of :repo_item
 
   #scope :recipient, lambda { |recipient|
   #  joins(:receipts).where('receipts.receiver_id' => recipient.id,'receipts.receiver_type' => recipient.class.base_class.to_s)
@@ -31,13 +33,13 @@ class Sharing < ActiveRecord::Base
     if members.kind_of?(Array)
       # Add each member to this sharing
       members.each do |i|
-        sharing_member = SharingsMember.new(sharing_permissions)
+        sharing_member = RepositoryManager::SharingsMember.new(sharing_permissions)
         sharing_member.member = i
         # Add the sharings members in the sharing
         self.sharings_members << sharing_member
       end
     else
-      sharing_member = SharingsMember.new(sharing_permissions)
+      sharing_member = RepositoryManager::SharingsMember.new(sharing_permissions)
       sharing_member.member = members
       # Add the sharings members in the sharing
       self.sharings_members << sharing_member

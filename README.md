@@ -4,7 +4,7 @@ Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/
 
 # RepositoryManager
 
-This gem add fonctionalities to manage repositories. Each instance (users, groups, etc..) can have it own repository (with files and folders). It can manage them (edit, remove, add, etc) and share them with other objects.
+This gem add functionalities to manage repositories. Each instance (users, groups, etc..) can have it own repository (with files and folders). It can manage them (edit, remove, add, etc) and share them with other objects.
 
 This project is based on the need for a repository manager system for [Collaide](https://github.com/facenord-sud/collaide). A system for easily create/delete files and folders in a repository. For sharing these "repo items" easily with other object with a flexible and complete authorisations management.
 
@@ -62,7 +62,7 @@ RepositoryManager.setup do |config|
 end
 ```
 
-For instance, if you want that a default sharing is totaly free (for edit, delete, etc), just put all default parameters to `true` :
+For instance, if you want that a default sharing is totally free (for edit, delete, etc), just put all default parameters to `true` :
 ```ruby
 RepositoryManager.setup do |config|
   config.default_repo_item_permissions = { can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true }
@@ -75,7 +75,7 @@ See the chapter [Authorisations](#authorisations) for more details about the per
 
 ## Preparing your models
 
-You can choose wich model can have repository. 
+You can choose witch model can have repository.
 
 In your model:
 
@@ -85,7 +85,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-You are not limited to the User model. You can use RepositoryManager in any other model and use it in serveral different models. If you have Groups and Houses in your application and you want to exchange `repo_items` as if they were the same, just add `has_repository` to each one and you will be able to sharing `repo_files`/`repo_folders` groups-groups, groups-users, users-groups and users-users. Of course, you can extend it for as many classes as you need.
+You are not limited to the User model. You can use RepositoryManager in any other model and use it in several different models. If you have Groups and Houses in your application and you want to exchange `repo_items` as if they were the same, just add `has_repository` to each one and you will be able to sharing `repo_files`/`repo_folders` groups-groups, groups-users, users-groups and users-users. Of course, you can extend it for as many classes as you need.
 
 Example:
 
@@ -115,7 +115,7 @@ A few methods are written in those two ways :
 - method(arg, options)
 - method!(arg, options) (note the "!")
 
-The two methods do the same, but the one with the "!" returns an Exeption error if it is a problem (AuthorisationException for instance) and the method without "!" return false if it has a problem.
+The two methods do the same, but the one with the "!" returns an Exception error if it is a problem (AuthorisationException for instance) and the method without "!" return false if it has a problem.
 
 ### How can I create/delete/move a repo_item (file or folder)
 
@@ -130,8 +130,8 @@ source_folder = user1.create_folder('Root folder')
 # user1 own repository :
 #   -- 'Root folder'
 
-# source_folder is the directory in wich user1 wants to create the folder 'The new folder'
-the_new_folder = user1.create_folder('The new folder', source_folder)
+# source_folder is the directory in witch user1 wants to create the folder 'The new folder'
+the_new_folder = user1.create_folder('The new folder', source_folder: source_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
@@ -139,9 +139,9 @@ the_new_folder = user1.create_folder('The new folder', source_folder)
 
 # Now we want to add a file into the_new_folder 
 # Note : user1 needs the ':can_create => true' permission in the folder : the_new_folder (else the method returns `false`).
-user1.create_file(params[:file], the_new_folder)
+user1.create_file(params[:file], source_folder: the_new_folder)
 # OR
-user1.create_file(File.open('somewhere'), the_new_folder)
+user1.create_file(File.open('somewhere'), source_folder: the_new_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
@@ -168,7 +168,7 @@ test_folder = user1.create_folder('Test folder')
 #   |-- 'Test folder'
 
 # user1 want to move 'The new folder' in 'Test folder'
-user1.move_repo_item(the_new_folder, test_folder)
+user1.move_repo_item(the_new_folder, source_folder: test_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
@@ -215,13 +215,13 @@ sharing = user1.share(the_new_folder, members, options)
 
 `repo_item_permissions` specifies what kind of permissions you give on the repo_item in a specific sharing.
 
-`sharing_permissions` specifies if the member selectionned can add or remove other members in this sharing.
+`sharing_permissions` specifies if the member selected can add or remove other members in this sharing.
 
 See the chapter [Authorisations](#authorisations) for more details.
 
 ### Repository Manager and the nested sharing
 
-Repository Manager actualy don't accept nested sharing.
+Repository Manager actually don't accept nested sharing.
 
 ```ruby
 
@@ -276,9 +276,9 @@ Recall: a repo_item can be:
 
 ```ruby
 # We want to know if the object repo_item is a file or a folder:
-if repo_item.type == 'RepoFolder'
+if repo_item.type == 'RepositoryManager::RepoFolder'
   repo_item.name #=> Returns the name of the folder (for instance : 'New folder').
-elsif repo_item.type == 'RepoFile'
+elsif repo_item.type == 'RepositoryManager::RepoFile'
   repo_item.name #=> Returns the name of the file (for instance : 'file.png').
   # Here is the file
   repo_item.file.url # => '/url/to/file.png'
@@ -286,7 +286,7 @@ elsif repo_item.type == 'RepoFile'
 end
 ```
 
-For file informations, more infos on [the documentation of the carrierwave gem](https://github.com/carrierwaveuploader/carrierwave). 
+For file details, more infos on [the documentation of the carrierwave gem](https://github.com/carrierwaveuploader/carrierwave).
 
 
 ### How can I manage a sharing
@@ -326,7 +326,7 @@ If an object has the authorisation, it can remove members from a sharing, else t
 user1.remove_members_from(sharing, group2) # The second parameter can be an object or an array of object
 ```
 
-You can directly work with the `sharing`. Be carefull, there is NO authorisation control !
+You can directly work with the `sharing`. Be careful, there is NO authorisation control !
 
 ```ruby
 # Add a member to the sharing `sharing`
@@ -381,7 +381,7 @@ Like the repo_item authorisations, you can get the sharing authorisations with :
 ### Download a repository
 
 RepositoryManager make the download of a repo_item easy. If the user want to download a file, the `user.download(repo_item)` method returns you the path of the file (if the user `can_read` it).
-If it want to download a folder, it automaticaly genere a zip file with all the contant that the user can_read. The method returns the path of this zip file.
+If it want to download a folder, it automatically generates a zip file with all the constant that the user can_read. The method returns the path of this zip file.
 
 ```ruby
 # user1 want to download the_folder

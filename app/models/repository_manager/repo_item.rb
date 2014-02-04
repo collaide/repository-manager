@@ -1,21 +1,26 @@
-class RepoItem < ActiveRecord::Base
+class RepositoryManager::RepoItem < ActiveRecord::Base
+  self.table_name = :rm_repo_items
+
   attr_accessible :type if RepositoryManager.protected_attributes?
 
   has_ancestry
 
   # Associate with the User Class
   belongs_to :owner, :polymorphic => true
-  has_many :sharings, :dependent => :destroy
+  has_many :sharings, :class_name => 'RepositoryManager::Sharing', :dependent => :destroy
   #has_many :members, through: :sharings
-  belongs_to :user, class_name: RepositoryManager.user_model if RepositoryManager.user_model
+  #belongs_to :user, class_name: RepositoryManager.user_model if RepositoryManager.user_model
+  belongs_to :sender, polymorphic: true
+
+  validates_presence_of :owner
 
   if Rails::VERSION::MAJOR == 4
-    scope :files, -> { where type: 'RepoFile' }
-    scope :folders, -> { where type: 'RepoFolder' }
+    scope :files, -> { where type: 'RepositoryManager::RepoFile' }
+    scope :folders, -> { where type: 'RepositoryManager::RepoFolder' }
   else
     # Rails 3 does it this way
-    scope :files, where(type: 'RepoFile')
-    scope :folders, where(type: 'RepoFolder')
+    scope :files, where(type: 'RepositoryManager::RepoFile')
+    scope :folders, where(type: 'RepositoryManager::RepoFolder')
   end
 
   # Copy itself into the target_folder
@@ -33,7 +38,7 @@ class RepoItem < ActiveRecord::Base
 
   # Move itself into the target_folder
   def move!(target_folder)
-    if target_folder.type == 'RepoFolder'
+    if target_folder.type == 'RepositoryManager::RepoFolder'
       self.update_attribute :parent, target_folder
     else
       raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{name}' can't be a file")
@@ -52,11 +57,11 @@ class RepoItem < ActiveRecord::Base
   def has_nested_sharing?
     # An array with the ids of all ancestors and descendants
     ancestor_and_descendant_ids = []
-    ancestor_and_descendant_ids << self.descendant_ids if self.type == 'RepoFolder' && !self.descendant_ids.empty?
+    ancestor_and_descendant_ids << self.descendant_ids if self.type == 'RepositoryManager::RepoFolder' && !self.descendant_ids.empty?
     ancestor_and_descendant_ids << self.ancestor_ids if !self.ancestor_ids.empty?
 
     # If it exist a sharing, it returns true
-    if Sharing.where(repo_item_id: ancestor_and_descendant_ids).count > 0
+    if RepositoryManager::Sharing.where(repo_item_id: ancestor_and_descendant_ids).count > 0
       true
     else
       false

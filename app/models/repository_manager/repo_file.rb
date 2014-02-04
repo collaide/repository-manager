@@ -1,7 +1,7 @@
-class RepoFile < RepoItem
+class RepositoryManager::RepoFile < RepositoryManager::RepoItem
   attr_accessible :file, :content_type, :file_size if RepositoryManager.protected_attributes?
 
-  validates :file, presence: true
+  validates_presence_of :file
   mount_uploader :file, RepoFileUploader
   before_save :update_asset_attributes
 
