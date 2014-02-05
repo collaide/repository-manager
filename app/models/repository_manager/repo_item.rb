@@ -70,6 +70,14 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     end
   end
 
+  def is_folder
+    self.type == 'RepositoryManager::RepoFolder'
+  end
+
+  def is_file
+    self.type == 'RepositoryManager::RepoFile'
+  end
+
   private
   def put_sender
     self.sender = owner unless sender

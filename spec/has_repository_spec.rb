@@ -19,11 +19,15 @@ describe 'HasRepository' do
   end
 
   it "can add a file to repo_item" do
-    #TODO
+
   end
 
   it "can add a folder to repo_item" do
-    #TODO
+    folder = @user1.create_folder('folder')
+    folder2 = @user1.create_folder('folder2')
+    @user1.move_repo_item(folder, folder2)
+
+    expect(folder2.children).to eq([folder])
   end
 
   it 'can share his own repo_item with other users' do

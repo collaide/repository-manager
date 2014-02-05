@@ -162,11 +162,17 @@ module RepositoryManager
       #     RepositoryManagerException if the file already exist
       #     AuthorisationException if the object don't have the permission
       def create_file!(file, options = {})
+        puts 'aaaaaaaaaaaaaaaaaaaa'
+        puts file.class.name.inspect
+
         source_folder = options[:source_folder]
         # If he want to create a file in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
           if file.class.name == 'RepositoryManager::RepoFile'
             repo_file = file
+          elsif file.class.name == 'File'
+            repo_file = RepositoryManager::RepoFile.new()
+            repo_file.file = file
           else
             repo_file = RepositoryManager::RepoFile.new(file)
           end
@@ -374,7 +380,7 @@ module RepositoryManager
         end
       end
 
-        # You can here add new members in the sharing
+        # You can here remove members in the sharing
       # Param member could be an object or an array of object
       def remove_members_from!(sharing, members)
         if can_remove_from?(sharing)
