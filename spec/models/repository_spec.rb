@@ -200,4 +200,24 @@ describe 'RepoItem' do
 
     #@user1.create_file!(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
   end
+
+  it 'sender is equal to owner if no sender in create_folder' do
+    folder = @user1.create_folder('test')
+    expect(folder.sender).to eq(@user1)
+  end
+
+  it 'sender is equal to owner if no sender in create_file' do
+    file = @user2.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
+    expect(file.sender).to eq(@user2)
+  end
+
+  it 'can specify a sender in create_folder method' do
+    folder = @user1.create_folder('test', sender: @user2)
+    expect(folder.sender).to eq(@user2)
+  end
+
+  it 'can specify a sender in create_file method' do
+    file = @user2.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), sender: @user1)
+    expect(file.sender).to eq(@user1)
+  end
 end

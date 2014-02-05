@@ -3,6 +3,8 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
 
   attr_accessible :type if RepositoryManager.protected_attributes?
 
+  before_save :put_sender
+
   has_ancestry
 
   # Associate with the User Class
@@ -66,5 +68,10 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     else
       false
     end
+  end
+
+  private
+  def put_sender
+    self.sender = owner unless sender
   end
 end

@@ -84,7 +84,10 @@ module RepositoryManager
         end
       end
 
-      # Create a folder with the name (name) in the directory (source_folder)
+      # Create a folder with the name (name)
+      # options :
+      #   :source_folder = The directory in with the folder is created
+      #   :sender = The object of the sender (ex : current_user)
       # Returns the object of the folder created if it is ok
       # Returns an Exception if the folder is not created
       #     RepositoryManagerException if the name already exist
@@ -102,7 +105,7 @@ module RepositoryManager
             folder.name = name
           end
           folder.owner = self
-          #folder.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
+          folder.sender = options[:sender]
 
           # If we are in root path we check if we can add this folder name
           if !source_folder && repo_item_name_exist_in_root?(name)
@@ -121,6 +124,8 @@ module RepositoryManager
         folder
       end
 
+      # Like create_folder!
+      # Returns false if the folder is not created instead of an exception
       def create_folder(name = '', options = {})
         begin
           create_folder!(name, options)
@@ -147,9 +152,15 @@ module RepositoryManager
       end
 
       # Create the file (file) in the directory (source_folder)
+      # options :
+      #   :source_folder = The directory in with the folder is created
+      #   :sender = The object of the sender (ex : current_user)
+      #
       # Param file can be a File, or a instance of RepoFile
-      # Return the object of the file created if it is ok
-      # Return false if the file is not created (no authorisation)
+      # Returns the object of the file created if it is ok
+      # Returns an Exception if the folder is not created
+      #     RepositoryManagerException if the file already exist
+      #     AuthorisationException if the object don't have the permission
       def create_file!(file, options = {})
         source_folder = options[:source_folder]
         # If he want to create a file in a directory, we have to check if he have the authorisation
@@ -162,7 +173,7 @@ module RepositoryManager
           end
 
           repo_file.owner = self
-          #repo_file.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
+          repo_file.sender = options[:sender]
 
 
           # If we are in root path we check if we can add this file name

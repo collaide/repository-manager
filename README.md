@@ -106,8 +106,8 @@ end
 ### Introduction
 
 A `repo_item` is an item in a repository, it can be:
-- A file (`repo_file`, class name : `RepoFile`)
-- A folder (`repo_folder`, class name : `RepoFolder`).
+- A file (`repo_file`, class name : `RepositoryManager::RepoFile`)
+- A folder (`repo_folder`, class name : `RepositoryManager::RepoFolder`).
 
 A folder can contains files and folders. Like in a real tree files and folders.
 
@@ -115,7 +115,7 @@ A few methods are written in those two ways :
 - method(arg, options)
 - method!(arg, options) (note the "!")
 
-The two methods do the same, but the one with the "!" returns an Exception error if it is a problem (AuthorisationException for instance) and the method without "!" return false if it has a problem.
+The two methods do the same, but the one with the "!" returns an Exception error if it is a problem (AuthorisationException or RepositoryManagerException for instance) and the method without "!" return false if it has a problem.
 
 ### How can I create/delete/move a repo_item (file or folder)
 
@@ -189,6 +189,22 @@ user1.delete_repo_item(file2)
 
 # user1 own repository :
 #   |-- 'Root folder'
+
+```
+
+If a user (sender of the file/folder) send a file or folder into a group (owner of the file/folder), you can specify the owner and the sender like this :
+
+```ruby
+# user1 wants to create a folder and a file into group1
+folder = group1.create_folder('Folder created by user1', sender: user1)
+
+# Now he send the file into the folder
+file = group1.create_file(params[:file], source_folder: params[:file], sender: user1)
+
+file.owner # Returns group1
+file.sender # Returns user1
+
+# If you don't specify the sender, the owner becomes the sender
 
 ```
 
