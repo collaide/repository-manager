@@ -63,6 +63,7 @@ end
 ```
 
 For instance, if you want that a default sharing is totally free (for edit, delete, etc), just put all default parameters to `true` :
+
 ```ruby
 RepositoryManager.setup do |config|
   config.default_repo_item_permissions = { can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true }
