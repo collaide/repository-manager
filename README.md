@@ -208,7 +208,7 @@ file.sender # Returns user1
 
 ```
 
-WARNING : There is no verification if the user has the authorisation to create a file or folder into this group. You have to check this in your controller !
+WARNING : There is no verification if the user has the authorisation to create a file or folder into this group. You have to check this in your controller ! The fact that user1 is the sender of this folder gives him NO AUTHORISATION on it !
 
 ### How can I share a repo_item (file/folder)
 
