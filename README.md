@@ -208,6 +208,8 @@ file.sender # Returns user1
 
 ```
 
+WARNING : There is no verification if the user has the authorisation to create a file or folder into this group. You have to check this in your controller !
+
 ### How can I share a repo_item (file/folder)
 
 Now, user1 want to share his folder 'The new folder' with a Group object `group1` et another User object `user2`. You can use the `has_repository` method `share(repo_item, member, options = nil)`.
