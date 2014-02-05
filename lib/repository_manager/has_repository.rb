@@ -168,8 +168,7 @@ module RepositoryManager
           if file.class.name == 'RepositoryManager::RepoFile'
             repo_file = file
           else
-            repo_file = RepositoryManager::RepoFile.new
-            repo_file.file = file
+            repo_file = RepositoryManager::RepoFile.new(file)
           end
 
           repo_file.owner = self
