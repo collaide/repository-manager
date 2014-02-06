@@ -18,17 +18,6 @@ describe 'HasRepository' do
     expect(@user2.sharings.last).to eq(sharing)
   end
 
-  it "can add a file to repo_item" do
-
-  end
-
-  it "can add a folder to repo_item" do
-    folder = @user1.create_folder('folder')
-    folder2 = @user1.create_folder('folder2')
-    @user1.move_repo_item(folder, folder2)
-
-    expect(folder2.children).to eq([folder])
-  end
 
   it 'can share his own repo_item with other users' do
     rep = FactoryGirl.build(:rm_repo_file)

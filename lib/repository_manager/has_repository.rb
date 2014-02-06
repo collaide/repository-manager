@@ -94,6 +94,11 @@ module RepositoryManager
       #     AuthorisationException if the object don't have the permission
       def create_folder!(name = '', options = {})
         source_folder = options[:source_folder]
+        if source_folder
+          unless source_folder.is_folder?
+            raise RepositoryManager::RepositoryManagerException.new("create folder failed. The source folder must be a repo_folder.")
+          end
+        end
 
         # If he want to create a folder in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
@@ -162,18 +167,22 @@ module RepositoryManager
       #     RepositoryManagerException if the file already exist
       #     AuthorisationException if the object don't have the permission
       def create_file!(file, options = {})
-        puts 'aaaaaaaaaaaaaaaaaaaa'
-        puts file.class.name.inspect
-
         source_folder = options[:source_folder]
+        if source_folder
+          unless source_folder.is_folder?
+            raise RepositoryManager::RepositoryManagerException.new("create file failed. The source folder must be a repo_folder.")
+          end
+        end
+
         # If he want to create a file in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
+
           if file.class.name == 'RepositoryManager::RepoFile'
             repo_file = file
           elsif file.class.name == 'File'
             repo_file = RepositoryManager::RepoFile.new()
             repo_file.file = file
-          else
+          else # "ActionController::Parameters"
             repo_file = RepositoryManager::RepoFile.new(file)
           end
 
@@ -241,7 +250,7 @@ module RepositoryManager
         if can_download?(repo_item)
           path = options[:path] if options[:path]
 
-          repo_item.download({object: self, path: path})
+          repo_item.download!({object: self, path: path})
         else
           raise RepositoryManager::AuthorisationException.new("download failed. You don't have the permission to download the repo_item '#{repo_item.name}'")
         end
@@ -260,7 +269,7 @@ module RepositoryManager
         unless can_update?(repo_item)
           raise RepositoryManager::AuthorisationException.new("rename repo_item failed. You don't have the permission to update the repo_item '#{repo_item.name}'")
         end
-        repo_item.rename(new_name)
+        repo_item.rename!(new_name)
       end
 
       # Rename the repo_item with the new_name
@@ -281,13 +290,13 @@ module RepositoryManager
           raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to create in the target_folder '#{target_folder.name}'")
         end
         # If it has the permission, we move the repo_item in the target_folder
-        repo_item.move(target_folder)
+        repo_item.move!(target_folder)
       end
 
       def move_repo_item(repo_item, target_folder)
         begin
           move_repo_item!(repo_item, target_folder)
-        rescue RepositoryManager::AuthorisationException
+        rescue RepositoryManager::RepositoryManagerException, RepositoryManager::AuthorisationException
           false
         end
       end

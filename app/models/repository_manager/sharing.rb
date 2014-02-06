@@ -51,10 +51,10 @@ class RepositoryManager::Sharing < ActiveRecord::Base
     if members.kind_of?(Array)
       # Add each member to this sharing
       members.each do |member|
-        self.sharings_members.where(:member_id => member.id, :member_type => member.class.base_class.to_s).first.destroy
+        self.sharings_members.where(member: member).first.destroy
       end
     else
-      self.sharings_members.where(:member_id => members.id, :member_type => members.class.base_class.to_s).first.destroy
+      self.sharings_members.where(member: members).first.destroy
     end
   end
 

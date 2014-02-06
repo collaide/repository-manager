@@ -15,10 +15,17 @@ describe 'RepoItem' do
   end
 
   it 'can create a folder in it own folder' do
-    folder = @user1.create_folder('Folder1', source_folder: @user1_folder)
+    @user1.create_folder('Folder1', source_folder: @user1_folder)
 
     expect(@user1_folder.has_children?).to eq(true)
   end
+
+  it 'can\'t create a folder in it a file' do
+    folder = @user1.create_folder('Folder1', source_folder: @user1_file)
+
+    expect(folder).to eq(false)
+  end
+
 
   it 'can\'t create a folder in another folder without permission' do
     folder = @user2.create_folder('Folder1', source_folder: @user1_folder)
@@ -220,4 +227,29 @@ describe 'RepoItem' do
     file = @user2.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), sender: @user1)
     expect(file.sender).to eq(@user1)
   end
+
+  it "can add a file to folder" do
+    file = @user2.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
+    folder = @user2.create_folder('folder')
+
+    @user2.move_repo_item(file, folder)
+
+    expect(folder.children).to eq([file])
+  end
+
+  it "can add a folder to folder" do
+    folder = @user2.create_folder('folder')
+    folder2 = @user2.create_folder('folder2')
+    @user2.move_repo_item(folder, folder2)
+
+    expect(folder2.children).to eq([folder])
+  end
+
+  it "can't add a folder into a file" do
+    file = @user2.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
+    folder = @user2.create_folder('folder')
+
+    expect(@user2.move_repo_item(folder,file)).to eq(false)
+  end
+
 end

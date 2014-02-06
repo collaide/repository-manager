@@ -10,8 +10,12 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
     file.url.split('/').last
   end
 
-  # Downloading this file
   def download(options = {})
+    self.download!(options)
+  end
+
+  # Downloading this file
+  def download!(options = {})
     path = file.path
     #render status: :bad_request and return unless File.exist?(path)
     #send_file(path)

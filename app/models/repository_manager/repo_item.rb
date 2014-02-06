@@ -40,7 +40,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
 
   # Move itself into the target_folder
   def move!(target_folder)
-    if target_folder.type == 'RepositoryManager::RepoFolder'
+    if target_folder.is_folder?
       self.update_attribute :parent, target_folder
     else
       raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{name}' can't be a file")
@@ -59,7 +59,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
   def has_nested_sharing?
     # An array with the ids of all ancestors and descendants
     ancestor_and_descendant_ids = []
-    ancestor_and_descendant_ids << self.descendant_ids if self.type == 'RepositoryManager::RepoFolder' && !self.descendant_ids.empty?
+    ancestor_and_descendant_ids << self.descendant_ids if self.is_folder? && !self.descendant_ids.empty?
     ancestor_and_descendant_ids << self.ancestor_ids if !self.ancestor_ids.empty?
 
     # If it exist a sharing, it returns true
@@ -70,11 +70,13 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     end
   end
 
-  def is_folder
+  # Returns true if it is a folder
+  def is_folder?
     self.type == 'RepositoryManager::RepoFolder'
   end
 
-  def is_file
+  # Returns true if it is a file
+  def is_file?
     self.type == 'RepositoryManager::RepoFile'
   end
 
