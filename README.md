@@ -313,9 +313,9 @@ Recall: a repo_item can be:
 
 ```ruby
 # We want to know if the object repo_item is a file or a folder:
-if repo_item.type == 'RepositoryManager::RepoFolder'
+if repo_item.is_folder
   repo_item.name #=> Returns the name of the folder (for instance : 'New folder').
-elsif repo_item.type == 'RepositoryManager::RepoFile'
+elsif repo_item.is_file?
   repo_item.name #=> Returns the name of the file (for instance : 'file.png').
   # Here is the file
   repo_item.file.url # => '/url/to/file.png'
