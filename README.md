@@ -183,6 +183,16 @@ user1.move_repo_item(the_new_folder, source_folder: test_folder)
 #   |  |-- 'The new folder'
 #   |  |  |-- 'file.txt'
 
+# user1 want to rename 'The new folder' to 'The renamed folder'
+user1.rename_repo_item(the_new_folder, 'The renamed folder')
+
+# user1 own repository :
+#   |-- 'Root folder'
+#   |-- 'file2.jpg'
+#   |-- 'Test folder'
+#   |  |-- 'The renamed folder'
+#   |  |  |-- 'file.txt'
+
 # Delete a repo_item
 # Note : user1 needs the ':can_delete => true' permission in the folder : the_new_folder (else the method returns `false`).
 user1.delete_repo_item(test_folder)
@@ -198,14 +208,17 @@ user1.delete_repo_item(file2)
 
 ```
 
-If a user (sender of the file/folder) send a file or folder into a group (owner of the file/folder), you can specify the owner and the sender like this :
+If a user (sender of the item) send a file or folder into a group (owner of this item), you can specify the owner and the sender like this :
 
 ```ruby
 # user1 wants to create a folder and a file into group1
 folder = group1.create_folder('Folder created by user1', sender: user1)
 
+folder.owner # Returns group1
+folder.sender # Returns user1
+
 # Now he send the file into the folder
-file = group1.create_file(params[:file], source_folder: params[:file], sender: user1)
+file = group1.create_file(params[:file], source_folder: folder, sender: user1)
 
 file.owner # Returns group1
 file.sender # Returns user1
@@ -300,9 +313,9 @@ Recall: a repo_item can be:
 
 ```ruby
 # We want to know if the object repo_item is a file or a folder:
-if repo_item.type == 'RepositoryManager::RepoFolder'
+if repo_item.is_folder
   repo_item.name #=> Returns the name of the folder (for instance : 'New folder').
-elsif repo_item.type == 'RepositoryManager::RepoFile'
+elsif repo_item.is_file?
   repo_item.name #=> Returns the name of the file (for instance : 'file.png').
   # Here is the file
   repo_item.file.url # => '/url/to/file.png'
@@ -431,10 +444,7 @@ the_folder.delete_zip
 
 ## TODO
 
-- Test the rename folder method
-- Test if the file already exist before creating or moving it
 - Do the rename file method
-- Write the documentation for the rename method
 - Write the methods : copy, share_link.
 - Snapshot the file if possible
 - Versioning
@@ -444,4 +454,6 @@ the_folder.delete_zip
 ## License
 
 This project rocks and uses MIT-LICENSE.
+
+Created by Yves Baumann.
 
