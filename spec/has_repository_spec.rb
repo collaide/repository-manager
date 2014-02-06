@@ -255,6 +255,7 @@ describe 'HasRepository' do
     expect(@user2.sharings.count).to eq(0)
     @user1.share(file, @user2)
     expect(@user2.sharings.count).to eq(0)
+
   end
 
   it "can create a folder" do
@@ -277,7 +278,7 @@ describe 'HasRepository' do
     sharing = @group1.share(folder, @user2, creator: @user1)
 
     expect(sharing.reload.owner).to eq(@group1)
-    expect(sharing.reload.creator).to eq(@user1)
+    expect(sharing.creator).to eq(@user1)
   end
 
   it 'is by default owner = creator' do
@@ -285,7 +286,15 @@ describe 'HasRepository' do
     sharing = @group1.share(folder, @user2)
 
     expect(sharing.reload.owner).to eq(@group1)
-    expect(sharing.reload.creator).to eq(@group1)
+    expect(sharing.creator).to eq(@group1)
+  end
+
+  it 'returns only root repo items' do
+    @user3.create_folder!
+    @user3.create_folder!(nil, source_folder: @user3.create_folder!)
+    expect(@user3.repo_items.count).to eq(3)
+    expect(@user3.root_repo_items.count).to eq(2)
+
   end
 
 end

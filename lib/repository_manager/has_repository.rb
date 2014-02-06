@@ -14,6 +14,14 @@ module RepositoryManager
         # The sharing repo_items
         has_many :shared_repo_items, through: :sharings, source: :repo_item, class_name: 'RepositoryManager::RepoItem'
 
+        if Rails::VERSION::MAJOR == 4
+          has_many :root_repo_items, -> { where ancestry: nil }, as: :owner, class_name: 'RepositoryManager::RepoItem'
+          #scope :root_repo_items, -> { where ancestry: nil }
+        else
+          has_many :root_repo_items, -> { where ancestry: nil }, as: :owner, class_name: 'RepositoryManager::RepoItem'
+          #scope :root_repo_items, where(where ancestry: nil)
+        end
+
         #scope :all_repo_items, -> { self.repo_items.shared_repo_items }
 
         #All repo_items (own and sharings)
@@ -104,7 +112,7 @@ module RepositoryManager
         if can_create?(source_folder)
 
           folder = RepoFolder.new
-          if name == ''
+          if name == '' || name == nil || name == false || name.blank?
             folder.name = default_folder_name(source_folder)
           else
             folder.name = name
