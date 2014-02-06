@@ -143,6 +143,11 @@ the_new_folder = user1.create_folder('The new folder', source_folder: source_fol
 user1.create_file(params[:file], source_folder: the_new_folder)
 # OR
 user1.create_file(File.open('somewhere'), source_folder: the_new_folder)
+# OR
+repo_file = RepositoryManager::RepoFile.new
+repo_file.file = your_file
+user1.create_file(repo_file, source_folder: the_new_folder)
+
 
 # user1 own repository :
 #   |-- 'Root folder'
