@@ -218,7 +218,7 @@ folder.owner # Returns group1
 folder.sender # Returns user1
 
 # Now he send the file into the folder
-file = group1.create_file(params[:file], source_folder: params[:file], sender: user1)
+file = group1.create_file(params[:file], source_folder: folder, sender: user1)
 
 file.owner # Returns group1
 file.sender # Returns user1
