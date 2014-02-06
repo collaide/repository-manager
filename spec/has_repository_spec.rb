@@ -272,4 +272,20 @@ describe 'HasRepository' do
     expect(@user1.repo_items.files.count).to eq(1)
   end
 
+  it 'can put a creator for a specific sharing' do
+    folder = @group1.create_folder('a')
+    sharing = @group1.share(folder, @user2, creator: @user1)
+
+    expect(sharing.reload.owner).to eq(@group1)
+    expect(sharing.reload.creator).to eq(@user1)
+  end
+
+  it 'is by default owner = creator' do
+    folder = @group1.create_folder('a')
+    sharing = @group1.share(folder, @user2)
+
+    expect(sharing.reload.owner).to eq(@group1)
+    expect(sharing.reload.creator).to eq(@group1)
+  end
+
 end
