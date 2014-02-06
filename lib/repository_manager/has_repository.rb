@@ -179,7 +179,7 @@ module RepositoryManager
 
           if file.class.name == 'RepositoryManager::RepoFile'
             repo_file = file
-          elsif file.class.name == 'File'
+          elsif file.class.name == 'File' || file.class.name == 'ActionDispatch::Http::UploadedFile'
             repo_file = RepositoryManager::RepoFile.new()
             repo_file.file = file
           else # "ActionController::Parameters"
