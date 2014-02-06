@@ -183,6 +183,16 @@ user1.move_repo_item(the_new_folder, source_folder: test_folder)
 #   |  |-- 'The new folder'
 #   |  |  |-- 'file.txt'
 
+# user1 want to rename 'The new folder' to 'The renamed folder'
+user1.rename_repo_item(the_new_folder, 'The renamed folder')
+
+# user1 own repository :
+#   |-- 'Root folder'
+#   |-- 'file2.jpg'
+#   |-- 'Test folder'
+#   |  |-- 'The renamed folder'
+#   |  |  |-- 'file.txt'
+
 # Delete a repo_item
 # Note : user1 needs the ':can_delete => true' permission in the folder : the_new_folder (else the method returns `false`).
 user1.delete_repo_item(test_folder)
@@ -198,11 +208,14 @@ user1.delete_repo_item(file2)
 
 ```
 
-If a user (sender of the file/folder) send a file or folder into a group (owner of the file/folder), you can specify the owner and the sender like this :
+If a user (sender of the item) send a file or folder into a group (owner of this item), you can specify the owner and the sender like this :
 
 ```ruby
 # user1 wants to create a folder and a file into group1
 folder = group1.create_folder('Folder created by user1', sender: user1)
+
+folder.owner # Returns group1
+folder.sender # Returns user1
 
 # Now he send the file into the folder
 file = group1.create_file(params[:file], source_folder: params[:file], sender: user1)
@@ -431,8 +444,6 @@ the_folder.delete_zip
 
 ## TODO
 
-- Test the rename folder method
-- Test if the file already exist before creating or moving it
 - Do the rename file method
 - Write the documentation for the rename method
 - Write the methods : copy, share_link.
