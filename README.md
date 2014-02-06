@@ -445,7 +445,6 @@ the_folder.delete_zip
 ## TODO
 
 - Do the rename file method
-- Write the documentation for the rename method
 - Write the methods : copy, share_link.
 - Snapshot the file if possible
 - Versioning
@@ -455,4 +454,5 @@ the_folder.delete_zip
 ## License
 
 This project rocks and uses MIT-LICENSE.
+Created by Yves Baumann.
 
