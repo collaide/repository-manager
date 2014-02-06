@@ -140,19 +140,11 @@ describe 'RepoItem' do
     expect(test_folder.parent_id).to eq(@user1_folder.id)
   end
 
-  it 'can move a folder into another folder' do
-    folder = @user1.create_folder('Folder1', source_folder: @user1_folder)
-    expect(@user1.repo_items.count).to eq(3)
-    folder2 = @user1.create_folder('Folder1', source_folder: @user1_folder)
-    expect(folder2).to eq(false)
-    expect(@user1.repo_items.count).to eq(3)
-    folder3 = @user1.create_folder('Folder2', source_folder: @user1_folder)
-    expect(@user1.repo_items.count).to eq(4)
-    # TODO
-  end
-
   it 'can rename it own folder' do
-    # TODO
+    @user1.rename_repo_item(@user1_folder, 'test new name')
+
+    expect(@user1_folder.reload.name).to eq('test new name')
+
   end
 
   it 'can rename it own file' do
@@ -161,12 +153,11 @@ describe 'RepoItem' do
 
   it 'can rename item with share update permission' do
     # TODO
-
   end
 
   it 'can\'t rename item without share update permission' do
-    # TODO
-
+    @user2.rename_repo_item(@user1_folder, 'test new name')
+    expect(@user1_folder.reload.name).to eq('Folder')
   end
 
   it 'can create a new folder with different name' do
@@ -177,9 +168,9 @@ describe 'RepoItem' do
 
     # TODO add translate in gem
     expect(folder1.name).to eq('translation missing: en.repository_manager.models.repo_folder.name')
-    expect(folder2.name).to eq('translation missing: en.repository_manager.models.repo_folder.name2')
+    expect(folder2.name).to eq('translation missing: en.repository_manager.models.repo_folder.name 2')
     expect(folder3.name).to eq('translation missing: en.repository_manager.models.repo_folder.name')
-    expect(folder4.name).to eq('translation missing: en.repository_manager.models.repo_folder.name2')
+    expect(folder4.name).to eq('translation missing: en.repository_manager.models.repo_folder.name 2')
 
   end
 
@@ -228,7 +219,7 @@ describe 'RepoItem' do
     expect(file.sender).to eq(@user1)
   end
 
-  it "can add a file to folder" do
+  it "can move a file to folder" do
     file = @user2.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
     folder = @user2.create_folder('folder')
 
@@ -237,7 +228,7 @@ describe 'RepoItem' do
     expect(folder.children).to eq([file])
   end
 
-  it "can add a folder to folder" do
+  it "can move a folder to folder" do
     folder = @user2.create_folder('folder')
     folder2 = @user2.create_folder('folder2')
     @user2.move_repo_item(folder, folder2)
@@ -245,7 +236,7 @@ describe 'RepoItem' do
     expect(folder2.children).to eq([folder])
   end
 
-  it "can't add a folder into a file" do
+  it "can't move a folder into a file" do
     file = @user2.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
     folder = @user2.create_folder('folder')
 

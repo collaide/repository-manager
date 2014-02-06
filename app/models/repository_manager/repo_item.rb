@@ -40,11 +40,13 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
 
   # Move itself into the target_folder
   def move!(target_folder)
-    if target_folder.is_folder?
-      self.update_attribute :parent, target_folder
-    else
-      raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{name}' can't be a file")
+    unless target_folder.is_folder?
+      raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{target_folder.name}' can't be a file")
     end
+    if target_folder.name_exist_in_children?(self.name)
+      raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the folder '#{target_folder.name}'")
+    end
+    self.update_attribute :parent, target_folder
   end
 
   def move(target_folder)

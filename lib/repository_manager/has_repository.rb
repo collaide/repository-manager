@@ -518,7 +518,7 @@ module RepositoryManager
       # Put a default name if none is given
       def default_folder_name(source_folder)
         i = ''
-        name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
+        name = "#{I18n.t 'repository_manager.models.repo_folder.name'}"
         # We check if another item has the same name
 
         if source_folder
@@ -529,7 +529,7 @@ module RepositoryManager
               i = 1
             end
             i += 1
-            name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
+            name = "#{I18n.t 'repository_manager.models.repo_folder.name'} #{i}"
           end
         else
           #TODO Optimiser, récupérer tout les instances contenants le nom, puis faire la boucle (pas boucle de requete)
@@ -539,7 +539,7 @@ module RepositoryManager
               i = 1
             end
             i += 1
-            name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
+            name = "#{I18n.t 'repository_manager.models.repo_folder.name'} #{i}"
           end
 
         end

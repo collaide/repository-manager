@@ -21,7 +21,7 @@ class RepositoryManager::Sharing < ActiveRecord::Base
     # If the member is the owner, he can do what he want !
     if self.owner == member
       return true
-    elsif i = self.sharings_members.where(member_id: member.id, member_type: member.class.base_class.to_s).first
+    elsif i = self.sharings_members.where(member: member).first
       return {can_add: i.can_add, can_remove: i.can_remove}
     else
       return false

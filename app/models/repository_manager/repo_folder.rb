@@ -122,7 +122,6 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   end
 
   private
-
   # Returns the default path of the zip file
   # object is the object that want to download this file
   def get_default_download_path(object = nil)
@@ -133,10 +132,10 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   def add_repo_item_to_zip(children, zf, object = nil, prefix = nil)
     children.each do |child|
       # If this is a file, we just add this file to the zip
-      if child.type == 'RepositoryManager::RepoFile'
+      if child.is_file?
         # Add the file in the zip if the object is authorised to read it.
         zf.add("#{prefix}#{child.name}", child.file.current_path) if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)
-      elsif child.type == 'RepositoryManager::RepoFolder'
+      elsif child.is_folder?
         # If this folder has children, we do it again with it children
         if child.has_children?
           # We go in this new directory and add it repo_items
