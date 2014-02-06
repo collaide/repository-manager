@@ -454,5 +454,6 @@ the_folder.delete_zip
 ## License
 
 This project rocks and uses MIT-LICENSE.
+
 Created by Yves Baumann.
 
