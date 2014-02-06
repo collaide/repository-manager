@@ -56,7 +56,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   #     :path => 'path/to/zip/' is the path where the zip is generated
   def download!(options = {})
     # Get all the children
-    children = RepositoryManager::RepoItem.find(child_ids)
+    children = self.children
 
     # If something is in the array to add, we zip it
     if children.length > 0
