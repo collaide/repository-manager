@@ -41,6 +41,8 @@ ActiveRecord::Schema.define(version: 20131018214212) do
   create_table "rm_sharings", force: true do |t|
     t.integer "owner_id"
     t.string  "owner_type"
+    t.integer "creator_id"
+    t.string  "creator_type"
     t.integer "repo_item_id"
     t.boolean "can_create",   default: false
     t.boolean "can_read",     default: false

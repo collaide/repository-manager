@@ -41,7 +41,7 @@ module RepositoryManager
         if !RepositoryManager.accept_nested_sharing
           # Check if no other sharing exist in the path
           if repo_item.has_nested_sharing?
-            raise RepositoryManager::NestedSharingException.new("sharing failed. Another sharing already exist on the subtree or an ancestor '#{repo_item.name}'")
+            raise RepositoryManager::NestedSharingException.new("sharing failed. Another sharing already exist on the subtree or an ancestor of '#{repo_item.name}'")
           end
         end
 
@@ -63,7 +63,7 @@ module RepositoryManager
 
           sharing = RepositoryManager::Sharing.new(repo_item_permissions)
           sharing.owner = self
-          #sharing.user = RepositoryManager.user_model.constantize.find(session[:user_id]) if RepositoryManager.user_model
+          sharing.creator = options[:creator]
 
           sharing.add_members(members, sharing_permissions)
 

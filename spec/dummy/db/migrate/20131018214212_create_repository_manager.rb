@@ -4,6 +4,7 @@ class CreateRepositoryManager < ActiveRecord::Migration
 
     create_table :rm_sharings do |t|
       t.references :owner, polymorphic: true#, index: true
+      t.references :creator, polymorphic: true#, index: true
       t.references :repo_item#, index: true
       t.boolean :can_create, :default => false
       t.boolean :can_read, :default => false

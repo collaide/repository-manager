@@ -1,7 +1,7 @@
 class RepositoryManager::RepoItem < ActiveRecord::Base
   self.table_name = :rm_repo_items
 
-  attr_accessible :type if RepositoryManager.protected_attributes?
+  attr_accessible :type, :ancestry, :name, :owner, :sender if RepositoryManager.protected_attributes?
 
   before_save :put_sender
 

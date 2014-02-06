@@ -1,10 +1,13 @@
 class RepositoryManager::Sharing < ActiveRecord::Base
   self.table_name = :rm_sharings
 
-  attr_accessible :can_read, :can_create, :can_update, :can_delete, :can_share if RepositoryManager.protected_attributes?
+  attr_accessible :can_read, :can_create, :can_update, :can_delete, :can_share, :owner, :creator if RepositoryManager.protected_attributes?
+
+  before_save :put_creator
 
   has_many :sharings_members, :class_name => 'RepositoryManager::SharingsMember', :dependent => :destroy
   belongs_to :owner, polymorphic: true
+  belongs_to :creator, polymorphic: true
   belongs_to :repo_item, :class_name => 'RepositoryManager::RepoItem'
 
   validates_presence_of :repo_item
@@ -56,6 +59,11 @@ class RepositoryManager::Sharing < ActiveRecord::Base
     else
       self.sharings_members.where(member: members).first.destroy
     end
+  end
+
+  private
+  def put_creator
+    self.creator = owner unless creator
   end
 
 end
