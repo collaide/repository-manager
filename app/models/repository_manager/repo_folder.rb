@@ -126,7 +126,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   # object is the object that want to download this file
   def get_default_download_path(object = nil)
     object ? add_to_path = object.get_default_download_path(''): add_to_path = ''
-    "download/#{add_to_path}#{self.class.to_s.underscore}/#{self.id}/"
+    "download/#{add_to_path}#{self.class.base_class.to_s.underscore}/#{self.id}/"
   end
 
   def add_repo_item_to_zip(children, zf, object = nil, prefix = nil)
@@ -136,12 +136,12 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
         # Add the file in the zip if the object is authorised to read it.
         zf.add("#{prefix}#{child.name}", child.file.current_path) if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)
       elsif child.is_folder?
+        children = child.children
         # If this folder has children, we do it again with it children
-        unless child.has_children?
+        if children.empty?
           # We just create the folder if it is empty
-          zf.mkdir(child.name) if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)
+          zf.mkdir("#{prefix}#{child.name}") if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)
         else
-          zf.mkdir(child.name) if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)
           # We go in this new directory and add it repo_items
           add_repo_item_to_zip(child.children, zf, object, "#{prefix}#{child.name}/")
         end

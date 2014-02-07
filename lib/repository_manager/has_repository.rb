@@ -417,7 +417,7 @@ module RepositoryManager
 
         # Get the download path of the member
       def get_default_download_path(prefix = 'download/')
-        "#{prefix}#{self.class.to_s.underscore}/#{self.id}/"
+        "#{prefix}#{self.class.base_class.to_s.underscore}/#{self.id}/"
       end
 
       # Returns true of false if the name exist in the root path of this instance
