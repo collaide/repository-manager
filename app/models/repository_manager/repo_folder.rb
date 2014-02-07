@@ -59,7 +59,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
     children = self.children
 
     # If something is in the array to add, we zip it
-    if children.length > 0
+    #if children.length > 0
 
       # Default values
       options[:object]? object = options[:object]: object = nil
@@ -81,10 +81,10 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
         add_repo_item_to_zip(children, zf, object)
       }
       return full_path
-    else
-      # Nothing to download here
-      raise RepositoryManager::RepositoryManagerException.new("download failed. Folder #{name} is empty")
-    end
+    #else
+    #  # Nothing to download here
+    #  raise RepositoryManager::RepositoryManagerException.new("download failed. Folder #{name} is empty")
+    #end
   end
 
   def download(options = {})
