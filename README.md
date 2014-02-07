@@ -399,7 +399,7 @@ The owner of a `repo_item` (file or folder) has all the authorisations on it. Wh
 To check if a user has one of this authorisation, you just have to write : `user1.can_read?(repo_item)`, `user1.can_share?(repo_item)`, etc (it returns `true` or `false`).
 
 NOTICE : An object who can share a repo_item, can't set new permissions that it doesn't have.
-For instance: `user3` has a `sharing` of `repo_item1` in with it `:can_delete => false` and `:can_share => true`. He can share `repo_item1` with `user4`, but he can't put `:can_delete => true` in the `repo_item_permission` of this new share.
+For instance: `user3` has a `sharing` of `repo_item1` in which it `:can_delete => false` and `:can_share => true`. He can share `repo_item1` with `user4`, but he can't put `:can_delete => true` in the `repo_item_permission` of this new share.
 
 You can get all the authorisations of an `object` in a `repo_item` with this method: `object.get_authorisations(repo_item)`
 
