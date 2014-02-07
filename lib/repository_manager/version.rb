@@ -1,3 +1,3 @@
 module RepositoryManager
-  VERSION = '0.0.23'
+  VERSION = '0.1.15'
 end

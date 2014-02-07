@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :repo_file do
+  factory :rm_repo_file, :class => RepositoryManager::RepoFile do
     file { fixture_file }
     #sequence :password do |n|
     #  'secret'

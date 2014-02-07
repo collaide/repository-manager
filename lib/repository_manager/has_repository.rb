@@ -5,14 +5,22 @@ module RepositoryManager
     module ClassMethods
       def has_repository(options = {})
 
-        has_many :sharings, through: :sharings_members
-        has_many :sharings_members, as: :member, dependent: :destroy
-        has_many :sharings_owners, as: :owner, class_name: 'Sharing'
+        has_many :sharings, through: :sharings_members, class_name: 'RepositoryManager::Sharing'
+        has_many :sharings_members, class_name: 'RepositoryManager::SharingsMember', as: :member, dependent: :destroy
+        has_many :sharings_owners, as: :owner, class_name: 'RepositoryManager::Sharing'
 
         # The own repo_items
-        has_many :repo_items, as: :owner #, dependent: :destroy
+        has_many :repo_items, as: :owner, class_name: 'RepositoryManager::RepoItem' #, dependent: :destroy
         # The sharing repo_items
-        has_many :shared_repo_items, through: :sharings, source: :repo_item, class_name: 'RepoItem'
+        has_many :shared_repo_items, through: :sharings, source: :repo_item, class_name: 'RepositoryManager::RepoItem'
+
+        if Rails::VERSION::MAJOR == 4
+          has_many :root_repo_items, -> { where ancestry: nil }, as: :owner, class_name: 'RepositoryManager::RepoItem'
+          #scope :root_repo_items, -> { where ancestry: nil }
+        else
+          has_many :root_repo_items, -> { where ancestry: nil}, as: :owner, class_name: 'RepositoryManager::RepoItem'
+          #scope :root_repo_items, where(where ancestry: nil)
+        end
 
         #scope :all_repo_items, -> { self.repo_items.shared_repo_items }
 
@@ -41,7 +49,7 @@ module RepositoryManager
         if !RepositoryManager.accept_nested_sharing
           # Check if no other sharing exist in the path
           if repo_item.has_nested_sharing?
-            raise RepositoryManager::NestedSharingException.new("sharing failed. Another sharing already exist on the subtree or an ancestor '#{repo_item.name}'")
+            raise RepositoryManager::NestedSharingException.new("sharing failed. Another sharing already exist on the subtree or an ancestor of '#{repo_item.name}'")
           end
         end
 
@@ -61,9 +69,9 @@ module RepositoryManager
           # Correct the item permission with accepted permissions
           repo_item_permissions = make_repo_item_permissions(repo_item_permissions, authorisations)
 
-          sharing = Sharing.new(repo_item_permissions)
+          sharing = RepositoryManager::Sharing.new(repo_item_permissions)
           sharing.owner = self
-          sharing.user = current_user if RepositoryManager.user_model
+          sharing.creator = options[:creator]
 
           sharing.add_members(members, sharing_permissions)
 
@@ -84,23 +92,33 @@ module RepositoryManager
         end
       end
 
-      # Create a folder with the name (name) in the directory (source_folder)
+      # Create a folder with the name (name)
+      # options :
+      #   :source_folder = The directory in with the folder is created
+      #   :sender = The object of the sender (ex : current_user)
       # Returns the object of the folder created if it is ok
       # Returns an Exception if the folder is not created
       #     RepositoryManagerException if the name already exist
       #     AuthorisationException if the object don't have the permission
-      def create_folder!(name = '', source_folder = nil)
+      def create_folder!(name = '', options = {})
+        source_folder = options[:source_folder]
+        if source_folder
+          unless source_folder.is_folder?
+            raise RepositoryManager::RepositoryManagerException.new("create folder failed. The source folder must be a repo_folder.")
+          end
+        end
+
         # If he want to create a folder in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
 
           folder = RepoFolder.new
-          if name == ''
+          if name == '' || name == nil || name == false || name.blank?
             folder.name = default_folder_name(source_folder)
           else
             folder.name = name
           end
           folder.owner = self
-          folder.user = current_user if RepositoryManager.user_model
+          folder.sender = options[:sender]
 
           # If we are in root path we check if we can add this folder name
           if !source_folder && repo_item_name_exist_in_root?(name)
@@ -119,9 +137,11 @@ module RepositoryManager
         folder
       end
 
-      def create_folder(name = '', source_folder = nil)
+      # Like create_folder!
+      # Returns false if the folder is not created instead of an exception
+      def create_folder(name = '', options = {})
         begin
-          create_folder!(name, source_folder)
+          create_folder!(name, options)
         rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException
           false
         end
@@ -145,44 +165,59 @@ module RepositoryManager
       end
 
       # Create the file (file) in the directory (source_folder)
+      # options :
+      #   :source_folder = The directory in with the folder is created
+      #   :sender = The object of the sender (ex : current_user)
+      #
       # Param file can be a File, or a instance of RepoFile
-      # Return the object of the file created if it is ok
-      # Return false if the file is not created (no authorisation)
-      def create_file!(file, source_folder = nil)
+      # Returns the object of the file created if it is ok
+      # Returns an Exception if the folder is not created
+      #     RepositoryManagerException if the file already exist
+      #     AuthorisationException if the object don't have the permission
+      def create_file!(file, options = {})
+        source_folder = options[:source_folder]
+        if source_folder
+          unless source_folder.is_folder?
+            raise RepositoryManager::RepositoryManagerException.new("create file failed. The source folder must be a repo_folder.")
+          end
+        end
+
         # If he want to create a file in a directory, we have to check if he have the authorisation
         if can_create?(source_folder)
-          if file.class.name == 'RepoFile'
+
+          if file.class.name == 'RepositoryManager::RepoFile'
             repo_file = file
-          else
-            repo_file = RepoFile.new
+          elsif file.class.name == 'File' || file.class.name == 'ActionDispatch::Http::UploadedFile'
+            repo_file = RepositoryManager::RepoFile.new()
             repo_file.file = file
+          else # "ActionController::Parameters"
+            repo_file = RepositoryManager::RepoFile.new(file)
           end
 
           repo_file.owner = self
-          repo_file.user = current_user if RepositoryManager.user_model
+          repo_file.sender = options[:sender]
 
-          #puts repo_file.name
 
           # If we are in root path we check if we can add this file name
-          if !source_folder && repo_item_name_exist_in_root?(repo_file.name)
-            raise RepositoryManager::RepositoryManagerException.new("create file failed. The repo_item '#{name}' already exist in the root folder.")
+          if !source_folder && repo_item_name_exist_in_root?(repo_file.file.identifier)
+            raise RepositoryManager::RepositoryManagerException.new("create file failed. The repo_item '#{repo_file.file.identifier}' already exist in the root folder.")
           end
 
           unless repo_file.save
-            raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file '#{name}' can't be save")
+            raise RepositoryManager::RepositoryManagerException.new("create_file failed. The file can't be save")
           end
 
           # It raise an error if name already exist and destroy the file
           source_folder.add!(repo_file, true) if source_folder
         else
-          raise RepositoryManager::AuthorisationException.new("create_file failed. The file '#{name}' already exist in folder '#{source_folder.name}'")
+          raise RepositoryManager::AuthorisationException.new("create_file failed. You don't have the permission to create a file")
         end
         repo_file
       end
 
-      def create_file(file, source_folder = nil)
+      def create_file(file, options = {})
         begin
-          create_file!(file, source_folder)
+          create_file!(file, options)
         rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException
           false
         end
@@ -223,7 +258,7 @@ module RepositoryManager
         if can_download?(repo_item)
           path = options[:path] if options[:path]
 
-          repo_item.download({object: self, path: path})
+          repo_item.download!({object: self, path: path})
         else
           raise RepositoryManager::AuthorisationException.new("download failed. You don't have the permission to download the repo_item '#{repo_item.name}'")
         end
@@ -242,7 +277,7 @@ module RepositoryManager
         unless can_update?(repo_item)
           raise RepositoryManager::AuthorisationException.new("rename repo_item failed. You don't have the permission to update the repo_item '#{repo_item.name}'")
         end
-        repo_item.rename(new_name)
+        repo_item.rename!(new_name)
       end
 
       # Rename the repo_item with the new_name
@@ -263,13 +298,13 @@ module RepositoryManager
           raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to create in the target_folder '#{target_folder.name}'")
         end
         # If it has the permission, we move the repo_item in the target_folder
-        repo_item.move(target_folder)
+        repo_item.move!(target_folder)
       end
 
       def move_repo_item(repo_item, target_folder)
         begin
           move_repo_item!(repo_item, target_folder)
-        rescue RepositoryManager::AuthorisationException
+        rescue RepositoryManager::RepositoryManagerException, RepositoryManager::AuthorisationException
           false
         end
       end
@@ -362,7 +397,7 @@ module RepositoryManager
         end
       end
 
-        # You can here add new members in the sharing
+        # You can here remove members in the sharing
       # Param member could be an object or an array of object
       def remove_members_from!(sharing, members)
         if can_remove_from?(sharing)
@@ -382,14 +417,18 @@ module RepositoryManager
 
         # Get the download path of the member
       def get_default_download_path(prefix = 'download/')
-        "#{prefix}#{self.class.to_s.underscore}/#{self.id}/"
+        "#{prefix}#{self.class.base_class.to_s.underscore}/#{self.id}/"
       end
 
       # Returns true of false if the name exist in the root path of this instance
-      # TODO DONT WORK WITH REPO_FILES !!!!
       def repo_item_name_exist_in_root?(name)
         # add : or file : name
-        RepoItem.where(name: name).where(owner: self).where(ancestry: nil).first ? true : false
+        #RepoItem.where(name: name).where(owner: self).where(ancestry: nil).first ? true : false
+        #puts RepoItem.where('name = ? OR file = ?', name, name).where(owner: self).where(ancestry: nil).first.inspect
+        #puts self.inspect
+
+        RepoItem.where('name = ? OR file = ?', name, name).where(owner: self).where(ancestry: nil).first ? true : false
+
       end
 
       private
@@ -487,27 +526,28 @@ module RepositoryManager
       # Put a default name if none is given
       def default_folder_name(source_folder)
         i = ''
-        name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
+        name = "#{I18n.t 'repository_manager.models.repo_folder.name'}"
         # We check if another item has the same name
 
         if source_folder
+          #TODO Optimiser, récupérer tout les instances contenants le nom, puis faire la boucle (pas boucle de requete)
           # We check if another item has the same name
           until !source_folder.name_exist_in_children?(name) do
             if i == ''
               i = 1
             end
             i += 1
-            name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
+            name = "#{I18n.t 'repository_manager.models.repo_folder.name'} #{i}"
           end
-
         else
+          #TODO Optimiser, récupérer tout les instances contenants le nom, puis faire la boucle (pas boucle de requete)
           # Si il n'a pas de parent, racine
           until !repo_item_name_exist_in_root?(name) do
             if i == ''
               i = 1
             end
             i += 1
-            name = "#{I18n.t 'repository_manager.models.repo_folder.name'}#{i}"
+            name = "#{I18n.t 'repository_manager.models.repo_folder.name'} #{i}"
           end
 
         end

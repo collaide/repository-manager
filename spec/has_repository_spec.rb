@@ -10,21 +10,17 @@ describe 'HasRepository' do
   end
 
   it "should be associate with shares" do
-    sharing = Sharing.create
-    @user1.sharings << sharing
-    expect(@user1.sharings.last).to eq(sharing)
+    folder = @user1.create_folder('salut')
+    sharing = RepositoryManager::Sharing.new
+    sharing.repo_item = folder
+    sharing.save
+    @user2.sharings << sharing
+    expect(@user2.sharings.last).to eq(sharing)
   end
 
-  it "can add a file to repo_item" do
-    #TODO
-  end
-
-  it "can add a folder to repo_item" do
-    #TODO
-  end
 
   it 'can share his own repo_item with other users' do
-    rep = FactoryGirl.create(:repo_file)
+    rep = FactoryGirl.build(:rm_repo_file)
     rep.owner = @user1
     rep.save
 
@@ -55,7 +51,7 @@ describe 'HasRepository' do
   end
 
   it 'can not share a repo_item without sharings and without the permission' do
-    rep = FactoryGirl.create(:repo_file)
+    rep = FactoryGirl.build(:rm_repo_file)
     rep.owner = @user3
     rep.save
 
@@ -69,7 +65,7 @@ describe 'HasRepository' do
   end
 
   it 'can not share a repo_item with sharing but without the permission' do
-    rep = FactoryGirl.create(:repo_folder)
+    rep = FactoryGirl.build(:rm_repo_folder)
     rep.owner = @user3
     rep.save
 
@@ -88,7 +84,7 @@ describe 'HasRepository' do
   end
 
   it 'can share a repo_item with sharing and with the permission' do
-    rep = FactoryGirl.create(:repo_folder)
+    rep = FactoryGirl.build(:rm_repo_folder)
     rep.owner = @user3
     rep.save
 
@@ -110,7 +106,7 @@ describe 'HasRepository' do
   end
 
   it 'default sharings permissions are to false' do
-    rep = FactoryGirl.create(:repo_folder)
+    rep = FactoryGirl.build(:rm_repo_folder)
     rep.owner = @user3
     rep.save
 
@@ -139,7 +135,7 @@ describe 'HasRepository' do
   end
 
   it 'can share a repo_item with sharing and with restricted permissions' do
-    rep = FactoryGirl.create(:repo_folder)
+    rep = FactoryGirl.build(:rm_repo_folder)
     rep.owner = @user3
     rep.save
 
@@ -163,7 +159,6 @@ describe 'HasRepository' do
 
     sharing_of_user_1 = @user1.sharings.last
 
-    # TODO correct this, sharing is nil
     expect(sharing_of_user_1.can_read?).to eq(true)
     expect(sharing_of_user_1.can_update?).to eq(false)
     expect(sharing_of_user_1.can_share?).to eq(true)
@@ -172,7 +167,7 @@ describe 'HasRepository' do
   end
 
   it 'can share a repo_item with sharing permissions' do
-    rep = FactoryGirl.create(:repo_folder)
+    rep = FactoryGirl.build(:rm_repo_folder)
     rep.owner = @user3
     rep.save
 
@@ -199,7 +194,7 @@ describe 'HasRepository' do
   #  middle = @user3.create_folder('Middle', parent)
   #  children = @user3.create_folder('Children', middle)
   #
-  #  file = FactoryGirl.build(:repo_file)
+  #  file = FactoryGirl.build(:rm_repo_file)
   #  file.owner = @user3
   #  file.save
   #
@@ -219,8 +214,8 @@ describe 'HasRepository' do
 
   it 'can\'t share a nested sharing' do
     parent = @user1.create_folder('Parent')
-    nested = @user1.create_folder('Nested', parent)
-    children = @user1.create_folder('Children', nested)
+    nested = @user1.create_folder('Nested', source_folder: parent)
+    children = @user1.create_folder('Children', source_folder: nested)
 
     # @user1 own repository :
     #   |-- 'Parent'
@@ -238,12 +233,13 @@ describe 'HasRepository' do
   end
 
   it 'can\'t share a repo_item with ancestor sharing permissions' do
-    parent = FactoryGirl.create(:repo_folder)
+    parent = FactoryGirl.build(:rm_repo_folder)
     parent.owner = @user3
-    middle = @user3.create_folder('Middle', parent)
-    children = @user3.create_folder('Children', middle)
+    parent.save
+    middle = @user3.create_folder('Middle', source_folder: parent)
+    children = @user3.create_folder('Children', source_folder: middle)
 
-    file = FactoryGirl.build(:repo_file)
+    file = FactoryGirl.build(:rm_repo_file)
     file.owner = @user3
     file.save
 
@@ -259,13 +255,14 @@ describe 'HasRepository' do
     expect(@user2.sharings.count).to eq(0)
     @user1.share(file, @user2)
     expect(@user2.sharings.count).to eq(0)
+
   end
 
   it "can create a folder" do
     folder = @user1.create_folder('test folder')
     #folder = @user1.repo_items.last
     expect(folder.name).to eq('test folder')
-    expect(folder.type).to eq('RepoFolder')
+    expect(folder.type).to eq('RepositoryManager::RepoFolder')
     expect(@user1.repo_items.folders.count).to eq(1)
   end
 
@@ -275,4 +272,29 @@ describe 'HasRepository' do
     expect(@user1.repo_items.count).to eq(1)
     expect(@user1.repo_items.files.count).to eq(1)
   end
+
+  it 'can put a creator for a specific sharing' do
+    folder = @group1.create_folder('a')
+    sharing = @group1.share(folder, @user2, creator: @user1)
+
+    expect(sharing.reload.owner).to eq(@group1)
+    expect(sharing.creator).to eq(@user1)
+  end
+
+  it 'is by default owner = creator' do
+    folder = @group1.create_folder('a')
+    sharing = @group1.share(folder, @user2)
+
+    expect(sharing.reload.owner).to eq(@group1)
+    expect(sharing.creator).to eq(@group1)
+  end
+
+  it 'returns only root repo items' do
+    @user3.create_folder!
+    @user3.create_folder!(nil, source_folder: @user3.create_folder!)
+    expect(@user3.repo_items.count).to eq(3)
+    expect(@user3.root_repo_items.count).to eq(2)
+
+  end
+
 end
