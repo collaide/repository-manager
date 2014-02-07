@@ -231,7 +231,7 @@ WARNING : There is no verification if the user has the authorisation to create a
 
 ### How can I share a repo_item (file/folder)
 
-Now, user1 want to share his folder 'The new folder' with a Group object `group1` et another User object `user2`. You can use the `has_repository` method `share(repo_item, member, options = nil)`.
+Now, user1 want to share his folder 'The new folder' with a Group object `group1` and another User object `user2`. You can use the `has_repository` method `share(repo_item, member, options = nil)`.
 
 
 ```ruby
@@ -239,7 +239,7 @@ Now, user1 want to share his folder 'The new folder' with a Group object `group1
 
 members = []
 # You can add other instances (who `has_repository`) in this array to share with more than one instance
-member << group1
+members << group1
 members << user2
 
 sharing = user1.share(the_new_folder, members)
@@ -252,7 +252,7 @@ sharing = user1.share(the_new_folder, members, options)
 
 `repo_item_permissions` specifies what kind of permissions you give on the repo_item in a specific sharing.
 
-`sharing_permissions` specifies if the member selected can add or remove other members in this sharing.
+`sharing_permissions` specifies if the member of the sharing can add or remove other members in this sharing.
 
 See the chapter [Authorisations](#authorisations) for more details.
 
@@ -289,22 +289,31 @@ You can have two kind of repo_items:
 - Your own repo_items
 - The repo_items shared with you.
 
+You can get all the items of only these who are in the root.
+
 ```ruby
 # user1 want to get his own repository
 user1.repo_items.all # => You get the repo_items that user1 has created
 
+# user2 want to get his root repo_items 
+user2.root_repo_items.all
+
 # user2 want to get his shared repo_items
 user2.shared_repo_items.all
+
+# user2 want to get his root shared repo_items
+user2.root_shared_repo_items.all
+
 ```
 
 If you only want to have the folders or the files, you can do it like that:
 
 ```ruby
 # return only the own folders of user1
-user1.repo_items.folders.all # => You get the repo_folders that user1 has created
+user1.repo_items.folders.to_a # => You get the repo_folders that user1 has created
 
 # user2 want to get his shared repo_files
-user2.shared_repo_items.files.all
+user2.shared_repo_items.files.to_a
 ```
 
 Recall: a repo_item can be:
@@ -333,7 +342,7 @@ If it has the authorisation, an object can add members to a sharing.
 
 ```ruby
 # user1 want to add members to his sharing
-# NOTE: The action is done only if user1 has the ':can_add' permission.
+# NOTE: The action is done only if user1 has the ':can_add' sharing permission.
 user1.can_add_to?(sharing) # => true
 
 # Add members
@@ -344,7 +353,7 @@ members << group2
 
 user1.add_members_to(sharing, members)
 
-# You can change the default sharing permissions options :
+# You can change the default sharing permissions options for the new members :
 options = {can_add: true, can_remove: false}
 user1.add_members_to(sharing, members, options)
 
@@ -353,10 +362,10 @@ user1.add_members_to(sharing, members, options)
 group2.can_add_to?(sharing) # => true
 group2.can_remove_from?(sharing) # => false
 
-# If user2 add a member in the sharing, he can choose if the permission ':can_add' is true or false, but he can't put ':can_remove' to true (because he don't have this permission himself).
+# If user2 (the user who was add with the sharing permissions : {can_add: true, can_remove: false}) add a member in the sharing, he can choose if the permission ':can_add' is true or false, but he can't put ':can_remove' to true (because he don't have this permission himself).
 ```
 
-If an object has the authorisation, it can remove members from a sharing, else the method return `false`.
+If an object has the authorisation, it can remove members from a sharing, else the method return `false` (or raise an AuthorisationException if you user the `remove_members_from!` method).
 
 ```ruby
 # user1 want to remove group2 from the sharing `sharing`
@@ -382,17 +391,17 @@ sharing.remove_members({user2, group1})
 
 The owner of a `repo_item` (file or folder) has all the authorisations on it. When he share this `repo_item`, he can choose what authorisation he gives to the share. The authorisations are :
 - `can_read?(repo_item)` : The member can read (=download) this file/folder.
-- `can_create?(repo_item)` : Can create in the repo_item (Note: if repo_item is nil (= root), always true).
-- `can_update?(repo_item)` : Can update a repo_item.
+- `can_create?(repo_item)` : Can create in the repo_item (Note: if repo_item is nil (= own root), always true).
+- `can_update?(repo_item)` : Can update a repo_item (ex: rename).
 - `can_delete?(repo_item)` : Can delete a repo_item.
 - `can_share?(repo_item)` : Can share a repo_item.
 
 To check if a user has one of this authorisation, you just have to write : `user1.can_read?(repo_item)`, `user1.can_share?(repo_item)`, etc (it returns `true` or `false`).
 
 NOTICE : An object who can share a repo_item, can't set new permissions that it doesn't have.
-For instance: `user3` has a sharing of `repo_item1` with `:can_delete => false` and `:can_share => true`. He can share `repo_item1` with `user4`, but he can't put `:can_delete => true` in this new share.
+For instance: `user3` has a `sharing` of `repo_item1` in with it `:can_delete => false` and `:can_share => true`. He can share `repo_item1` with `user4`, but he can't put `:can_delete => true` in the `repo_item_permission` of this new share.
 
-You can get all the authorisations with this method: `user1.get_authorisations(repo_item)`
+You can get all the authorisations of an `object` in a `repo_item` with this method: `object.get_authorisations(repo_item)`
 
 ```ruby
       # Gets the repo authorisations
@@ -407,18 +416,20 @@ You can get all the authorisations with this method: `user1.get_authorisations(r
 
 #### Sharing permissions
 
-You can manage the permissions of a member in a sharing. The owner of the sharing has all the permissions. The permissions are:
+You can manage the permissions of a member in a sharing. The owner of the sharing has all the permissions. The sharing permissions are:
 - `can_add_to?(sharing)` : The member can add a new instance in this sharing.
 - `can_remove_from?(sharing)` : Can remove an instance from this sharing.
 
 To check if the object can add or remove an instance in the sharing, just write : `group1.can_add_to?(sharing)` or `group1.can_remove_from?(sharing)` (it returns `true` or `false`).
 
-Like the repo_item authorisations, you can get the sharing authorisations with : `group1.get_sharing_authorisations(sharing)`.
+Like the repo_item authorisations, you can get the sharing authorisations of an `object` in a `sharing` with : `object.get_sharing_authorisations(sharing)`.
 
 ### Download a repository
 
-RepositoryManager make the download of a repo_item easy. If the user want to download a file, the `user.download(repo_item)` method returns you the path of the file (if the user `can_read` it).
-If it want to download a folder, it automatically generates a zip file with all the constant that the user can_read. The method returns the path of this zip file.
+RepositoryManager make the download of a `repo_item` easy. If the user want to download a file, use the `has_repository` method : `download`. This method returns you the path of the file (if the user `can_read` it).
+
+If the `repo_item` is a file, the method returns you the path of this file.
+If the `repo_item` is a folder, it automatically generates a zip file with all the constant that the user `can_read`. The method returns the path of this zip file.
 
 ```ruby
 # user1 want to download the_folder
@@ -428,7 +439,7 @@ path_to_zip = user1.download(the_folder)
 send_file path_to_zip
 
 # Don't forget to delete the zip file after the user has downloaded it (when his session end for instance)
-# I created a method how delete all the download file path
+# I created a method who delete all the download file path of an object (here `user1` for instance)
 user1.delete_download_path()
 ```
 
