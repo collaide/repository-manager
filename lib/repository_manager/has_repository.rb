@@ -15,10 +15,10 @@ module RepositoryManager
         has_many :shared_repo_items, through: :sharings, source: :repo_item, class_name: 'RepositoryManager::RepoItem'
 
         if Rails::VERSION::MAJOR == 4
-          has_many :root_repo_items, -> { where ancestry: '' }, as: :owner, class_name: 'RepositoryManager::RepoItem'
+          has_many :root_repo_items, -> { where ancestry: nil }, as: :owner, class_name: 'RepositoryManager::RepoItem'
           #scope :root_repo_items, -> { where ancestry: nil }
         else
-          has_many :root_repo_items, -> { where ancestry: '' }, as: :owner, class_name: 'RepositoryManager::RepoItem'
+          has_many :root_repo_items, -> { where ancestry: nil }, as: :owner, class_name: 'RepositoryManager::RepoItem'
           #scope :root_repo_items, where(where ancestry: nil)
         end
 
