@@ -141,8 +141,9 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
           # We just create the folder if it is empty
           zf.mkdir(child.name) if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)
         else
+          zf.mkdir(child.name) if object == nil || !RepositoryManager.accept_nested_sharing || object.can_read?(child)
           # We go in this new directory and add it repo_items
-          add_repo_item_to_zip(RepositoryManager::RepoItem.find(child.child_ids), zf, object, "#{prefix}#{child.name}/")
+          add_repo_item_to_zip(child.children, zf, object, "#{prefix}#{child.name}/")
         end
       end
     end
