@@ -16,10 +16,10 @@ module RepositoryManager
 
         if Rails::VERSION::MAJOR == 4
           has_many :root_repo_items, -> { where ancestry: nil }, as: :owner, class_name: 'RepositoryManager::RepoItem'
-          #scope :root_repo_items, -> { where ancestry: nil }
+          has_many :root_shared_repo_items,  -> { where ancestry: nil }, through: :sharings, source: :repo_item, class_name: 'RepositoryManager::RepoItem'
         else
-          has_many :root_repo_items, -> { where ancestry: nil}, as: :owner, class_name: 'RepositoryManager::RepoItem'
-          #scope :root_repo_items, where(where ancestry: nil)
+          has_many :root_repo_items, where(ancestry: nil), as: :owner, class_name: 'RepositoryManager::RepoItem'
+          has_many :root_shared_repo_items, where(ancestry: nil), through: :sharings, source: :repo_item, class_name: 'RepositoryManager::RepoItem'
         end
 
         #scope :all_repo_items, -> { self.repo_items.shared_repo_items }
