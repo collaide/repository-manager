@@ -530,28 +530,28 @@ module RepositoryManager
         # We check if another item has the same name
 
         if source_folder
-          #TODO Optimiser, récupérer tout les instances contenants le nom, puis faire la boucle (pas boucle de requete)
-          # We check if another item has the same name
-          until !source_folder.name_exist_in_children?(name) do
-            if i == ''
-              i = 1
-            end
-            i += 1
-            name = "#{I18n.t 'repository_manager.models.repo_folder.name'} #{i}"
-          end
+          folders = source_folder.children
         else
-          #TODO Optimiser, récupérer tout les instances contenants le nom, puis faire la boucle (pas boucle de requete)
-          # Si il n'a pas de parent, racine
-          until !repo_item_name_exist_in_root?(name) do
-            if i == ''
-              i = 1
-            end
-            i += 1
-            name = "#{I18n.t 'repository_manager.models.repo_folder.name'} #{i}"
+          folders = RepositoryManager::RepoFolder.where('name LIKE ?', "%#{name}%").where(owner: self).where(ancestry: nil).to_a
+        end
+        # Si il n'a pas de parent, racine
+        until !name_exist_in_array(folders, name) do
+          if i == ''
+            i = 1
           end
-
+          i += 1
+          name = "#{I18n.t 'repository_manager.models.repo_folder.name'} #{i}"
         end
         name
+      end
+
+      def name_exist_in_array(folders, name)
+        folders.each do |folder|
+          if folder.name == name
+            return true
+          end
+        end
+        return false
       end
 
     end
