@@ -27,9 +27,9 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     scope :folders, where(type: 'RepositoryManager::RepoFolder')
   end
 
-  # Copy itself into the target_folder
+  # Copy itself into the source_folder
   # options
-  #   :target_folder = the folder in witch you copy this item
+  #   :source_folder = the folder in witch you copy this item
   #   :owner = the owner of the item
   #   :sender = the sender of the item (if you specify owner and not sender.. The sender becomes the owner)
   def copy!(options = {})
@@ -48,8 +48,8 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
       new_item.sender = self.sender
     end
 
-    if options[:target_folder]
-      options[:target_folder].add!(new_item)
+    if options[:source_folder]
+      options[:source_folder].add!(new_item)
     end
 
     new_item.save!
@@ -64,18 +64,18 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     end
   end
 
-  # Move itself into the target_folder or root
+  # Move itself into the source_folder or root
   # options
-  #   :target_folder => move into this target_folder
+  #   :source_folder => move into this source_folder
   #   :owner = the owner of the item
   def move!(options = {})
-    # If we are in target_folder, we check if it's ok
-    if options[:target_folder]
-      unless options[:target_folder].is_folder?
-        raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{target_folder.name}' can't be a file")
+    # If we are in source_folder, we check if it's ok
+    if options[:source_folder]
+      unless options[:source_folder].is_folder?
+        raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{options[:source_folder].name}' can't be a file")
       end
-      if options[:target_folder].name_exist_in_children?(self.name)
-        raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the folder '#{target_folder.name}'")
+      if options[:source_folder].name_exist_in_children?(self.name)
+        raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the folder '#{options[:source_folder].name}'")
       end
     else
       # We are in root, we check if name exist in root
@@ -89,14 +89,14 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     end
     # here, all is ok
     self.owner = options[:owner] if options[:owner]
-    self.update_attribute :parent, options[:target_folder]
+    self.update_attribute :parent, options[:source_folder]
     self.save!
     self
   end
 
-  def move(target_folder)
+  def move(options = {})
     begin
-      move!(target_folder)
+      move!(options)
     rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
       false
     end
