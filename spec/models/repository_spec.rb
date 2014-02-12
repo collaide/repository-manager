@@ -181,13 +181,18 @@ describe 'RepoItem' do
     folder3 = @user1.create_folder('', source_folder: folder1)
     folder4 = @user1.create_folder('', source_folder: folder1)
     folder2 = @user1.create_folder()
+    folder5 = @user1.create_folder()
+    folder6 = @user1.create_folder('', source_folder: folder1)
+
+
 
     # TODO add translate in gem
     expect(folder1.name).to eq('translation missing: en.repository_manager.models.repo_folder.name')
     expect(folder2.name).to eq('translation missing: en.repository_manager.models.repo_folder.name 2')
     expect(folder3.name).to eq('translation missing: en.repository_manager.models.repo_folder.name')
     expect(folder4.name).to eq('translation missing: en.repository_manager.models.repo_folder.name 2')
-
+    expect(folder5.name).to eq('translation missing: en.repository_manager.models.repo_folder.name 3')
+    expect(folder6.name).to eq('translation missing: en.repository_manager.models.repo_folder.name 3')
   end
 
   it 'can\'t create a folder with the same name at root' do

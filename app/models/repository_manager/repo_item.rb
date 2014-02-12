@@ -28,33 +28,76 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
   end
 
   # Copy itself into the target_folder
-  def copy(target_folder)
-    #new_file = self.dup
-    #new_file.folder = target_folder
-    #new_file.save!
-    #
-    #path = "#{Rails.root}/uploads/#{Rails.env}/#{new_file.id}/original"
-    #FileUtils.mkdir_p path
-    #FileUtils.cp_r self.attachment.path, "#{path}/#{new_file.id}"
-    #
-    #new_file
+  # options
+  #   :target_folder = the folder in witch you copy this item
+  #   :owner = the owner of the item
+  #   :sender = the sender of the item (if you specify owner and not sender.. The sender becomes the owner)
+  def copy!(options = {})
+    new_item = RepoItem.new
+    new_item.type = self.type
+    new_item.file = self.file
+    new_item.content_type = self.content_type
+    new_item.file_size = self.file_size
+    new_item.name = self.name
+    options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner
+    if options[:sender]
+      new_item.sender = options[:sender]
+    elsif options[:owner]
+      new_item.sender = options[:owner]
+    else
+      new_item.sender = self.sender
+    end
+
+    if options[:target_folder]
+      options[:target_folder].add!(new_item)
+    end
+
+    new_item.save!
+    new_item
   end
 
-  # Move itself into the target_folder
-  def move!(target_folder)
-    unless target_folder.is_folder?
-      raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{target_folder.name}' can't be a file")
+  def copy(options = {})
+    begin
+      copy!(options)
+    rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+      false
     end
-    if target_folder.name_exist_in_children?(self.name)
-      raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the folder '#{target_folder.name}'")
+  end
+
+  # Move itself into the target_folder or root
+  # options
+  #   :target_folder => move into this target_folder
+  #   :owner = the owner of the item
+  def move!(options = {})
+    # If we are in target_folder, we check if it's ok
+    if options[:target_folder]
+      unless options[:target_folder].is_folder?
+        raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{target_folder.name}' can't be a file")
+      end
+      if options[:target_folder].name_exist_in_children?(self.name)
+        raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the folder '#{target_folder.name}'")
+      end
+    else
+      # We are in root, we check if name exist in root
+      if options[:owner]
+        if options[:owner].repo_item_name_exist_in_root?(self.name)
+          raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the root")
+        elsif self.owner.repo_item_name_exist_in_root?(self.name)
+          raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the root")
+        end
+      end
     end
-    self.update_attribute :parent, target_folder
+    # here, all is ok
+    self.owner = options[:owner] if options[:owner]
+    self.update_attribute :parent, options[:target_folder]
+    self.save!
+    self
   end
 
   def move(target_folder)
     begin
       move!(target_folder)
-    rescue RepositoryManager::RepositoryManagerException
+    rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
       false
     end
   end

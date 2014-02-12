@@ -42,7 +42,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   def rename(new_name)
     begin
       rename!(new_name)
-    rescue RepositoryManager::RepositoryManagerException
+    rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
       false
     end
   end

@@ -17,8 +17,6 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
   # Downloading this file
   def download!(options = {})
     path = file.path
-    #render status: :bad_request and return unless File.exist?(path)
-    #send_file(path)
   end
 
   private
