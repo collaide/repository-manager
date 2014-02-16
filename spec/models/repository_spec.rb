@@ -151,7 +151,7 @@ describe 'RepoItem' do
     test_folder = @user1.create_folder('Test folder', source_folder: root_test_folder)
     @user1.create_folder('Nested test folder', source_folder: test_folder)
 
-    @user1.move_repo_item(test_folder, source_folder: @user1_folder)
+    @user1.move_repo_item(test_folder, @user1_folder)
 
     expect(test_folder.parent_id).to eq(@user1_folder.id)
   end
@@ -244,15 +244,15 @@ describe 'RepoItem' do
     file = @user2.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
     folder = @user2.create_folder('folder')
 
-    @user2.move_repo_item!(file, source_folder: folder)
+    @user2.move_repo_item!(file, folder)
 
     expect(folder.children).to eq([file])
   end
 
-  it "can move a folder to folder" do
+  it "can move a folder into a folder" do
     folder = @user2.create_folder('folder')
     folder2 = @user2.create_folder('folder2')
-    @user2.move_repo_item!(folder, source_folder: folder2)
+    @user2.move_repo_item!(folder, folder2)
 
     expect(folder2.children).to eq([folder])
   end
@@ -261,7 +261,26 @@ describe 'RepoItem' do
     file = @user2.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"))
     folder = @user2.create_folder('folder')
 
-    expect(@user2.move_repo_item!(folder, source_folder: file)).to eq(false)
+    expect(@user2.move_repo_item(folder, file)).to eq(false)
+  end
+
+  it "move_repo_item default to the root of the self owner" do
+    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
+
+    @user1.delete_repo_item!(@user1_file)
+    #expect(@user1.root_repo_items.count).to eq(1)
+    @user1.move_repo_item!(file)
+    expect(@user1.root_repo_items.count).to eq(2)
+  end
+
+  it "move_repo_item can't move a file into a root if file already exist" do
+    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
+    expect(@user1.move_repo_item(file)).to eq(false)
+  end
+
+  it "move_repo_item can't move if no permission" do
+      file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
+      expect(@user2.move_repo_item(file)).to eq(false)
   end
 
 end

@@ -286,32 +286,25 @@ module RepositoryManager
       end
 
       # Move the repo_item. If you let all options empty, the item is moving into the self.root
-      # options
-      #   :source_folder => move into this source_folder
-      #   :owner => the new owner if we move it to root (source_folder => nil)
-      def move_repo_item!(repo_item, options = {})
+      # target =>  move into this source_folder
+      # if target == nil, move to the root
+      def move_repo_item!(repo_item, target = nil)
+        if !can_read?(repo_item)
+          raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")
+        end
         # If we want to change the owner we have to have the can_delete authorisation
-        if options[:source_folder]
+        if target
           # If want to change the owner, we have to check if we have the authorisation
-          if options[:source_folder].owner != repo_item.owner && !can_delete?(repo_item)
+          if target.owner != repo_item.owner && !can_delete?(repo_item)
             raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
           end
           # If we don't want to change the owner, we look if we can_update
-          if options[:source_folder].owner == repo_item.owner && !can_update?(repo_item)
+          if target.owner == repo_item.owner && !can_update?(repo_item)
             raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to update the '#{repo_item.name}'")
           end
           # We check if we can_create in the source_folder
-          unless can_create?(options[:source_folder])
+          unless can_create?(target)
             raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to create in the source_folder '#{options[:source_folder].name}'")
-          end
-        elsif options[:owner]
-          # elsif there is no source_folder, but a specify owner, we check if we can delete, if owner change
-          if options[:owner] != repo_item.owner && !can_delete?(repo_item)
-            raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
-          end
-          # If we don't want to change the owner, we look if we can_update
-          if options[:owner] == repo_item.owner && !can_update?(repo_item)
-            raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to update the '#{repo_item.name}'")
           end
         else
           # Else if there is no source_folder, we check if we can delete the repo_item, if the owner change
@@ -319,45 +312,45 @@ module RepositoryManager
             raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
           end
         end
-        # We put the owner
-        if options[:source_folder]
-          owner = options[:source_folder].owner
-        elsif options[:owner]
-          owner = options[:owner].owner
-        else
-          owner = self
-        end
         # If it has the permission, we move the repo_item in the source_folder
-        repo_item.move!(source_folder: options[:source_folder], owner: owner)
+        repo_item.move!(source_folder: target)
       end
 
-      def move_repo_item(repo_item, options = {})
+      def move_repo_item(repo_item, target = nil)
         begin
-          move_repo_item!(repo_item, options)
+          move_repo_item!(repo_item, target)
         rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           false
         end
       end
 
-      # Copy the repo_item in the source_folder or in the root
+      # Copy the repo_item in the source_folder or in own root
+      # target => the folder in witch we want to copy the repo item
       # options
-      #   :source_folder => the folder in witch we want to copy the repo item
       #   :sender => the new sender (by default => owner)
-      def copy_repo_item!(repo_item, options = {})
+      def copy_repo_item!(repo_item, target = nil, options = {})
         unless can_read?(repo_item)
           raise RepositoryManager::AuthorisationException.new("copy repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")
         end
 
-        if options[:source_folder] &&  !can_create?(options[:source_folder])
-          raise RepositoryManager::AuthorisationException.new("copy repo_item failed. You don't have the permission to create in the source_folder '#{source_folder.name}'")
+        if target &&  !can_create?(target)
+          raise RepositoryManager::AuthorisationException.new("copy repo_item failed. You don't have the permission to create in the source_folder '#{target.name}'")
         end
+
+        # The new owner
+        if target
+          owner = target.owner
+        else
+          owner = self
+        end
+
         # If it has the permission, we move the repo_item in the source_folder
-        repo_item.copy!(source_folder: options[:source_folder], owner: self, sender: options[:sender])
+        repo_item.copy!(source_folder: target, owner: owner, sender: options[:sender])
       end
 
-      def copy_repo_item(repo_item, options = {})
+      def copy_repo_item(repo_item, target = nil, options = {})
         begin
-          copy_repo_item!(repo_item, options)
+          copy_repo_item!(repo_item, target, options)
         rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           false
         end
@@ -451,7 +444,7 @@ module RepositoryManager
         end
       end
 
-        # You can here remove members in the sharing
+      # You can here remove members in the sharing
       # Param member could be an object or an array of object
       def remove_members_from!(sharing, members)
         if can_remove_from?(sharing)
@@ -476,13 +469,7 @@ module RepositoryManager
 
       # Returns true of false if the name exist in the root path of this instance
       def repo_item_name_exist_in_root?(name)
-        # add : or file : name
-        #RepoItem.where(name: name).where(owner: self).where(ancestry: nil).first ? true : false
-        #puts RepoItem.where('name = ? OR file = ?', name, name).where(owner: self).where(ancestry: nil).first.inspect
-        #puts self.inspect
-
         RepoItem.where('name = ? OR file = ?', name, name).where(owner: self).where(ancestry: nil).first ? true : false
-
       end
 
       private
@@ -499,6 +486,12 @@ module RepositoryManager
             authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_remove] == true)
         end
       end
+
+      # reflexion: can_do?(what, options)
+      # options
+      #   hash : authorisations hash
+      #   class: RepoItem => get_authorisations
+      #   class: has_repository => regarder si on peu déplacer dans root (question: non pas possible ?)
 
       # Return if you can do or not this action (what)
       def can_do?(what, repo_item, authorisations = nil)

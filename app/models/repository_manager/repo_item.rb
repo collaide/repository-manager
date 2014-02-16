@@ -31,7 +31,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
   # options
   #   :source_folder = the folder in witch you copy this item
   #   :owner = the owner of the item
-  #   :sender = the sender of the item (if you specify owner and not sender.. The sender becomes the owner)
+  #   :sender = the sender of the item (if you don't specify sender.. The sender becomes the owner)
   def copy!(options = {})
     new_item = RepoItem.new
     new_item.type = self.type
@@ -64,10 +64,11 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     end
   end
 
-  # Move itself into the source_folder or root
+  # Move itself into the target or root
   # options
-  #   :source_folder => move into this source_folder
+  #   :source_folder = the folder in witch you copy this item
   #   :owner = the owner of the item
+  # If :source_folder = nil, move to the root (of same owner)
   def move!(options = {})
     # If we are in source_folder, we check if it's ok
     if options[:source_folder]
@@ -77,18 +78,19 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
       if options[:source_folder].name_exist_in_children?(self.name)
         raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the folder '#{options[:source_folder].name}'")
       end
-    else
-      # We are in root, we check if name exist in root
-      if options[:owner]
-        if options[:owner].repo_item_name_exist_in_root?(self.name)
-          raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the root")
-        elsif self.owner.repo_item_name_exist_in_root?(self.name)
-          raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the root")
-        end
-      end
+    # We are in root, we check if name exist in root
+    # We stay in the same owner
+    elsif self.owner.repo_item_name_exist_in_root?(self.name)
+      raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the root")
     end
     # here, all is ok
-    self.owner = options[:owner] if options[:owner]
+    # We change the owner if another one is specify
+    if options[:owner]
+      self.owner = options[:owner]
+    elsif options[:source_folder]
+      self.owner = options[:source_folder].owner
+    end
+    # we update the tree with the new parent
     self.update_attribute :parent, options[:source_folder]
     self.save!
     self
