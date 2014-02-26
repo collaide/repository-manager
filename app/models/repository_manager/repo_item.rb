@@ -31,19 +31,19 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
   # options
   #   :source_folder = the folder in witch you copy this item
   #   :owner = the owner of the item
-  #   :sender = the sender of the item (if you don't specify sender.. The sender becomes the owner)
+  #   :sender = the sender of the item (if you don't specify sender.. The sender is still the same)
   def copy!(options = {})
-    new_item = RepoItem.new
+    new_item = RepositoryManager::RepoItem.new
     new_item.type = self.type
-    new_item.file = self.file
+    #new_item.file = self.file
     new_item.content_type = self.content_type
     new_item.file_size = self.file_size
     new_item.name = self.name
     options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner
     if options[:sender]
       new_item.sender = options[:sender]
-    elsif options[:owner]
-      new_item.sender = options[:owner]
+    #elsif options[:owner]
+    #  new_item.sender = options[:owner]
     else
       new_item.sender = self.sender
     end
@@ -105,7 +105,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
   end
 
   # Returns true if it exist a sharing in the ancestors of descendant_ids of the repo_item (without itself)
-  def has_nested_sharing?
+  def can_be_shared_without_nesting?
     # An array with the ids of all ancestors and descendants
     ancestor_and_descendant_ids = []
     ancestor_and_descendant_ids << self.descendant_ids if self.is_folder? && !self.descendant_ids.empty?

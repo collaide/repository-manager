@@ -48,7 +48,7 @@ module RepositoryManager
         # Nested sharing are not accepted
         if !RepositoryManager.accept_nested_sharing
           # Check if no other sharing exist in the path
-          if repo_item.has_nested_sharing?
+          if repo_item.can_be_shared_without_nesting?
             raise RepositoryManager::NestedSharingException.new("sharing failed. Another sharing already exist on the subtree or an ancestor of '#{repo_item.name}'")
           end
         end
@@ -327,7 +327,7 @@ module RepositoryManager
       # Copy the repo_item in the source_folder or in own root
       # target => the folder in witch we want to copy the repo item
       # options
-      #   :sender => the new sender (by default => owner)
+      #   :sender => the new sender (by default => still the old sender)
       def copy_repo_item!(repo_item, target = nil, options = {})
         unless can_read?(repo_item)
           raise RepositoryManager::AuthorisationException.new("copy repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")

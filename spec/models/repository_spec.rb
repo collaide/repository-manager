@@ -279,8 +279,17 @@ describe 'RepoItem' do
   end
 
   it "move_repo_item can't move if no permission" do
-      file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
-      expect(@user2.move_repo_item(file)).to eq(false)
-  end
+    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
+    expect(@user2.move_repo_item(file)).to eq(false)
+  end 
 
+  it "can't copy a file withour permission" do
+    expect(@user2.copy_repo_item(@user1_file)).to eq(false)         
+  end
+  
+  it "can copy a file with read permission" do
+    @user1.share(@user1_file, @user2, repo_item_permissions: {can_read:true})
+    @user2.copy_repo_item(@user1_file)
+    expect(@user2.root_repo_items).to eq([@user1_file])
+  end
 end

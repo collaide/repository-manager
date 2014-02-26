@@ -273,9 +273,9 @@ children = @user1.create_folder('Children', nested)
 
 @user1.share(nested, @user2)
 
-nested.has_nested_sharing? # Returns false (because `nested` is shared but there is no nested sharing)
-parent.has_nested_sharing? # Returns true (because there is a sharing on one of his descendants)
-children.has_nested_sharing? # Returns true (because there is a sharing on one of his ancestors)
+nested.can_be_shared_without_nesting? # Returns false (because `nested` is shared but there exist no nested sharing)
+parent.can_be_shared_without_nesting? # Returns true (because there is a sharing on one of his descendants)
+children.can_be_shared_without_nesting? # Returns true (because there is a sharing on one of his ancestors)
 
 # Here we can't share 'Parent' or 'Children' because it already exist a nested sharing.
 @user1.share(parent, @user2) # Returns false
@@ -382,7 +382,7 @@ sharing.add_members(member, {can_add: true, can_remove: false})
 
 
 # Remove members from the sharing
-sharing.remove_members({user2, group1})
+sharing.remove_members([user2, group1])
 ```
 
 ### Authorisations
@@ -414,7 +414,7 @@ You can get all the authorisations of an `object` in a `repo_item` with this met
       end
 ```
 
-#### Sharing permissions
+#### Sharing authorisations
 
 You can manage the permissions of a member in a sharing. The owner of the sharing has all the permissions. The sharing permissions are:
 - `can_add_to?(sharing)` : The member can add a new instance in this sharing.
