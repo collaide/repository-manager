@@ -224,9 +224,9 @@ describe 'HasRepository' do
 
     @user1.share(nested, @user2)
 
-    expect(nested.can_be_shared_without_nesting?).to eq(false) # Returns false (because `nested` is shared but there is no nested sharing)
-    expect(parent.can_be_shared_without_nesting?).to eq(true) # Returns true (because there is a sharing on one of his descendants)
-    expect(parent.can_be_shared_without_nesting?).to eq(true) # Returns true (because there is a sharing on one of his ancestors)
+    expect(nested.can_be_shared_without_nesting?).to eq(true) # Returns true (because `nested` is shared but there is no nested sharing)
+    expect(parent.can_be_shared_without_nesting?).to eq(false) # Returns false (because there is a sharing on one of his descendants)
+    expect(parent.can_be_shared_without_nesting?).to eq(false) # Returns false (because there is a sharing on one of his ancestors)
 
     # Here we can't share 'Parent' or 'Children' because it already exist a nested sharing.
     expect(@user1.share(parent, @user2)).to eq(false) # Returns false

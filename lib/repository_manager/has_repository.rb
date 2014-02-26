@@ -48,7 +48,7 @@ module RepositoryManager
         # Nested sharing are not accepted
         if !RepositoryManager.accept_nested_sharing
           # Check if no other sharing exist in the path
-          if repo_item.can_be_shared_without_nesting?
+          unless repo_item.can_be_shared_without_nesting?
             raise RepositoryManager::NestedSharingException.new("sharing failed. Another sharing already exist on the subtree or an ancestor of '#{repo_item.name}'")
           end
         end

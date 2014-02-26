@@ -273,9 +273,9 @@ children = @user1.create_folder('Children', nested)
 
 @user1.share(nested, @user2)
 
-nested.can_be_shared_without_nesting? # Returns false (because `nested` is shared but there exist no nested sharing)
-parent.can_be_shared_without_nesting? # Returns true (because there is a sharing on one of his descendants)
-children.can_be_shared_without_nesting? # Returns true (because there is a sharing on one of his ancestors)
+nested.can_be_shared_without_nesting? # Returns true (because `nested` is shared but there exist no nested sharing)
+parent.can_be_shared_without_nesting? # Returns false (because there is a sharing on one of his descendants)
+children.can_be_shared_without_nesting? # Returns false (because there is a sharing on one of his ancestors)
 
 # Here we can't share 'Parent' or 'Children' because it already exist a nested sharing.
 @user1.share(parent, @user2) # Returns false

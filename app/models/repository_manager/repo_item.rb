@@ -113,9 +113,9 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
 
     # If it exist a sharing, it returns true
     if RepositoryManager::Sharing.where(repo_item_id: ancestor_and_descendant_ids).count > 0
-      true
-    else
       false
+    else
+      true
     end
   end
 
