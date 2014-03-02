@@ -121,6 +121,9 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
       Zip::File.open(full_path, Zip::File::CREATE) { |zf|
         add_repo_item_to_zip(children, zf, object)
       }
+
+    File.chmod(0444, full_path)
+
       return full_path
     #else
     #  # Nothing to download here
