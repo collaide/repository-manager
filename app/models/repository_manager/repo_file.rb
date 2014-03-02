@@ -19,6 +19,39 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
     path = file.path
   end
 
+  # Copy itself into the source_folder
+  # options
+  #   :source_folder = the folder in witch you copy this item
+  #   :owner = the owner of the item
+  #   :sender = the sender of the item (if you don't specify sender.. The sender is still the same)
+  def copy!(options = {})
+    new_item = RepositoryManager::RepoFile.new
+    new_item.file = File.open(self.file.current_path)
+    options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner
+    if options[:sender]
+      new_item.sender = options[:sender]
+      #elsif options[:owner]
+      #  new_item.sender = options[:owner]
+    else
+      new_item.sender = self.sender
+    end
+
+    if options[:source_folder]
+      options[:source_folder].add!(new_item)
+    end
+
+    new_item.save!
+    new_item
+  end
+
+  def copy(options = {})
+    begin
+      copy!(options)
+    rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+      false
+    end
+  end
+
   private
 
   def update_asset_attributes

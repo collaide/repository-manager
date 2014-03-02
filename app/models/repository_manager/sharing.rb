@@ -15,9 +15,9 @@ class RepositoryManager::Sharing < ActiveRecord::Base
   #scope :recipient, lambda { |recipient|
   #  joins(:receipts).where('receipts.receiver_id' => recipient.id,'receipts.receiver_type' => recipient.class.base_class.to_s)
   #}
-  scope :members, lambda { |member|
-    joins(:sharings_members).where('sharings_members.member_id' => member.id,'sharings_members.member_type' => member.class.base_class.to_s)
-  }
+  #scope :members, lambda { |member|
+  #  joins(:sharings_members).where('sharings_members.member_id' => member.id,'sharings_members.member_type' => member.class.base_class.to_s)
+  #}
 
   # Return the authorisations of the sharing for the member
   def get_authorisations(member)
@@ -36,12 +36,18 @@ class RepositoryManager::Sharing < ActiveRecord::Base
     if members.kind_of?(Array)
       # Add each member to this sharing
       members.each do |i|
+        unless i.respond_to? :share # Check if this object "has_repository"
+          raise RepositoryManager::RepositoryManagerException.new("add members failed. The object passed into members should be a model who 'has_repository'")
+        end
         sharing_member = RepositoryManager::SharingsMember.new(sharing_permissions)
         sharing_member.member = i
         # Add the sharings members in the sharing
         self.sharings_members << sharing_member
       end
     else
+      unless members.respond_to? :share # Check if this object "has_repository"
+        raise RepositoryManager::RepositoryManagerException.new("add members failed. The object passed into members should be a model who 'has_repository'")
+      end
       sharing_member = RepositoryManager::SharingsMember.new(sharing_permissions)
       sharing_member.member = members
       # Add the sharings members in the sharing

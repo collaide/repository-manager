@@ -47,6 +47,40 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
     end
   end
 
+  # Copy itself into the source_folder
+  # options
+  #   :source_folder = the folder in witch you copy this item
+  #   :owner = the owner of the item
+  #   :sender = the sender of the item (if you don't specify sender.. The sender is still the same)
+  def copy!(options = {})
+    new_item = RepositoryManager::RepoFolder.new
+
+    #TODO recurcive function for copy all the content of the folder
+
+    options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner
+    if options[:sender]
+      new_item.sender = options[:sender]
+      #elsif options[:owner]
+      #  new_item.sender = options[:owner]
+    else
+      new_item.sender = self.sender
+    end
+
+    if options[:source_folder]
+      options[:source_folder].add!(new_item)
+    end
+
+    new_item
+  end
+
+  def copy(options = {})
+    begin
+      copy!(options)
+    rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+      false
+    end
+  end
+
     # Download this folder (zip it first)
   # Return the path to the folder.zip
   # options can have :

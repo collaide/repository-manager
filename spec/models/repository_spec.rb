@@ -290,6 +290,6 @@ describe 'RepoItem' do
   it "can copy a file with read permission" do
     @user1.share(@user1_file, @user2, repo_item_permissions: {can_read:true})
     @user2.copy_repo_item(@user1_file)
-    expect(@user2.root_repo_items).to eq([@user1_file])
+    expect(@user2.root_repo_items.count).to eq(1)
   end
 end

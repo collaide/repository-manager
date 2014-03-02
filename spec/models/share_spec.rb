@@ -35,6 +35,7 @@ describe 'Sharing' do
     expect(@user2.shared_repo_items.count).to eq(0)
   end
 
+
   it 'can remove a member in a sharing with permission' do
     sharing = @user1.share(@user1_file, @user2, {sharing_permissions:{can_add: false, can_remove: true}})
     @user1.add_members_to(sharing, @user3)

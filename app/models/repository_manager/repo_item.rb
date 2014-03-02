@@ -27,43 +27,6 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     scope :folders, where(type: 'RepositoryManager::RepoFolder')
   end
 
-  # Copy itself into the source_folder
-  # options
-  #   :source_folder = the folder in witch you copy this item
-  #   :owner = the owner of the item
-  #   :sender = the sender of the item (if you don't specify sender.. The sender is still the same)
-  def copy!(options = {})
-    new_item = RepositoryManager::RepoItem.new
-    new_item.type = self.type
-    #new_item.file = self.file
-    new_item.content_type = self.content_type
-    new_item.file_size = self.file_size
-    new_item.name = self.name
-    options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner
-    if options[:sender]
-      new_item.sender = options[:sender]
-    #elsif options[:owner]
-    #  new_item.sender = options[:owner]
-    else
-      new_item.sender = self.sender
-    end
-
-    if options[:source_folder]
-      options[:source_folder].add!(new_item)
-    end
-
-    new_item.save!
-    new_item
-  end
-
-  def copy(options = {})
-    begin
-      copy!(options)
-    rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
-      false
-    end
-  end
-
   # Move itself into the target or root
   # options
   #   :source_folder = the folder in witch you copy this item

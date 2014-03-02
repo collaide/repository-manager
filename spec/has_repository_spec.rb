@@ -18,7 +18,6 @@ describe 'HasRepository' do
     expect(@user2.sharings.last).to eq(sharing)
   end
 
-
   it 'can share his own repo_item with other users' do
     rep = FactoryGirl.build(:rm_repo_file)
     rep.owner = @user1
