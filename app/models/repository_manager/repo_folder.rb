@@ -167,7 +167,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   # object is the object that want to download this file
   def get_default_download_path(object = nil)
     object ? add_to_path = object.get_default_download_path(''): add_to_path = ''
-    "download/#{add_to_path}#{self.class.base_class.to_s.underscore}/#{self.id}/"
+    "#{Rails.root.join('download')}/#{add_to_path}#{self.class.base_class.to_s.underscore}/#{self.id}/"
   end
 
   def add_repo_item_to_zip(children, zf, object = nil, prefix = nil)

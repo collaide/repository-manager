@@ -463,7 +463,7 @@ module RepositoryManager
       end
 
         # Get the download path of the member
-      def get_default_download_path(prefix = 'download/')
+      def get_default_download_path(prefix = "#{Rails.root.join('download')}/")
         "#{prefix}#{self.class.base_class.to_s.underscore}/#{self.id}/"
       end
 

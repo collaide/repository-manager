@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20131018214212) do
     t.integer "sender_id"
     t.string  "sender_type"
     t.string  "ancestry"
+    t.integer "ancestry_depth", default: 0
     t.string  "name"
     t.float   "file_size"
     t.string  "content_type"

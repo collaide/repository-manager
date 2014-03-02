@@ -24,7 +24,7 @@ class CreateRepositoryManager < ActiveRecord::Migration
       t.references :owner, polymorphic: true#, index: true
       t.references :sender, polymorphic: true#, index: true
       t.string :ancestry
-      #t.integer :ancestry_depth, :default => 0
+      t.integer :ancestry_depth, :default => 0
       t.string :name
       t.float :file_size
       t.string :content_type

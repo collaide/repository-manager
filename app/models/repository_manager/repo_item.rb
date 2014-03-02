@@ -5,7 +5,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
 
   before_save :put_sender
 
-  has_ancestry
+  has_ancestry cache_depth: true
 
   # Associate with the User Class
   belongs_to :owner, :polymorphic => true
