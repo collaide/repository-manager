@@ -1,7 +1,6 @@
 require 'zip'
 
 class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
-  #attr_accessible :name if RepositoryManager.protected_attributes?
 
   validates :name, presence: true
 

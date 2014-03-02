@@ -456,7 +456,6 @@ the_folder.delete_zip
 ## TODO
 
 - Do the rename file method
-- Test the copy method
 - Configure path to save files
 - Write the methods : share_link.
 - Snapshot the file if possible
