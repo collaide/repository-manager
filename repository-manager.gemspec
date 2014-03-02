@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email       = ['texicitys@gmail.com']
   s.homepage    = 'https://github.com/Texicitys/repository-manager'
   s.summary     = "Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/sharings)."
-  s.description = "This project is based on the need for a repository manager system for Collaide. A system for easily create/delete files and folders in a repository. For sharing these repositories easily with other object with a flexible and complete authorisations management.
+  s.description = "This project is based on the need for a repository manager system for Collaide. A system for easily create/delete files and folders in a repository. For sharing these repositories easily with other object with a flexible and complete permissions management.
 Each instance (users, groups, etc..) can have it own repositories (with files and folders). It can manage them easily (edit, remove, add, etc) and sharing them with other instance."
 
   #s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]

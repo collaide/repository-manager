@@ -6,7 +6,7 @@ Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/
 
 This gem add functionalities to manage repositories. Each instance (users, groups, etc..) can have it own repository (with files and folders). It can manage them (edit, remove, add, etc) and share them with other objects.
 
-This project is based on the need for a repository manager system for [Collaide](https://github.com/facenord-sud/collaide). A system for easily create/delete files and folders in a repository. For sharing these "repo items" easily with other object with a flexible and complete authorisations management.
+This project is based on the need for a repository manager system for [Collaide](https://github.com/facenord-sud/collaide). A system for easily create/delete files and folders in a repository. For sharing these "repo items" easily with other object with a flexible and complete permissions management.
 
 Instead of creating my core repository manager system heavily 
 dependent on our development, I'm trying to implement a generic and potent repository gem.
@@ -72,7 +72,7 @@ end
 ```
 
 
-See the chapter [Authorisations](#authorisations) for more details about the permissions.
+See the chapter [Permissions](#permissions) for more details about the permissions.
 
 ## Preparing your models
 
@@ -116,7 +116,7 @@ A few methods are written in those two ways :
 - method(arg, options)
 - method!(arg, options) (note the "!")
 
-The two methods do the same, but the one with the "!" returns an Exception error if it is a problem (AuthorisationException or RepositoryManagerException for instance) and the method without "!" return false if it has a problem.
+The two methods do the same, but the one with the "!" returns an Exception error if it is a problem (PermissionException or RepositoryManagerException for instance) and the method without "!" return false if it has a problem.
 
 ### How can I create/delete/move a repo_item (file or folder)
 
@@ -227,7 +227,7 @@ file.sender # Returns user1
 
 ```
 
-WARNING : There is no verification if the user has the authorisation to create a file or folder into this group. You have to check this in your controller ! The fact that user1 is the sender of this folder gives him NO AUTHORISATION on it !
+WARNING : There is no verification if the user has the permission to create a file or folder into this group. You have to check this in your controller ! The fact that user1 is the sender of this folder gives him NO AUTHORISATION on it !
 
 ### How can I share a repo_item (file/folder)
 
@@ -254,7 +254,7 @@ sharing = user1.share(the_new_folder, members, options)
 
 `sharing_permissions` specifies if the member of the sharing can add or remove other members in this sharing.
 
-See the chapter [Authorisations](#authorisations) for more details.
+See the chapter [Permissions](#permissions) for more details.
 
 ### Repository Manager and the nested sharing
 
@@ -338,7 +338,7 @@ For file details, more infos on [the documentation of the carrierwave gem](https
 ### How can I manage a sharing
 
 
-If it has the authorisation, an object can add members to a sharing.
+If it has the permission, an object can add members to a sharing.
 
 ```ruby
 # user1 want to add members to his sharing
@@ -365,14 +365,14 @@ group2.can_remove_from?(sharing) # => false
 # If user2 (the user who was add with the sharing permissions : {can_add: true, can_remove: false}) add a member in the sharing, he can choose if the permission ':can_add' is true or false, but he can't put ':can_remove' to true (because he don't have this permission himself).
 ```
 
-If an object has the authorisation, it can remove members from a sharing, else the method return `false` (or raise an AuthorisationException if you user the `remove_members_from!` method).
+If an object has the permission, it can remove members from a sharing, else the method return `false` (or raise an PermissionException if you user the `remove_members_from!` method).
 
 ```ruby
 # user1 want to remove group2 from the sharing `sharing`
 user1.remove_members_from(sharing, group2) # The second parameter can be an object or an array of object
 ```
 
-You can directly work with the `sharing`. Be careful, there is NO authorisation control !
+You can directly work with the `sharing`. Be careful, there is NO permission control !
 
 ```ruby
 # Add a member to the sharing `sharing`
@@ -385,36 +385,36 @@ sharing.add_members(member, {can_add: true, can_remove: false})
 sharing.remove_members([user2, group1])
 ```
 
-### Authorisations
+### Permissions
 
-#### Repository authorisations
+#### Repository permissions
 
-The owner of a `repo_item` (file or folder) has all the authorisations on it. When he share this `repo_item`, he can choose what authorisation he gives to the share. The authorisations are :
+The owner of a `repo_item` (file or folder) has all the permissions on it. When he share this `repo_item`, he can choose what permission he gives to the share. The permissions are :
 - `can_read?(repo_item)` : The member can read (=download) this file/folder.
 - `can_create?(repo_item)` : Can create in the repo_item (Note: if repo_item is nil (= own root), always true).
 - `can_update?(repo_item)` : Can update a repo_item (ex: rename).
 - `can_delete?(repo_item)` : Can delete a repo_item.
 - `can_share?(repo_item)` : Can share a repo_item.
 
-To check if a user has one of this authorisation, you just have to write : `user1.can_read?(repo_item)`, `user1.can_share?(repo_item)`, etc (it returns `true` or `false`).
+To check if a user has one of this permission, you just have to write : `user1.can_read?(repo_item)`, `user1.can_share?(repo_item)`, etc (it returns `true` or `false`).
 
 NOTICE : An object who can share a repo_item, can't set new permissions that it doesn't have.
 For instance: `user3` has a `sharing` of `repo_item1` in which it `:can_delete => false` and `:can_share => true`. He can share `repo_item1` with `user4`, but he can't put `:can_delete => true` in the `repo_item_permission` of this new share.
 
-You can get all the authorisations of an `object` in a `repo_item` with this method: `object.get_authorisations(repo_item)`
+You can get all the permissions of an `object` in a `repo_item` with this method: `object.get_permissions(repo_item)`
 
 ```ruby
-      # Gets the repo authorisations
-      # Return false if the entity has not the authorisation to share this rep
-      # Return true if the entity can share this rep with all the authorisations
+      # Gets the repo permissions
+      # Return false if the entity has not the permission to share this rep
+      # Return true if the entity can share this rep with all the permissions
       # Return an Array if the entity can share but with restriction
-      # Return true if the repo_item is nil (he as all authorisations on his own rep)
-      def get_authorisations(repo_item = nil)
+      # Return true if the repo_item is nil (he as all permissions on his own rep)
+      def get_permissions(repo_item = nil)
         [...]
       end
 ```
 
-#### Sharing authorisations
+#### Sharing permissions
 
 You can manage the permissions of a member in a sharing. The owner of the sharing has all the permissions. The sharing permissions are:
 - `can_add_to?(sharing)` : The member can add a new instance in this sharing.
@@ -422,7 +422,7 @@ You can manage the permissions of a member in a sharing. The owner of the sharin
 
 To check if the object can add or remove an instance in the sharing, just write : `group1.can_add_to?(sharing)` or `group1.can_remove_from?(sharing)` (it returns `true` or `false`).
 
-Like the repo_item authorisations, you can get the sharing authorisations of an `object` in a `sharing` with : `object.get_sharing_authorisations(sharing)`.
+Like the repo_item permissions, you can get the sharing permissions of an `object` in a `sharing` with : `object.get_sharing_permissions(sharing)`.
 
 ### Download a repository
 

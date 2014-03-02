@@ -50,7 +50,7 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
   def copy(options = {})
     begin
       copy!(options)
-    rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+    rescue RepositoryManager::PermissionException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
       false
     end
   end

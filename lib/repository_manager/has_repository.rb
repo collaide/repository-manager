@@ -53,10 +53,10 @@ module RepositoryManager
           end
         end
 
-        authorisations = get_authorisations(repo_item)
+        permissions = get_permissions(repo_item)
 
-        # Here we look if the instance has the authorisation for making a sharing
-        if can_share?(nil, authorisations)
+        # Here we look if the instance has the permission for making a sharing
+        if can_share?(nil, permissions)
 
           # We put the default options
           repo_item_permissions = RepositoryManager.default_repo_item_permissions
@@ -67,7 +67,7 @@ module RepositoryManager
           sharing_permissions = options[:sharing_permissions] if options[:sharing_permissions]
 
           # Correct the item permission with accepted permissions
-          repo_item_permissions = make_repo_item_permissions(repo_item_permissions, authorisations)
+          repo_item_permissions = make_repo_item_permissions(repo_item_permissions, permissions)
 
           sharing = RepositoryManager::Sharing.new(repo_item_permissions)
           sharing.owner = self
@@ -80,14 +80,14 @@ module RepositoryManager
           sharing
         else
           # No permission => No sharing
-          raise RepositoryManager::AuthorisationException.new("sharing failed. You don't have the permission to share the repo_item '#{repo_item.name}'")
+          raise RepositoryManager::PermissionException.new("sharing failed. You don't have the permission to share the repo_item '#{repo_item.name}'")
         end
       end
 
       def share(repo_item, members, options = {})
         begin
           share!(repo_item, members, options)
-        rescue RepositoryManager::AuthorisationException, RepositoryManager::NestedSharingException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+        rescue RepositoryManager::PermissionException, RepositoryManager::NestedSharingException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           false
         end
       end
@@ -99,7 +99,7 @@ module RepositoryManager
       # Returns the object of the folder created if it is ok
       # Returns an Exception if the folder is not created
       #     RepositoryManagerException if the name already exist
-      #     AuthorisationException if the object don't have the permission
+      #     PermissionException if the object don't have the permission
       def create_folder!(name = '', options = {})
         source_folder = options[:source_folder]
         if source_folder
@@ -108,7 +108,7 @@ module RepositoryManager
           end
         end
 
-        # If he want to create a folder in a directory, we have to check if he have the authorisation
+        # If he want to create a folder in a directory, we have to check if he have the permission
         if can_create?(source_folder)
 
           folder = RepoFolder.new
@@ -130,7 +130,7 @@ module RepositoryManager
 
           folder.save!
         else
-          raise RepositoryManager::AuthorisationException.new("create_folder failed. You don't have the permission to create a folder in '#{source_folder.name}'")
+          raise RepositoryManager::PermissionException.new("create_folder failed. You don't have the permission to create a folder in '#{source_folder.name}'")
         end
         folder
       end
@@ -140,7 +140,7 @@ module RepositoryManager
       def create_folder(name = '', options = {})
         begin
           create_folder!(name, options)
-        rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+        rescue RepositoryManager::PermissionException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           false
         end
       end
@@ -150,14 +150,14 @@ module RepositoryManager
         if can_delete?(repo_item)
           repo_item.destroy
         else
-          raise RepositoryManager::AuthorisationException.new("delete_repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
+          raise RepositoryManager::PermissionException.new("delete_repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
         end
       end
 
       def delete_repo_item(repo_item)
         begin
           delete_repo_item!(repo_item)
-        rescue RepositoryManager::AuthorisationException
+        rescue RepositoryManager::PermissionException
           false
         end
       end
@@ -171,7 +171,7 @@ module RepositoryManager
       # Returns the object of the file created if it is ok
       # Returns an Exception if the folder is not created
       #     RepositoryManagerException if the file already exist
-      #     AuthorisationException if the object don't have the permission
+      #     PermissionException if the object don't have the permission
       def create_file!(file, options = {})
         source_folder = options[:source_folder]
         if source_folder
@@ -180,7 +180,7 @@ module RepositoryManager
           end
         end
 
-        # If he want to create a file in a directory, we have to check if he have the authorisation
+        # If he want to create a file in a directory, we have to check if he have the permission
         if can_create?(source_folder)
 
           if file.class.name == 'RepositoryManager::RepoFile'
@@ -206,7 +206,7 @@ module RepositoryManager
 
           repo_file.save!
         else
-          raise RepositoryManager::AuthorisationException.new("create_file failed. You don't have the permission to create a file")
+          raise RepositoryManager::PermissionException.new("create_file failed. You don't have the permission to create a file")
         end
         repo_file
       end
@@ -214,17 +214,17 @@ module RepositoryManager
       def create_file(file, options = {})
         begin
           create_file!(file, options)
-        rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+        rescue RepositoryManager::PermissionException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           false
         end
       end
 
-      # Gets the repo authorisations
-      # Return false if the entity has not the authorisation to share this rep
-      # Return true if the entity can share this rep with all the authorisations
+      # Gets the repo permissions
+      # Return false if the entity has not the permission to share this rep
+      # Return true if the entity can share this rep with all the permissions
       # Return an Array if the entity can share but with restriction
-      # Return true if the repo_item is nil (he as all authorisations on his own rep)
-      def get_authorisations(repo_item = nil)
+      # Return true if the repo_item is nil (he as all permissions on his own rep)
+      def get_permissions(repo_item = nil)
         # If repo_item is nil, he can do what he want
         return true if repo_item == nil
 
@@ -256,14 +256,14 @@ module RepositoryManager
 
           repo_item.download!({object: self, path: path})
         else
-          raise RepositoryManager::AuthorisationException.new("download failed. You don't have the permission to download the repo_item '#{repo_item.name}'")
+          raise RepositoryManager::PermissionException.new("download failed. You don't have the permission to download the repo_item '#{repo_item.name}'")
         end
       end
 
       def download(repo_item, options = {})
         begin
           download!(repo_item, options)
-        rescue RepositoryManager::AuthorisationException
+        rescue RepositoryManager::PermissionException
           false
         end
       end
@@ -271,7 +271,7 @@ module RepositoryManager
       # Rename the repo_item with the new_name
       def rename_repo_item!(repo_item, new_name)
         unless can_update?(repo_item)
-          raise RepositoryManager::AuthorisationException.new("rename repo_item failed. You don't have the permission to update the repo_item '#{repo_item.name}'")
+          raise RepositoryManager::PermissionException.new("rename repo_item failed. You don't have the permission to update the repo_item '#{repo_item.name}'")
         end
         repo_item.rename!(new_name)
       end
@@ -280,7 +280,7 @@ module RepositoryManager
       def rename_repo_item(repo_item, new_name)
         begin
           rename_repo_item!(repo_item, new_name)
-        rescue RepositoryManager::AuthorisationException
+        rescue RepositoryManager::PermissionException
           false
         end
       end
@@ -290,26 +290,26 @@ module RepositoryManager
       # if target == nil, move to the root
       def move_repo_item!(repo_item, target = nil)
         if !can_read?(repo_item)
-          raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")
+          raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")
         end
-        # If we want to change the owner we have to have the can_delete authorisation
+        # If we want to change the owner we have to have the can_delete permission
         if target
-          # If want to change the owner, we have to check if we have the authorisation
+          # If want to change the owner, we have to check if we have the permission
           if target.owner != repo_item.owner && !can_delete?(repo_item)
-            raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
+            raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
           end
           # If we don't want to change the owner, we look if we can_update
           if target.owner == repo_item.owner && !can_update?(repo_item)
-            raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to update the '#{repo_item.name}'")
+            raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to update the '#{repo_item.name}'")
           end
           # We check if we can_create in the source_folder
           unless can_create?(target)
-            raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to create in the source_folder '#{options[:source_folder].name}'")
+            raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to create in the source_folder '#{options[:source_folder].name}'")
           end
         else
           # Else if there is no source_folder, we check if we can delete the repo_item, if the owner change
           if self != repo_item.owner && !can_delete?(repo_item)
-            raise RepositoryManager::AuthorisationException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
+            raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
           end
         end
         # If it has the permission, we move the repo_item in the source_folder
@@ -330,11 +330,11 @@ module RepositoryManager
       #   :sender => the new sender (by default => still the old sender)
       def copy_repo_item!(repo_item, target = nil, options = {})
         unless can_read?(repo_item)
-          raise RepositoryManager::AuthorisationException.new("copy repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")
+          raise RepositoryManager::PermissionException.new("copy repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")
         end
 
         if target &&  !can_create?(target)
-          raise RepositoryManager::AuthorisationException.new("copy repo_item failed. You don't have the permission to create in the source_folder '#{target.name}'")
+          raise RepositoryManager::PermissionException.new("copy repo_item failed. You don't have the permission to create in the source_folder '#{target.name}'")
         end
 
         # The new owner
@@ -351,7 +351,7 @@ module RepositoryManager
       def copy_repo_item(repo_item, target = nil, options = {})
         begin
           copy_repo_item!(repo_item, target, options)
-        rescue RepositoryManager::AuthorisationException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+        rescue RepositoryManager::PermissionException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           false
         end
       end
@@ -361,41 +361,41 @@ module RepositoryManager
         FileUtils.rm_rf(self.get_default_download_path())
       end
 
-      #Return the authorisations of the sharing (can_add, can_remove)
-      def get_sharing_authorisations(sharing)
-        sharing.get_authorisations(self)
+      #Return the permissions of the sharing (can_add, can_remove)
+      def get_sharing_permissions(sharing)
+        sharing.get_permissions(self)
       end
 
       # Return true if you can share the repo, else false
-      # You can give the authorisations or the repo_item as params
-      def can_share?(repo_item, authorisations = nil)
-        can_do?('share', repo_item, authorisations)
+      # You can give the permissions or the repo_item as params
+      def can_share?(repo_item, permissions = nil)
+        can_do?('share', repo_item, permissions)
       end
 
       # Return true if you can read the repo, else false
-      def can_read?(repo_item, authorisations = nil)
-        can_do?('read', repo_item, authorisations)
+      def can_read?(repo_item, permissions = nil)
+        can_do?('read', repo_item, permissions)
       end
 
       # Return true if you can download the repo, else false
       # Read = Download for the moment
-      def can_download?(repo_item, authorisations = nil)
-        can_do?('read', repo_item, authorisations)
+      def can_download?(repo_item, permissions = nil)
+        can_do?('read', repo_item, permissions)
       end
 
       # Return true if you can create in the repo, false else
-      def can_create?(repo_item, authorisations = nil)
-        can_do?('create', repo_item, authorisations)
+      def can_create?(repo_item, permissions = nil)
+        can_do?('create', repo_item, permissions)
       end
 
       # Returns true if you can edit the repo, false else
-      def can_update?(repo_item, authorisations = nil)
-        can_do?('update', repo_item, authorisations)
+      def can_update?(repo_item, permissions = nil)
+        can_do?('update', repo_item, permissions)
       end
 
       # Returns true if you can delete the repo, false else
-      def can_delete?(repo_item, authorisations = nil)
-        can_do?('delete', repo_item, authorisations)
+      def can_delete?(repo_item, permissions = nil)
+        can_do?('delete', repo_item, permissions)
       end
 
       ## Returns true if  it exist a sharing in the ancestors of descendant_ids of the repo_item (without itself)
@@ -427,19 +427,19 @@ module RepositoryManager
       # You can here add new members in the sharing
       # Param member could be an object or an array of object
       def add_members_to!(sharing, members, options = RepositoryManager.default_sharing_permissions)
-        authorisations = get_sharing_authorisations(sharing)
+        permissions = get_sharing_permissions(sharing)
         if can_add_to?(sharing)
-          sharing_permissions = make_sharing_permissions(options, authorisations)
+          sharing_permissions = make_sharing_permissions(options, permissions)
           sharing.add_members(members, sharing_permissions)
         else
-          raise RepositoryManager::AuthorisationException.new("add members failed. You don't have the permission to add a member in this sharing")
+          raise RepositoryManager::PermissionException.new("add members failed. You don't have the permission to add a member in this sharing")
         end
       end
 
       def add_members_to(sharing, members, options = RepositoryManager.default_sharing_permissions)
         begin
           add_members_to!(sharing, members, options = RepositoryManager.default_sharing_permissions)
-        rescue RepositoryManager::AuthorisationException
+        rescue RepositoryManager::PermissionException
           false
         end
       end
@@ -450,14 +450,14 @@ module RepositoryManager
         if can_remove_from?(sharing)
           sharing.remove_members(members)
         else
-          raise RepositoryManager::AuthorisationException.new("remove members failed. You don't have the permission to remove a member on this sharing")
+          raise RepositoryManager::PermissionException.new("remove members failed. You don't have the permission to remove a member on this sharing")
         end
       end
 
       def remove_members_from(sharing, members)
         begin
           remove_members_from!(sharing, members)
-        rescue RepositoryManager::AuthorisationException
+        rescue RepositoryManager::PermissionException
           false
         end
       end
@@ -475,53 +475,53 @@ module RepositoryManager
       private
 
       # Return if you can do or not this action in the sharing
-      def can_do_to?(what, sharing, authorisations = nil)
-        if authorisations == nil
-          authorisations = sharing.get_authorisations(self)
+      def can_do_to?(what, sharing, permissions = nil)
+        if permissions == nil
+          permissions = sharing.get_permissions(self)
         end
         case what
           when 'add'
-            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_add] == true)
+            permissions == true || (permissions.kind_of?(Hash) && permissions[:can_add] == true)
           when 'remove'
-            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_remove] == true)
+            permissions == true || (permissions.kind_of?(Hash) && permissions[:can_remove] == true)
         end
       end
 
       # reflexion: can_do?(what, options)
       # options
-      #   hash : authorisations hash
-      #   class: RepoItem => get_authorisations
+      #   hash : permissions hash
+      #   class: RepoItem => get_permissions
       #   class: has_repository => regarder si on peu déplacer dans root (question: non pas possible ?)
 
       # Return if you can do or not this action (what)
-      def can_do?(what, repo_item, authorisations = nil)
-        # If we pass no authorisations we have to get it
-        if authorisations == nil
-          authorisations = get_authorisations(repo_item)
+      def can_do?(what, repo_item, permissions = nil)
+        # If we pass no permissions we have to get it
+        if permissions == nil
+          permissions = get_permissions(repo_item)
         end
 
         case what
           when 'read'
-            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_read] == true)
+            permissions == true || (permissions.kind_of?(Hash) && permissions[:can_read] == true)
           when 'delete'
             if RepositoryManager.accept_nested_sharing
               # TODO implement to look if he can delete all the folder
             else
-              authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_delete] == true)
+              permissions == true || (permissions.kind_of?(Hash) && permissions[:can_delete] == true)
             end
           when 'update'
-            authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_update] == true)
+            permissions == true || (permissions.kind_of?(Hash) && permissions[:can_update] == true)
           when 'share'
             if RepositoryManager.accept_nested_sharing
               # TODO implement to look if he can delete all the folder
             else
-              authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_share] == true)
+              permissions == true || (permissions.kind_of?(Hash) && permissions[:can_share] == true)
             end
           when 'create'
             if RepositoryManager.accept_nested_sharing
               # TODO implement to look if he can delete all the folder
             else
-              authorisations == true || (authorisations.kind_of?(Hash) && authorisations[:can_create] == true)
+              permissions == true || (permissions.kind_of?(Hash) && permissions[:can_create] == true)
             end
           else
             false
@@ -529,41 +529,41 @@ module RepositoryManager
 
       end
 
-      # Correct the repo_item_permissions with the authorisations
-      def make_repo_item_permissions(wanted_permissions, authorisations)
+      # Correct the repo_item_permissions with the permissions
+      def make_repo_item_permissions(wanted_permissions, permissions)
         # If it is an array, we have restriction in the permissions
-        if authorisations.kind_of?(Hash) && wanted_permissions
+        if permissions.kind_of?(Hash) && wanted_permissions
           # Built the sharing with the accepted permissions
           # We remove the permission if we can't sharing it
-          if wanted_permissions[:can_read] == true && authorisations[:can_read] == false
+          if wanted_permissions[:can_read] == true && permissions[:can_read] == false
             wanted_permissions[:can_read] = false
           end
-          if wanted_permissions[:can_create] == true && authorisations[:can_create] == false
+          if wanted_permissions[:can_create] == true && permissions[:can_create] == false
             wanted_permissions[:can_create] = false
           end
-          if wanted_permissions[:can_update] == true && authorisations[:can_update] == false
+          if wanted_permissions[:can_update] == true && permissions[:can_update] == false
             wanted_permissions[:can_update] = false
           end
-          if wanted_permissions[:can_delete] == true && authorisations[:can_delete] == false
+          if wanted_permissions[:can_delete] == true && permissions[:can_delete] == false
             wanted_permissions[:can_delete] = false
           end
-          if wanted_permissions[:can_share] == true && authorisations[:can_share] == false
+          if wanted_permissions[:can_share] == true && permissions[:can_share] == false
             wanted_permissions[:can_share] = false
           end
         end
         return wanted_permissions
       end
 
-      # Correct the sharing_permissions with the authorisations
-      def make_sharing_permissions(wanted_permissions, authorisations)
+      # Correct the sharing_permissions with the permissions
+      def make_sharing_permissions(wanted_permissions, permissions)
         # If it is an array, we have restriction in the permissions
-        if authorisations.kind_of?(Hash) && wanted_permissions
+        if permissions.kind_of?(Hash) && wanted_permissions
           # Built the sharing with the accepted permissions
           # We remove the permission if we can't share it
-          if wanted_permissions[:can_add] == true && authorisations[:can_add] == false
+          if wanted_permissions[:can_add] == true && permissions[:can_add] == false
             wanted_permissions[:can_add] = false
           end
-          if wanted_permissions[:can_remove] == true && authorisations[:can_remove] == false
+          if wanted_permissions[:can_remove] == true && permissions[:can_remove] == false
             wanted_permissions[:can_remove] = false
           end
         end

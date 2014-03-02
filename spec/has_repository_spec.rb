@@ -73,7 +73,7 @@ describe 'HasRepository' do
 
     # here user3 can share because he is the owner
     @user3.share(rep, members)
-    # here user2 should can share because he has the authorisation
+    # here user2 should can share because he has the permission
     members = []
     members << @user1
     @user2.share(rep, members)
@@ -95,7 +95,7 @@ describe 'HasRepository' do
 
     # here user3 can share because he is the owner
     @user3.share(rep, members, options)
-    # here user2 should can share because he has the authorisation
+    # here user2 should can share because he has the permission
     members = []
     members << @user1
     @user2.share(rep, members)
@@ -117,8 +117,8 @@ describe 'HasRepository' do
 
     # here user3 can share because he is the owner
     @user3.share(rep, members, options)
-    # here user2 should can share because he has the authorisation
-    # But he has only the authorisation of read (can_read = true), He can't share with more permissions
+    # here user2 should can share because he has the permission
+    # But he has only the permission of read (can_read = true), He can't share with more permissions
     members = []
     members << @user1
     #Here the permissions should be : :can_read => true, and all others false
@@ -146,8 +146,8 @@ describe 'HasRepository' do
 
     # here user3 can share because he is the owner
     @user3.share(rep, members, options)
-    # here user2 should can share because he has the authorisation
-    # But he has only the authorisation of read (can_read = true), He can't share with more permissions
+    # here user2 should can share because he has the permission
+    # But he has only the permission of read (can_read = true), He can't share with more permissions
     members = []
     members << @user1
 

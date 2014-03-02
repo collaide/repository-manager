@@ -19,8 +19,8 @@ class RepositoryManager::Sharing < ActiveRecord::Base
   #  joins(:sharings_members).where('sharings_members.member_id' => member.id,'sharings_members.member_type' => member.class.base_class.to_s)
   #}
 
-  # Return the authorisations of the sharing for the member
-  def get_authorisations(member)
+  # Return the permissions of the sharing for the member
+  def get_permissions(member)
     # If the member is the owner, he can do what he want !
     if self.owner == member
       return true
