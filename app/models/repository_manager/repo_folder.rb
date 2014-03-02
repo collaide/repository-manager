@@ -54,8 +54,13 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   #   :sender = the sender of the item (if you don't specify sender.. The sender is still the same)
   def copy!(options = {})
     new_item = RepositoryManager::RepoFolder.new
+    new_item.name = self.name
 
-    #TODO recurcive function for copy all the content of the folder
+    if options[:source_folder]
+      options[:source_folder].add!(new_item)
+    elsif options[:owner].repo_item_name_exist_in_root?(new_item.name)
+      raise RepositoryManager::RepositoryManagerException.new("copy failed. The repo_folder '#{new_item.name}' already exist in root.")
+    end
 
     options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner
     if options[:sender]
@@ -66,8 +71,11 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
       new_item.sender = self.sender
     end
 
-    if options[:source_folder]
-      options[:source_folder].add!(new_item)
+    new_item.save!
+
+    # Recursive method who copy all children.
+    children.each do |c|
+      c.copy!(source_folder: new_item, owner: options[:owner], sender: options[:sender])
     end
 
     new_item

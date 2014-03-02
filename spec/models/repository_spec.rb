@@ -143,6 +143,24 @@ describe 'RepoItem' do
     @user2.delete_download_path()
   end
 
+  it 'can copy a hard folder (nested folders and files)' do
+    nested = @user2.create_folder!('a')
+    a = @user2.create_folder!('a', source_folder: nested)
+    b = @user2.create_folder!('b', source_folder: a)
+    c = @user2.create_folder!('c', source_folder: b)
+    d = @user2.create_folder!('a', source_folder: c)
+    e = @user2.create_folder!('a', source_folder: d)
+
+    file = FactoryGirl.build(:rm_repo_file)
+    #@user2.create_file!(file, source_folder: a)
+    #@user2.create_file!(file, source_folder: nested)
+    @user2.create_file!(file, source_folder: c)
+    @user2.share!(nested, @user1, repo_item_permissions: {can_read: true})
+    copy = @user1.copy_repo_item!(nested)
+    @user1.download(copy)
+    @user1.delete_download_path()
+  end
+
   it 'can\'t add a repo_item with the same name in a folder' do
     root_folder = @user1.create_folder('Root folder')
     root_folder.add(@user1_folder)
