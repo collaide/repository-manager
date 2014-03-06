@@ -26,6 +26,14 @@ module RepositoryManager
     def protected_attributes?
       Rails.version < '4' || defined?(ProtectedAttributes)
     end
+
+    ##
+    # Loads the Carrierwave locale files before the Rails application locales
+    # letting the Rails application overrite the carrierwave locale defaults
+    #config.before_configuration do
+      I18n.load_path << File.join(File.dirname(__FILE__), 'repository_manager', 'locales', 'repository_manager.en.yml')
+    #end
+
   end
 
 end

@@ -1,0 +1,19 @@
+en:
+  repository_manager:
+    models:
+      repo_folder:
+        name: New folder
+    success:
+      repo_folder:
+        created: The folder was created with success !
+      repo_file:
+        created: The file was created with success !
+    errors:
+      repo_folder:
+        not_created: Error, the folder was not created !
+      repo_file:
+        not_created: Error, the file was not created !
+    form:
+      new:
+        repo_folder: Create a folder
+        repo_file: Send a file
