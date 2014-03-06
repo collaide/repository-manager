@@ -59,6 +59,8 @@ describe 'HasRepository' do
 
     @user1.share(rep, members)
 
+    expect(rep.errors.messages).to eq({sharing: ['You don\'t have the permission to share this item']})
+
     expect(@user2.sharings.count).to eq(0)
     expect(@user1.sharings_owners.count).to eq(0)
   end
@@ -229,6 +231,8 @@ describe 'HasRepository' do
 
     # Here we can't share 'Parent' or 'Children' because it already exist a nested sharing.
     expect(@user1.share(parent, @user2)).to eq(false) # Returns false
+    expect(parent.errors.messages).to eq({sharing: ['You can\'t share this item because another sharing exist on its ancestors or descendants']})
+
   end
 
   it 'can\'t share a repo_item with ancestor sharing permissions' do

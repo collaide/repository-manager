@@ -12,7 +12,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
     if name_exist_in_children?(repo_item.name)
       # we delete the repo if asked
       repo_item.destroy if destroy_if_fail
-      raise RepositoryManager::RepositoryManagerException.new("add failed. The repo_item '#{repo_item.name}' already exist in the folder '#{name}'")
+      raise RepositoryManager::ItemExistException.new("add failed. The repo_item '#{repo_item.name}' already exist in the folder '#{name}'")
     else
       repo_item.update_attribute :parent, self
     end
@@ -29,7 +29,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   # Rename the item
   def rename!(new_name)
     if name_exist_in_siblings?(new_name)
-      raise RepositoryManager::RepositoryManagerException.new("rename failed. The repo_item '#{new_name}' already exist.'")
+      raise RepositoryManager::ItemExistException.new("rename failed. The repo_item '#{new_name}' already exist.'")
     else
       self.name = new_name
       # TODO see if I have to save or not
@@ -58,7 +58,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
     if options[:source_folder]
       options[:source_folder].add!(new_item)
     elsif options[:owner].repo_item_name_exist_in_root?(new_item.name)
-      raise RepositoryManager::RepositoryManagerException.new("copy failed. The repo_folder '#{new_item.name}' already exist in root.")
+      raise RepositoryManager::ItemExistException.new("copy failed. The repo_folder '#{new_item.name}' already exist in root.")
     end
 
     options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner

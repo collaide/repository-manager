@@ -7,4 +7,7 @@ module RepositoryManager
 
   class NestedSharingException < RepositoryManagerException
   end
+
+  class ItemExistException < RepositoryManagerException
+  end
 end

@@ -21,14 +21,20 @@ describe 'RepoItem' do
   end
 
   it 'can\'t create a folder in it a file' do
-    folder = @user1.create_folder('Folder1', source_folder: @user1_file)
+    options = {source_folder: @user1_file}
+    folder = @user1.create_folder('Folder1', options)
+
+    expect(options[:errors]).to eq(['The folder was not created'])
 
     expect(folder).to eq(false)
   end
 
 
   it 'can\'t create a folder in another folder without permission' do
-    folder = @user2.create_folder('Folder1', source_folder: @user1_folder)
+    options = {source_folder: @user1_folder}
+    folder = @user2.create_folder('Folder1', options)
+
+    expect(options[:errors]).to eq(['You don\'t have the permission to create a folder'])
 
     expect(@user1_folder.has_children?).to eq(false)
     expect(folder).to eq(false)
@@ -97,6 +103,8 @@ describe 'RepoItem' do
   it 'user can\'t download a file without permission' do
     path = @user2.download(@user1_file)
     expect(path).to eq(false)
+    expect(@user1_file.errors.messages).to eq({download: ['You don\'t have the permission to download this item']})
+
   end
 
   #it 'download the file if there is just one in a folder (no zip)' do
@@ -191,6 +199,8 @@ describe 'RepoItem' do
 
   it 'can\'t rename item without share update permission' do
     @user2.rename_repo_item(@user1_folder, 'test new name')
+    expect(@user1_folder.errors.messages).to eq({rename: ['You don\'t have the permission to rename this item']})
+
     expect(@user1_folder.reload.name).to eq('Folder')
   end
 
@@ -212,7 +222,9 @@ describe 'RepoItem' do
 
   it 'can\'t create a folder with the same name at root' do
     @user1.create_folder('test')
-    folder2 = @user1.create_folder('test')
+    folder2 = @user1.create_folder('test',options={})
+
+    expect(options[:errors]).to eq(['This folder already exist'])
 
     expect(folder2).to eq(false)
   end
@@ -229,8 +241,11 @@ describe 'RepoItem' do
   it "can't create too file with the same name in folder" do
     file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
     expect(file.name).to eq('textfile.txt')
-    file2 = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
+    options = {source_folder: @user1_folder}
+    file2 = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), options)
     expect(file2).to eq(false)
+    expect(options[:errors]).to eq(['This file already exist'])
+
 
     #@user1.create_file!(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
   end
@@ -277,6 +292,9 @@ describe 'RepoItem' do
     folder = @user2.create_folder('folder')
 
     expect(@user2.move_repo_item(folder, file)).to eq(false)
+    expect(folder.errors.messages).to eq({move: ['This item was not moved']})
+
+
   end
 
   it "move_repo_item default to the root of the self owner" do
@@ -291,11 +309,15 @@ describe 'RepoItem' do
   it "move_repo_item can't move a file into a root if file already exist" do
     file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
     expect(@user1.move_repo_item(file)).to eq(false)
+    expect(file.errors.messages).to eq({move: ['This item already exist in the target destination']})
+
   end
 
   it "move_repo_item can't move if no permission" do
     file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
     expect(@user2.move_repo_item(file)).to eq(false)
+    expect(file.errors.messages).to eq({move: ['You don\'t have the permission to move this item']})
+
   end 
 
   it "can't copy a file withour permission" do

@@ -9,10 +9,37 @@ en:
       repo_file:
         created: The file was created with success !
     errors:
-      repo_folder:
-        not_created: Error, the folder was not created !
-      repo_file:
-        not_created: Error, the file was not created !
+      repo_item:
+        item_exist: This item already exist in the target destination
+        download:
+          no_permission: You don't have the permission to download this item
+        rename:
+          no_permission: You don't have the permission to rename this item
+        move:
+          no_permission: You don't have the permission to move this item
+          not_moved: This item was not moved
+        copy:
+          no_permission: You don't have the permission to copy this item
+          not_copied: This item was not copied
+        repo_folder:
+          item_exist: This folder already exist
+          create:
+            no_permission: You don't have the permission to create a folder
+            not_created: The folder was not created
+        repo_file:
+          item_exist: This file already exist
+          create:
+            no_permission: You don't have the permission to create a file
+            not_created: The file was not created
+      sharing:
+        create:
+          no_permission: You don't have the permission to share this item
+          nested_sharing: You can't share this item because another sharing exist on its ancestors or descendants
+          not_created: This item was not shared
+        add:
+          no_permission: You don't have the permission to add member to this share
+        remove:
+          no_permission: You don't have the permission to remove member from this share
     form:
       new:
         repo_folder: Create a folder

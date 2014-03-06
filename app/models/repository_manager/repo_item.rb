@@ -39,12 +39,12 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
         raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{options[:source_folder].name}' can't be a file")
       end
       if options[:source_folder].name_exist_in_children?(self.name)
-        raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the folder '#{options[:source_folder].name}'")
+        raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exist ine the folder '#{options[:source_folder].name}'")
       end
     # We are in root, we check if name exist in root
     # We stay in the same owner
     elsif self.owner.repo_item_name_exist_in_root?(self.name)
-      raise RepositoryManager::RepositoryManagerException.new("move failed. The repo_item '#{name}' already exist ine the root")
+      raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exist ine the root")
     end
     # here, all is ok
     # We change the owner if another one is specify

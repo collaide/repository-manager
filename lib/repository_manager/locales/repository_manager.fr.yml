@@ -9,10 +9,30 @@ fr:
       repo_file:
         created: Le fichier a été créé avec succès !
     errors:
-      repo_folder:
-        not_created: Erreur, le dossier n'a pas été créé !
-      repo_file:
-        not_created: Erreur, le fichier n'a pas été envoyé !
+      repo_item:
+        download:
+          no_permission: Vous n'avez pas la permission de télécharger cet élément
+        rename:
+          no_permission: Vous n'avez pas la permission de renommer cet élément
+        move:
+          no_permission: Vous n'avez pas la permission de déplacer cet élément
+          not_moved: Cet élément n'a pas été déplacé
+          item_exist: Cet élément existe déjà dans la destination cible
+        repo_folder:
+          item_exist: Ce dossier existe déjà
+          create:
+            no_permission: Vous n'avez pas la permission de créer un dossier
+            not_created: Le dossier n'a pas été créé
+        repo_file:
+          item_exist: Ce fichier existe déjà
+          create:
+            no_permission: Vous n'avez pas la permission de créer un fichier
+            not_created: Le fichier n'a pas été envoyé
+      sharing:
+        create:
+          no_permission: Vous n'avez pas la permission de partager cet élément
+          nested_sharing: Vous ne pouvez pas partager cet élément car un partage existe déjà dans un de ces parents ou descendants
+          not_created: L'élément n'a pas été partagé
     form:
       new:
         repo_folder: Créer un dossier

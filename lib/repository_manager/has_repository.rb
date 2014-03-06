@@ -87,7 +87,14 @@ module RepositoryManager
       def share(repo_item, members, options = {})
         begin
           share!(repo_item, members, options)
-        rescue RepositoryManager::PermissionException, RepositoryManager::NestedSharingException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+        rescue RepositoryManager::PermissionException
+          repo_item.errors.add(:sharing, I18n.t('repository_manager.errors.sharing.create.no_permission'))
+          false
+        rescue RepositoryManager::NestedSharingException
+          repo_item.errors.add(:sharing, I18n.t('repository_manager.errors.sharing.create.nested_sharing'))
+          false
+        rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+          repo_item.errors.add(:sharing, I18n.t('repository_manager.errors.sharing.create.not_created'))
           false
         end
       end
@@ -122,7 +129,7 @@ module RepositoryManager
 
           # If we are in root path we check if we can add this folder name
           if !source_folder && repo_item_name_exist_in_root?(name)
-            raise RepositoryManager::RepositoryManagerException.new("create folder failed. The repo_item '#{name}' already exist in the root folder.")
+            raise RepositoryManager::ItemExistException.new("create folder failed. The repo_item '#{name}' already exist in the root folder.")
           end
 
           # It raise an error if name already exist and destroy the folder
@@ -138,9 +145,17 @@ module RepositoryManager
       # Like create_folder!
       # Returns false if the folder is not created instead of an exception
       def create_folder(name = '', options = {})
+        options[:errors] = []
         begin
           create_folder!(name, options)
-        rescue RepositoryManager::PermissionException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+        rescue RepositoryManager::PermissionException
+          options[:errors].push(I18n.t'repository_manager.errors.repo_item.repo_folder.create.no_permission')
+          false
+        rescue RepositoryManager::ItemExistException
+          options[:errors].push(I18n.t'repository_manager.errors.repo_item.repo_folder.item_exist')
+          false
+        rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+          options[:errors].push(I18n.t'repository_manager.errors.repo_item.repo_folder.create.not_created')
           false
         end
       end
@@ -198,7 +213,7 @@ module RepositoryManager
 
           # If we are in root path we check if we can add this file name
           if !source_folder && repo_item_name_exist_in_root?(repo_file.file.identifier)
-            raise RepositoryManager::RepositoryManagerException.new("create file failed. The repo_item '#{repo_file.file.identifier}' already exist in the root folder.")
+            raise RepositoryManager::ItemExistException.new("create file failed. The repo_item '#{repo_file.file.identifier}' already exist in the root folder.")
           end
 
           # It raise an error if name already exist and destroy the file
@@ -212,9 +227,17 @@ module RepositoryManager
       end
 
       def create_file(file, options = {})
+        options[:errors] = []
         begin
           create_file!(file, options)
-        rescue RepositoryManager::PermissionException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+        rescue RepositoryManager::PermissionException
+          options[:errors].push(I18n.t'repository_manager.errors.repo_item.repo_file.create.no_permission')
+          false
+        rescue RepositoryManager::ItemExistException
+          options[:errors].push(I18n.t'repository_manager.errors.repo_item.repo_file.item_exist')
+          false
+        rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+          options[:errors].push(I18n.t'repository_manager.errors.repo_item.repo_file.create.not_created')
           false
         end
       end
@@ -264,6 +287,7 @@ module RepositoryManager
         begin
           download!(repo_item, options)
         rescue RepositoryManager::PermissionException
+          repo_item.errors.add(:download, I18n.t('repository_manager.errors.repo_item.download.no_permission'))
           false
         end
       end
@@ -281,6 +305,7 @@ module RepositoryManager
         begin
           rename_repo_item!(repo_item, new_name)
         rescue RepositoryManager::PermissionException
+          repo_item.errors.add(:rename, I18n.t('repository_manager.errors.repo_item.rename.no_permission'))
           false
         end
       end
@@ -319,7 +344,14 @@ module RepositoryManager
       def move_repo_item(repo_item, target = nil)
         begin
           move_repo_item!(repo_item, target)
+        rescue RepositoryManager::PermissionException
+          repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
+          false
+        rescue RepositoryManager::ItemExistException
+          repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
+          false
         rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+          repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.not_moved'))
           false
         end
       end
@@ -351,7 +383,14 @@ module RepositoryManager
       def copy_repo_item(repo_item, target = nil, options = {})
         begin
           copy_repo_item!(repo_item, target, options)
-        rescue RepositoryManager::PermissionException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+        rescue RepositoryManager::PermissionException
+          repo_item.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.copy.no_permission'))
+          false
+        rescue RepositoryManager::ItemExistException
+          repo_item.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))
+          false
+        rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+          repo_item.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.copy.not_copied'))
           false
         end
       end
@@ -440,6 +479,7 @@ module RepositoryManager
         begin
           add_members_to!(sharing, members, options = RepositoryManager.default_sharing_permissions)
         rescue RepositoryManager::PermissionException
+          sharing.errors.add(add: I18n.t('repository_manager.errors.sharing.add.no_permission'))
           false
         end
       end
@@ -458,6 +498,7 @@ module RepositoryManager
         begin
           remove_members_from!(sharing, members)
         rescue RepositoryManager::PermissionException
+          sharing.errors.add(remove: I18n.t('repository_manager.errors.sharing.remove.no_permission'))
           false
         end
       end
