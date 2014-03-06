@@ -15,6 +15,8 @@ en:
           no_permission: You don't have the permission to download this item
         rename:
           no_permission: You don't have the permission to rename this item
+        delete:
+          no_permission: You don't have the permission to delete this item
         move:
           no_permission: You don't have the permission to move this item
           not_moved: This item was not moved

@@ -68,6 +68,8 @@ describe 'RepoItem' do
 
   it 'can\'t delete a repo_item without permission' do
     @user2.delete_repo_item(@user1_file)
+    expect(@user1_file.errors.messages).to eq({delete: ['You don\'t have the permission to delete this item']})
+
     expect(@user1.repo_items.count).to eq(2)
   end
 
@@ -320,8 +322,9 @@ describe 'RepoItem' do
 
   end 
 
-  it "can't copy a file withour permission" do
-    expect(@user2.copy_repo_item(@user1_file)).to eq(false)         
+  it "can't copy a file without permission" do
+    expect(@user2.copy_repo_item(@user1_file)).to eq(false)
+    expect(@user1_file.errors.messages).to eq({copy: ['You don\'t have the permission to copy this item']})
   end
   
   it "can copy a file with read permission" do

@@ -173,6 +173,7 @@ module RepositoryManager
         begin
           delete_repo_item!(repo_item)
         rescue RepositoryManager::PermissionException
+          repo_item.errors.add(:delete, I18n.t('repository_manager.errors.repo_item.delete.no_permission'))
           false
         end
       end
@@ -479,7 +480,7 @@ module RepositoryManager
         begin
           add_members_to!(sharing, members, options = RepositoryManager.default_sharing_permissions)
         rescue RepositoryManager::PermissionException
-          sharing.errors.add(add: I18n.t('repository_manager.errors.sharing.add.no_permission'))
+          sharing.errors.add(:add, I18n.t('repository_manager.errors.sharing.add.no_permission'))
           false
         end
       end
@@ -498,7 +499,7 @@ module RepositoryManager
         begin
           remove_members_from!(sharing, members)
         rescue RepositoryManager::PermissionException
-          sharing.errors.add(remove: I18n.t('repository_manager.errors.sharing.remove.no_permission'))
+          sharing.errors.add(:remove, I18n.t('repository_manager.errors.sharing.remove.no_permission'))
           false
         end
       end

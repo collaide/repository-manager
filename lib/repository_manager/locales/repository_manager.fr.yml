@@ -14,6 +14,8 @@ fr:
           no_permission: Vous n'avez pas la permission de télécharger cet élément
         rename:
           no_permission: Vous n'avez pas la permission de renommer cet élément
+        delete:
+          no_permission: Vous n'avez pas la permission de supprimer cet élément
         move:
           no_permission: Vous n'avez pas la permission de déplacer cet élément
           not_moved: Cet élément n'a pas été déplacé
@@ -33,6 +35,10 @@ fr:
           no_permission: Vous n'avez pas la permission de partager cet élément
           nested_sharing: Vous ne pouvez pas partager cet élément car un partage existe déjà dans un de ces parents ou descendants
           not_created: L'élément n'a pas été partagé
+        add:
+          no_permission: Vous n'avez pas la permission d'ajouter un membre au partage
+        remove:
+          no_permission: Vous n'avez pas la permission de retirer un membre du partage
     form:
       new:
         repo_folder: Créer un dossier
