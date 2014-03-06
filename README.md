@@ -227,7 +227,7 @@ file.sender # Returns user1
 
 ```
 
-WARNING : There is no verification if the user has the permission to create a file or folder into this group. You have to check this in your controller ! The fact that user1 is the sender of this folder gives him NO AUTHORISATION on it !
+WARNING : There is no verification if the user1 has the permission to create a file or folder into this group. You have to check this in your controller ! The fact that user1 is the sender of this folder gives him NO PERMISSION on it !
 
 ### How can I share a repo_item (file/folder)
 
@@ -456,7 +456,6 @@ the_folder.delete_zip
 ## TODO
 
 - Do the rename file method
-- Configure path to save files
 - Write the methods : share_link.
 - Snapshot the file if possible
 - Versioning
