@@ -311,7 +311,7 @@ module RepositoryManager
         end
       end
 
-      # Move the repo_item. If you let all options empty, the item is moving into the self.root
+      # Move the repo_item
       # target =>  move into this source_folder
       # if target == nil, move to the root
       def move_repo_item!(repo_item, target = nil)
@@ -401,7 +401,7 @@ module RepositoryManager
         FileUtils.rm_rf(self.get_default_download_path())
       end
 
-      #Return the permissions of the sharing (can_add, can_remove)
+      # Return the permissions of the sharing (can_add, can_remove)
       def get_sharing_permissions(sharing)
         sharing.get_permissions(self)
       end
@@ -464,7 +464,7 @@ module RepositoryManager
         can_do_to?('remove', sharing)
       end
 
-      # You can here add new members in the sharing
+      # Add new members in the sharing
       # Param member could be an object or an array of object
       def add_members_to!(sharing, members, options = RepositoryManager.default_sharing_permissions)
         permissions = get_sharing_permissions(sharing)
@@ -485,7 +485,7 @@ module RepositoryManager
         end
       end
 
-      # You can here remove members in the sharing
+      # Remove members in the sharing
       # Param member could be an object or an array of object
       def remove_members_from!(sharing, members)
         if can_remove_from?(sharing)

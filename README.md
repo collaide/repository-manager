@@ -455,7 +455,7 @@ the_folder.delete_zip
 
 ### Errors handling
 
-When an error happen, you (and the user also) want to know what was the source of this problem. I tried t make it the most simple as possible.
+When an error happen, you (and the user also) want to know what was the source of this problem. I tried to make it the most simple as possible.
 
 For the two `has_repository` methods `create_file` and `create_folder`, the errors are pushed into the `options` hash parameter with the key `errors` (`options[:errors]`)
 
