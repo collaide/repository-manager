@@ -120,7 +120,7 @@ The two methods do the same, but the one with the "!" returns an Exception error
 
 ### How can I create/delete/move a repo_item (file or folder)
 
-You just have to call the `has_repository` methods `create_file`, `create_folder`, `move_repo_item` or `delete_repo_item`. [Check here for all `has_repository` methods]  (https://github.com/Texicitys/repository-manager/wiki/Has_repository-methods).
+You just have to call the `has_repository` methods `create_file`, `create_folder`, `move_repo_item`, `copy_repo_item` or `delete_repo_item`. [Check here for all `has_repository` methods]  (https://github.com/Texicitys/repository-manager/wiki/Has_repository-methods).
 
 ```ruby
 # user1 wants to create a folder in his repository
@@ -174,7 +174,7 @@ test_folder = user1.create_folder('Test folder')
 #   |-- 'Test folder'
 
 # user1 want to move 'The new folder' in 'Test folder'
-user1.move_repo_item(the_new_folder, source_folder: test_folder)
+user1.move_repo_item(the_new_folder, test_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
@@ -190,6 +190,17 @@ user1.rename_repo_item(the_new_folder, 'The renamed folder')
 #   |-- 'Root folder'
 #   |-- 'file2.jpg'
 #   |-- 'Test folder'
+#   |  |-- 'The renamed folder'
+#   |  |  |-- 'file.txt'
+
+# user1 want to copy 'Root folder' into 'Test folder'
+user1.copy_repo_item(source_folder, test_folder)
+
+# user1 own repository :
+#   |-- 'Root folder'
+#   |-- 'file2.jpg'
+#   |-- 'Test folder'
+#   |  |-- 'Root folder'
 #   |  |-- 'The renamed folder'
 #   |  |  |-- 'file.txt'
 
