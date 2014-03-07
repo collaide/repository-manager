@@ -120,7 +120,7 @@ The two methods do the same, but the one with the "!" returns an Exception error
 
 ### How can I create/delete/move a repo_item (file or folder)
 
-You just have to call the `has_repository` methods `create_file`, `create_folder`, `move_repo_item` or `delete_repo_item`. [Check here for all `has_repository` methods]  (https://github.com/Texicitys/repository-manager/wiki/Has_repository-methods)
+You just have to call the `has_repository` methods `create_file`, `create_folder`, `move_repo_item` or `delete_repo_item`. [Check here for all `has_repository` methods]  (https://github.com/Texicitys/repository-manager/wiki/Has_repository-methods).
 
 ```ruby
 # user1 wants to create a folder in his repository
