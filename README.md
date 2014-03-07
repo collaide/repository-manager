@@ -453,6 +453,47 @@ path = the_folder.download
 the_folder.delete_zip
 ```
 
+### Errors handling
+
+When an error happen, you (and the user also) want to know what was the source of this problem. I tried t make it the most simple as possible.
+
+For the two `has_repository` methods `create_file` and `create_folder`, the errors are pushed into the `options` hash parameter with the key `errors` (`options[:errors]`)
+
+
+```ruby
+# We want to redirect back with the notice 'Folder created' if the folder is created, and show the error(s) otherwise
+options = {source_folder: repo_item, sender: current_user}
+if @item = @group.create_folder(params[:repo_folder][:name], options)
+    redirect_to back, notice: 'Folder created'
+else
+    redirect_to back, alert: options[:errors].first # Contains the first text message error
+
+options[:errors] # Contains array of errors
+
+# Same for create_file
+options = {source_folder: repo_item, sender: current_user}
+if @item = @group.create_file(params[:repo_file][:file], options)
+    redirect_to back, notice: 'File created'
+else
+    redirect_to back, alert: options[:errors] # Contains the text message(s) error(s)
+
+options[:errors] # Contains array of errors
+```
+
+For the other `has_repository` methods, the error is added to the first object passed in parameter (for instance: `repo_item` or `sharing`)
+
+
+```ruby
+# We want to catch the error if it has one
+if @group.delete_repo_item(@repo_item)
+    redirect_to :back, notice: 'Item deleted'
+else
+    # repo_item.errors ==> Contains the errors
+    redirect_to :back, alert: repo_item.errors.messages[:delete].first }
+end
+```
+
+
 ## TODO
 
 - Do the rename file method
