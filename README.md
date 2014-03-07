@@ -475,7 +475,7 @@ options = {source_folder: repo_item, sender: current_user}
 if @item = @group.create_file(params[:repo_file][:file], options)
     redirect_to back, notice: 'File created'
 else
-    redirect_to back, alert: options[:errors] # Contains the text message(s) error(s)
+    redirect_to back, alert: options[:errors].first # Contains the first text message(s) error(s)
 
 options[:errors] # Contains array of errors
 ```
