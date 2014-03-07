@@ -489,7 +489,7 @@ if @group.delete_repo_item(@repo_item)
     redirect_to :back, notice: 'Item deleted'
 else
     # repo_item.errors ==> Contains the errors
-    redirect_to :back, alert: repo_item.errors.messages[:delete].first }
+    redirect_to :back, alert: repo_item.errors.messages[:delete].first
 end
 ```
 
