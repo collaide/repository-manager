@@ -514,7 +514,6 @@ end
 
 ## TODO
 
-- Test the rename file method
 - Write the methods : share_link.
 - Snapshot the file if possible
 - Versioning
