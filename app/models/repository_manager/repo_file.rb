@@ -4,11 +4,16 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
   validates_presence_of :file
   mount_uploader :file, RepoFileUploader
   before_save :update_asset_attributes
+  before_create :default_name
 
-  # Return the name of the file with his extension
-  def name
-    file.url.split('/').last
-  end
+  ## Return the name of the file with his extension
+  #def name
+  #  if self.name.blank?
+  #    file.url.split('/').last
+  #  else
+  #    self.name
+  #  end
+  #end
 
   def download(options = {})
     self.download!(options)
@@ -31,6 +36,7 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
     if options[:source_folder]
       options[:source_folder].add!(new_item)
     elsif options[:owner].repo_item_name_exist_in_root?(new_item.name)
+      self.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))
       raise RepositoryManager::ItemExistException.new("copy failed. The repo_file '#{new_item.name}' already exist in root.")
     end
 
@@ -50,7 +56,7 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
   def copy(options = {})
     begin
       copy!(options)
-    rescue RepositoryManager::PermissionException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+    rescue RepositoryManager::ItemExistException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
       false
     end
   end
@@ -61,6 +67,12 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
     if file.present? && file_changed?
       self.content_type = file.file.content_type
       self.file_size = file.file.size
+    end
+  end
+
+  def default_name
+    if name.blank?
+      self.name = file.url.split('/').last
     end
   end
 

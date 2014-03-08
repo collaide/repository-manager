@@ -39,11 +39,13 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
         raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{options[:source_folder].name}' can't be a file")
       end
       if options[:source_folder].name_exist_in_children?(self.name)
+        self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
         raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exist ine the folder '#{options[:source_folder].name}'")
       end
     # We are in root, we check if name exist in root
     # We stay in the same owner
     elsif self.owner.repo_item_name_exist_in_root?(self.name)
+      self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
       raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exist ine the root")
     end
     # here, all is ok
@@ -62,7 +64,27 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
   def move(options = {})
     begin
       move!(options)
-    rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+    rescue RepositoryManager::RepositoryManagerException, RepositoryManager::ItemExistException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+      false
+    end
+  end
+
+  # Rename the item
+  def rename!(new_name)
+    if name_exist_in_siblings?(new_name)
+      self.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))
+      raise RepositoryManager::ItemExistException.new("rename failed. The repo_item '#{new_name}' already exist.'")
+    else
+      self.name = new_name
+      save!
+    end
+  end
+
+  # Rename the item
+  def rename(new_name)
+    begin
+      rename!(new_name)
+    rescue RepositoryManager::ItemExistException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
       false
     end
   end

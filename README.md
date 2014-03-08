@@ -183,7 +183,7 @@ user1.move_repo_item(the_new_folder, test_folder)
 #   |  |-- 'The new folder'
 #   |  |  |-- 'file.txt'
 
-# user1 want to rename 'The new folder' to 'The renamed folder'
+# user1 want to rename 'The new folder' to 'The renamed folder' (it also can change the name of a file)
 user1.rename_repo_item(the_new_folder, 'The renamed folder')
 
 # user1 own repository :
@@ -338,8 +338,8 @@ if repo_item.is_folder
 elsif repo_item.is_file?
   repo_item.name #=> Returns the name of the file (for instance : 'file.png').
   # Here is the file
-  repo_item.file.url # => '/url/to/file.png'
-  repo_item.file.current_path # => 'path/to/file.png'
+  repo_item.file.url # => '/url/to/stored_file.png'
+  repo_item.file.current_path # => 'path/to/stored_file.png'
 end
 ```
 
@@ -443,6 +443,13 @@ If the `repo_item` is a file, the method returns you the path of this file.
 If the `repo_item` is a folder, it automatically generates a zip file with all the constant that the user `can_read`. The method returns the path of this zip file.
 
 ```ruby
+# user1 want to download the_file
+path_to_file = user1.download(the_file)
+# don't forget to specify the name of the file (it could have been changed since uploaded)
+send_file path_to_file, filename: the_file.name
+```
+
+```ruby
 # user1 want to download the_folder
 path_to_zip = user1.download(the_folder)
 
@@ -507,7 +514,7 @@ end
 
 ## TODO
 
-- Do the rename file method
+- Test the rename file method
 - Write the methods : share_link.
 - Snapshot the file if possible
 - Versioning

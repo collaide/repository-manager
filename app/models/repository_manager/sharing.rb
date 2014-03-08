@@ -36,7 +36,7 @@ class RepositoryManager::Sharing < ActiveRecord::Base
     if members.kind_of?(Array)
       # Add each member to this sharing
       members.each do |i|
-        unless i.respond_to? :share # Check if this object "has_repository"
+        unless i.respond_to? :create_folder # Check if this object "has_repository"
           raise RepositoryManager::RepositoryManagerException.new("add members failed. The object passed into members should be a model who 'has_repository'")
         end
         sharing_member = RepositoryManager::SharingsMember.new(sharing_permissions)
@@ -45,7 +45,7 @@ class RepositoryManager::Sharing < ActiveRecord::Base
         self.sharings_members << sharing_member
       end
     else
-      unless members.respond_to? :share # Check if this object "has_repository"
+      unless members.respond_to? :create_folder # Check if this object "has_repository"
         raise RepositoryManager::RepositoryManagerException.new("add members failed. The object passed into members should be a model who 'has_repository'")
       end
       sharing_member = RepositoryManager::SharingsMember.new(sharing_permissions)
