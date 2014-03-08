@@ -118,7 +118,7 @@ A few methods are written in those two ways :
 
 The two methods do the same, but the one with the "!" returns an Exception error if it is a problem (PermissionException or RepositoryManagerException for instance) and the method without "!" return false if it has a problem.
 
-### How can I create/delete/move/copy/rename a repo_item (file or folder)
+### How can I manage a repo_item (file or folder)
 
 You just have to call the `has_repository` methods `create_file`, `create_folder`, `move_repo_item`, `copy_repo_item`, `rename_repo_item` or `delete_repo_item`.
 
