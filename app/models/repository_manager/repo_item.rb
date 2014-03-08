@@ -114,6 +114,15 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     self.type == 'RepositoryManager::RepoFile'
   end
 
+  # Returns true or false if the name exist in siblings
+  def name_exist_in_siblings?(name)
+    # We take all siblings without itself
+    sibling_ids_without_itself = self.sibling_ids.delete(self.id)
+    # We check if another item has the same name
+    #RepositoryManager::RepoItem.where(name: name).where(id: sibling_ids_without_itself).first ? true : false
+    RepositoryManager::RepoItem.where('name = ?', name).where(id: sibling_ids_without_itself).first ? true : false
+  end
+
   private
   def put_sender
     self.sender = owner unless sender

@@ -180,7 +180,7 @@ module RepositoryManager
       # options :
       #   :source_folder = The directory in with the folder is created
       #   :sender = The object of the sender (ex : current_user)
-      #   :file_name = The name of the file (if you want to rename it directly)
+      #   :filename = The name of the file (if you want to rename it directly)
       #
       # Param file can be a File, or a instance of RepoFile
       # Returns the object of the file created if it is ok
@@ -207,7 +207,7 @@ module RepositoryManager
             repo_file = RepositoryManager::RepoFile.new(file)
           end
 
-          options[:file_name] ? repo_file.name = options[:file_name] : repo_file.name = repo_file.file.url.split('/').last
+          options[:filename] ? repo_file.name = options[:filename] : repo_file.name = repo_file.file.url.split('/').last
 
           repo_file.owner = self
           repo_file.sender = options[:sender]
@@ -511,7 +511,7 @@ module RepositoryManager
 
       # Returns true of false if the name exist in the root path of this instance
       def repo_item_name_exist_in_root?(name)
-        RepoItem.where('name = ? OR file = ?', name, name).where(owner: self).where(ancestry: nil).first ? true : false
+        RepoItem.where('name = ?', name).where(owner: self).where(ancestry: nil).first ? true : false
       end
 
       private
@@ -541,7 +541,6 @@ module RepositoryManager
         if permissions == nil
           permissions = get_permissions(repo_item)
         end
-
         case what
           when 'read'
             permissions == true || (permissions.kind_of?(Hash) && permissions[:can_read] == true)
