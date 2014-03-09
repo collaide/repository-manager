@@ -259,13 +259,13 @@ sharing = user1.share(the_new_folder, members)
 options = {
     sharing_permissions: {
         can_add: true, 
-        can_remove: true
+        can_remove: false
     }, 
     repo_item_permissions: {
         can_read: true, 
         can_create: true, 
         can_update: true, 
-        can_delete: true, 
+        can_delete: false, 
         can_share: true
     }
 }
