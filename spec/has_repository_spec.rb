@@ -35,7 +35,7 @@ describe 'HasRepository' do
     members << @user2
     members << @user3
 
-    @user1.share(rep, members)
+    @user1.share_repo_item(rep, members)
 
     #expect(@user1.sharings.count).to eq(0)
     expect(@user2.sharings.count).to eq(1)
@@ -57,7 +57,7 @@ describe 'HasRepository' do
     members = []
     members << @user2
 
-    @user1.share(rep, members)
+    @user1.share_repo_item(rep, members)
 
     expect(rep.errors.messages).to eq({sharing: ['You don\'t have the permission to share this item']})
 
@@ -74,11 +74,11 @@ describe 'HasRepository' do
     members << @user2
 
     # here user3 can share because he is the owner
-    @user3.share(rep, members)
+    @user3.share_repo_item(rep, members)
     # here user2 should can share because he has the permission
     members = []
     members << @user1
-    @user2.share(rep, members)
+    @user2.share_repo_item(rep, members)
 
     expect(@user1.sharings.count).to eq(0)
     expect(@user2.sharings_owners.count).to eq(0)
@@ -96,11 +96,11 @@ describe 'HasRepository' do
     options = {repo_item_permissions: {can_share: true}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, members, options)
+    @user3.share_repo_item(rep, members, options)
     # here user2 should can share because he has the permission
     members = []
     members << @user1
-    @user2.share(rep, members)
+    @user2.share_repo_item(rep, members)
 
     expect(@user1.sharings.count).to eq(1)
     expect(@user2.sharings_owners.count).to eq(1)
@@ -118,13 +118,13 @@ describe 'HasRepository' do
     options = {repo_item_permissions: {can_read: true, can_share: true}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, members, options)
+    @user3.share_repo_item(rep, members, options)
     # here user2 should can share because he has the permission
     # But he has only the permission of read (can_read = true), He can't share with more permissions
     members = []
     members << @user1
     #Here the permissions should be : :can_read => true, and all others false
-    @user2.share(rep, members)
+    @user2.share_repo_item(rep, members)
 
     sharing_of_user_1 = @user1.sharings.last
 
@@ -147,7 +147,7 @@ describe 'HasRepository' do
     options = {repo_item_permissions: {can_read: true, can_share: true}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, members, options)
+    @user3.share_repo_item(rep, members, options)
     # here user2 should can share because he has the permission
     # But he has only the permission of read (can_read = true), He can't share with more permissions
     members = []
@@ -156,7 +156,7 @@ describe 'HasRepository' do
     options = {repo_item_permissions: {can_read: true, can_update: true, can_share: true}}
 
     #Here the permissions should be : :can_read => true, :can_share => true and all others false
-    @user2.share(rep, members, options)
+    @user2.share_repo_item(rep, members, options)
 
     sharing_of_user_1 = @user1.sharings.last
 
@@ -178,7 +178,7 @@ describe 'HasRepository' do
     options = {sharing_permissions: {can_add: true, can_remove: false}}
 
     # here user3 can share because he is the owner
-    @user3.share(rep, members, options)
+    @user3.share_repo_item(rep, members, options)
 
     sharing_member_of_user_2 = @user2.sharings_members.last
 
@@ -202,14 +202,14 @@ describe 'HasRepository' do
   #  children.add(file)
   #
   #  options = {repo_item_permissions: {can_read: true, can_update: true, can_share: false}}
-  #  @user3.share(parent, @user1, options)
+  #  @user3.share_repo_item(parent, @user1, options)
   #
   #  options = {repo_item_permissions: {can_read: true, can_update: true, can_share: true}}
-  #  @user3.share(children, @user1, options)
+  #  @user3.share_repo_item(children, @user1, options)
   #
-  #  @user1.share(middle, @user2)
+  #  @user1.share_repo_item(middle, @user2)
   #  expect(@user2.sharings.count).to eq(0)
-  #  @user1.share(file, @user2)
+  #  @user1.share_repo_item(file, @user2)
   #  expect(@user2.sharings.count).to eq(1)
   #end
 
@@ -223,14 +223,14 @@ describe 'HasRepository' do
     #   |  |-- 'Nested'
     #   |  |  |-- 'Children'
 
-    @user1.share(nested, @user2)
+    @user1.share_repo_item(nested, @user2)
 
     expect(nested.can_be_shared_without_nesting?).to eq(true) # Returns true (because `nested` is shared but there is no nested sharing)
     expect(parent.can_be_shared_without_nesting?).to eq(false) # Returns false (because there is a sharing on one of his descendants)
     expect(parent.can_be_shared_without_nesting?).to eq(false) # Returns false (because there is a sharing on one of his ancestors)
 
     # Here we can't share 'Parent' or 'Children' because it already exist a nested sharing.
-    expect(@user1.share(parent, @user2)).to eq(false) # Returns false
+    expect(@user1.share_repo_item(parent, @user2)).to eq(false) # Returns false
     expect(parent.errors.messages).to eq({sharing: ['You can\'t share this item because another sharing exist on its ancestors or descendants']})
 
   end
@@ -249,14 +249,14 @@ describe 'HasRepository' do
     children.add(file)
 
     options = {repo_item_permissions: {can_read: true, can_update: true, can_share: true}}
-    @user3.share(parent, @user1, options)
+    @user3.share_repo_item(parent, @user1, options)
 
     options = {repo_item_permissions: {can_read: true, can_update: true, can_share: true}}
-    @user3.share(children, @user1, options)
+    @user3.share_repo_item(children, @user1, options)
 
-    @user1.share(middle, @user2)
+    @user1.share_repo_item(middle, @user2)
     expect(@user2.sharings.count).to eq(0)
-    @user1.share(file, @user2)
+    @user1.share_repo_item(file, @user2)
     expect(@user2.sharings.count).to eq(0)
 
   end
@@ -278,7 +278,7 @@ describe 'HasRepository' do
 
   it 'can put a creator for a specific sharing' do
     folder = @group1.create_folder('a')
-    sharing = @group1.share(folder, @user2, creator: @user1)
+    sharing = @group1.share_repo_item(folder, @user2, creator: @user1)
 
     expect(sharing.reload.owner).to eq(@group1)
     expect(sharing.creator).to eq(@user1)
@@ -286,7 +286,7 @@ describe 'HasRepository' do
 
   it 'is by default owner = creator' do
     folder = @group1.create_folder('a')
-    sharing = @group1.share(folder, @user2)
+    sharing = @group1.share_repo_item(folder, @user2)
 
     expect(sharing.reload.owner).to eq(@group1)
     expect(sharing.creator).to eq(@group1)

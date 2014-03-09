@@ -43,7 +43,7 @@ module RepositoryManager
       # options[:sharing_permissions] contains :
       #   <tt>:can_add</tt> - Specify if the member can add objects to the sharing
       #   <tt>:can_remove</tt> - Specify if the member can remove object to the sharing
-      def share!(repo_item, members, options = {})
+      def share_repo_item!(repo_item, members, options = {})
 
         # Nested sharing are not accepted
         if !RepositoryManager.accept_nested_sharing
@@ -86,9 +86,9 @@ module RepositoryManager
         end
       end
 
-      def share(repo_item, members, options = {})
+      def share_repo_item(repo_item, members, options = {})
         begin
-          share!(repo_item, members, options)
+          share_repo_item!(repo_item, members, options)
         rescue RepositoryManager::PermissionException, RepositoryManager::NestedSharingException, RepositoryManager::RepositoryManagerException
           false
         rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
@@ -275,7 +275,7 @@ module RepositoryManager
       # We zip all the content that the object has access.
       # options
       #   :path => 'path/to/zip'
-      def download!(repo_item, options = {})
+      def download_repo_item!(repo_item, options = {})
         if can_download?(repo_item)
           path = options[:path] if options[:path]
 
@@ -286,9 +286,9 @@ module RepositoryManager
         end
       end
 
-      def download(repo_item, options = {})
+      def download_repo_item(repo_item, options = {})
         begin
-          download!(repo_item, options)
+          download_repo_item!(repo_item, options)
         rescue RepositoryManager::PermissionException
           false
         end

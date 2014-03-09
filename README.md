@@ -242,7 +242,7 @@ WARNING : There is no verification if the user1 has the permission to create a f
 
 ### How can I share a repo_item (file/folder)
 
-Now, user1 want to share his folder 'The new folder' with a Group object `group1` and another User object `user2`. You can use the `has_repository` method `share(repo_item, member, options = nil)`.
+Now, user1 want to share his folder 'The new folder' with a Group object `group1` and another User object `user2`. You can use the `has_repository` method `share_repo_item(repo_item, member, options = nil)`.
 
 
 ```ruby
@@ -253,7 +253,7 @@ members = []
 members << group1
 members << user2
 
-sharing = user1.share(the_new_folder, members)
+sharing = user1.share_repo_item(the_new_folder, members)
 
 # If you want to customize your sharing options, you can do it like this:
 options = {
@@ -270,7 +270,7 @@ options = {
     }
 }
 
-sharing = user1.share(the_new_folder, members, options)
+sharing = user1.share_repo_item(the_new_folder, members, options)
 ```
 
 `repo_item_permissions` specifies what kind of permissions you give on the repo_item in a specific sharing.
@@ -294,16 +294,16 @@ children = @user1.create_folder('Children', nested)
 #   |  |-- 'Nested'
 #   |  |  |-- 'Children'
 
-@user1.share(nested, @user2)
+@user1.share_repo_item(nested, @user2)
 
 nested.can_be_shared_without_nesting? # Returns true (because `nested` is shared but there exist no nested sharing)
 parent.can_be_shared_without_nesting? # Returns false (because there is a sharing on one of his descendants)
 children.can_be_shared_without_nesting? # Returns false (because there is a sharing on one of his ancestors)
 
 # Here we can't share 'Parent' or 'Children' because it already exist a nested sharing.
-@user1.share(parent, @user2) # Returns false
-@user1.share!(parent, @user2) # Raise a NestedSharingException (note the "!")
-@user1.share!(children, @user2) # Raise a NestedSharingException  (note the "!")
+@user1.share_repo_item(parent, @user2) # Returns false
+@user1.share_repo_item!(parent, @user2) # Raise a NestedSharingException (note the "!")
+@user1.share_repo_item!(children, @user2) # Raise a NestedSharingException  (note the "!")
 ```
 
 ### How can I see my repo_items
@@ -451,21 +451,21 @@ Like the repo_item permissions, you can get the sharing permissions of an `objec
 
 ### Download a repository
 
-RepositoryManager make the download of a `repo_item` easy. If the user want to download a file, use the `has_repository` method : `download`. This method returns you the path of the file (if the user `can_read` it).
+RepositoryManager make the download of a `repo_item` easy. If the user want to download a file, use the `has_repository` method : `download_repo_item`. This method returns you the path of the file (if the user `can_read` it).
 
 If the `repo_item` is a file, the method returns you the path of this file.
 If the `repo_item` is a folder, it automatically generates a zip file with all the constant that the user `can_read`. The method returns the path of this zip file.
 
 ```ruby
 # user1 want to download the_file
-path_to_file = user1.download(the_file)
+path_to_file = user1.download_repo_item(the_file)
 # don't forget to specify the name of the file (it could have been changed since uploaded)
 send_file path_to_file, filename: the_file.name
 ```
 
 ```ruby
 # user1 want to download the_folder
-path_to_zip = user1.download(the_folder)
+path_to_zip = user1.download_repo_item(the_folder)
 
 # Then you can do what you want with this path, you can use the send_file method from rails in your controller
 send_file path_to_zip

@@ -87,7 +87,7 @@ describe 'RepoItem' do
 
   it 'can return only the sharing repo_items' do
     #expect(@user2.shared_repo_items.count).to eq(0)
-    @user1.share(@user1_file, @user2)
+    @user1.share_repo_item(@user1_file, @user2)
     expect(@user2.shared_repo_items.count).to eq(1)
   end
 
@@ -98,12 +98,12 @@ describe 'RepoItem' do
   end
 
   it 'user can download a file with permission' do
-    @user1.download(@user1_file)
+    @user1.download_repo_item(@user1_file)
     #expect(@user2.shared_repo_items.count).to eq(1)
   end
 
   it 'user can\'t download a file without permission' do
-    path = @user2.download(@user1_file)
+    path = @user2.download_repo_item(@user1_file)
     expect(path).to eq(false)
     expect(@user1_file.errors.messages).to eq({download: ['You don\'t have the permission to download this item']})
 
@@ -129,8 +129,8 @@ describe 'RepoItem' do
     user1_file3.save
     @user1.create_file(user1_file3, source_folder: @user1_folder)
 
-    @user1.download(@user1_folder)
-    @user1.download(@user1_folder)
+    @user1.download_repo_item(@user1_folder)
+    @user1.download_repo_item(@user1_folder)
     @user1_folder.download
 
     @user1_folder.delete_zip
@@ -149,7 +149,7 @@ describe 'RepoItem' do
     #@user2.create_file!(file, source_folder: a)
     #@user2.create_file!(file, source_folder: nested)
     @user2.create_file!(file, source_folder: c)
-    @user2.download(nested)
+    @user2.download_repo_item(nested)
     @user2.delete_download_path()
   end
 
@@ -165,9 +165,9 @@ describe 'RepoItem' do
     #@user2.create_file!(file, source_folder: a)
     #@user2.create_file!(file, source_folder: nested)
     @user2.create_file!(file, source_folder: c)
-    @user2.share!(nested, @user1, repo_item_permissions: {can_read: true})
+    @user2.share_repo_item!(nested, @user1, repo_item_permissions: {can_read: true})
     copy = @user1.copy_repo_item!(nested)
-    @user1.download(copy)
+    @user1.download_repo_item(copy)
     @user1.delete_download_path()
   end
 
@@ -336,8 +336,15 @@ describe 'RepoItem' do
   end
   
   it "can copy a file with read permission" do
-    @user1.share(@user1_file, @user2, repo_item_permissions: {can_read:true})
+    @user1.share_repo_item(@user1_file, @user2, repo_item_permissions: {can_read:true})
     @user2.copy_repo_item(@user1_file)
     expect(@user2.root_repo_items.count).to eq(1)
+  end
+
+  it "can copy a file with read permission in a folder" do
+    @user1.share_repo_item(@user1_file, @user2, repo_item_permissions: {can_read:true})
+    fold = @user2.create_folder!('fold')
+    @user2.copy_repo_item!(@user1_file, source_folder: fold)
+    expect(fold.children.count).to eq(1)
   end
 end
