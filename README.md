@@ -487,7 +487,7 @@ the_folder.delete_zip
 
 ### Errors handling
 
-When an error happen, you (and the user also) want to know what was the source of this problem. I tried to make it the most simple as possible.
+When an error happen, you (and the user also) want to know what is the source of the problem. I tried to make it the most simple as possible.
 
 For the two `has_repository` methods `create_file` and `create_folder`, the errors are pushed into the `options` hash parameter with the key `errors` (`options[:errors]`)
 
@@ -512,7 +512,7 @@ else
 options[:errors] # Contains array of errors
 ```
 
-For the other `has_repository` methods, the error is added to the first object passed in parameter (for instance: `repo_item` or `sharing`)
+For the other `has_repository` methods, the errors are added in the first object passed in parameter (for instance: `repo_item` or `sharing`)
 
 
 ```ruby
@@ -520,9 +520,10 @@ For the other `has_repository` methods, the error is added to the first object p
 if @group.delete_repo_item(@repo_item)
     redirect_to :back, notice: 'Item deleted'
 else
-    # repo_item.errors ==> Contains the errors
     redirect_to :back, alert: repo_item.errors.messages[:delete].first
 end
+
+# repo_item.errors ==> Contains the errors
 ```
 
 
