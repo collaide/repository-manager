@@ -1,5 +1,3 @@
-WORK IN PROGRESS, but it already works !
-
 Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/sharing). 
 
 # RepositoryManager [![Gem Version](https://badge.fury.io/rb/repository-manager.png)](http://badge.fury.io/rb/repository-manager)
