@@ -21,27 +21,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   def add(repo_item)
     begin
       add!(repo_item)
-    rescue RepositoryManager::RepositoryManagerException
-      false
-    end
-  end
-
-  # Rename the item
-  def rename!(new_name)
-    if name_exist_in_siblings?(new_name)
-      raise RepositoryManager::ItemExistException.new("rename failed. The repo_item '#{new_name}' already exist.'")
-    else
-      self.name = new_name
-      # TODO see if I have to save or not
-      save!
-    end
-  end
-
-  # Rename the item
-  def rename(new_name)
-    begin
-      rename!(new_name)
-    rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+    rescue RepositoryManager::ItemExistException
       false
     end
   end
@@ -58,6 +38,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
     if options[:source_folder]
       options[:source_folder].add!(new_item)
     elsif options[:owner].repo_item_name_exist_in_root?(new_item.name)
+      self.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))
       raise RepositoryManager::ItemExistException.new("copy failed. The repo_folder '#{new_item.name}' already exist in root.")
     end
 
@@ -83,7 +64,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   def copy(options = {})
     begin
       copy!(options)
-    rescue RepositoryManager::PermissionException, RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+    rescue RepositoryManager::ItemExistException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
       false
     end
   end
@@ -124,7 +105,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
 
     File.chmod(0444, full_path)
 
-      return full_path
+    return full_path
     #else
     #  # Nothing to download here
     #  raise RepositoryManager::RepositoryManagerException.new("download failed. Folder #{name} is empty")
@@ -153,16 +134,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   # Returns true or false if the name exist in this folder
   def name_exist_in_children?(name)
     #RepositoryManager::RepoItem.where(name: name).where(id: child_ids).first ? true : false
-    RepositoryManager::RepoItem.where('name = ? OR file = ?', name, name).where(id: child_ids).first ? true : false
-  end
-
-  # Returns true or false if the name exist in siblings
-  def name_exist_in_siblings?(name)
-    # We take all siblings without itself
-    sibling_ids_without_itself = self.sibling_ids.delete(self.id)
-    # We check if another item has the same name
-    #RepositoryManager::RepoItem.where(name: name).where(id: sibling_ids_without_itself).first ? true : false
-    RepositoryManager::RepoItem.where('name = ? OR file = ?', name, name).where(id: sibling_ids_without_itself).first ? true : false
+    RepositoryManager::RepoItem.where('name = ?', name).where(id: child_ids).first ? true : false
   end
 
   private

@@ -247,9 +247,17 @@ describe 'RepoItem' do
     file2 = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), options)
     expect(file2).to eq(false)
     expect(options[:errors]).to eq(['This file already exist'])
+  end
 
+  it "can rename a file" do
+    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
+    @user1.rename_repo_item(file, 'lol.txt')
+    expect(file.reload.name).to eq('lol.txt')
+    @user1.create_file!(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
+    file2 = @user1.create_file!(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder, filename: 'haha.txt')
 
-    #@user1.create_file!(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
+    expect(file2.reload.name).to eq('haha.txt')
+    expect(@user1_folder.children.count).to eq(3)
   end
 
   it 'sender is equal to owner if no sender in create_folder' do

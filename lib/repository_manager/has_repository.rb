@@ -49,6 +49,7 @@ module RepositoryManager
         if !RepositoryManager.accept_nested_sharing
           # Check if no other sharing exist in the path
           unless repo_item.can_be_shared_without_nesting?
+            repo_item.errors.add(:sharing, I18n.t('repository_manager.errors.sharing.create.nested_sharing'))
             raise RepositoryManager::NestedSharingException.new("sharing failed. Another sharing already exist on the subtree or an ancestor of '#{repo_item.name}'")
           end
         end
@@ -80,6 +81,7 @@ module RepositoryManager
           sharing
         else
           # No permission => No sharing
+          repo_item.errors.add(:sharing, I18n.t('repository_manager.errors.sharing.create.no_permission'))
           raise RepositoryManager::PermissionException.new("sharing failed. You don't have the permission to share the repo_item '#{repo_item.name}'")
         end
       end
@@ -87,11 +89,7 @@ module RepositoryManager
       def share(repo_item, members, options = {})
         begin
           share!(repo_item, members, options)
-        rescue RepositoryManager::PermissionException
-          repo_item.errors.add(:sharing, I18n.t('repository_manager.errors.sharing.create.no_permission'))
-          false
-        rescue RepositoryManager::NestedSharingException
-          repo_item.errors.add(:sharing, I18n.t('repository_manager.errors.sharing.create.nested_sharing'))
+        rescue RepositoryManager::PermissionException, RepositoryManager::NestedSharingException, RepositoryManager::RepositoryManagerException
           false
         rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           repo_item.errors.add(:sharing, I18n.t('repository_manager.errors.sharing.create.not_created'))
@@ -165,6 +163,7 @@ module RepositoryManager
         if can_delete?(repo_item)
           repo_item.destroy
         else
+          repo_item.errors.add(:delete, I18n.t('repository_manager.errors.repo_item.delete.no_permission'))
           raise RepositoryManager::PermissionException.new("delete_repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
         end
       end
@@ -173,7 +172,6 @@ module RepositoryManager
         begin
           delete_repo_item!(repo_item)
         rescue RepositoryManager::PermissionException
-          repo_item.errors.add(:delete, I18n.t('repository_manager.errors.repo_item.delete.no_permission'))
           false
         end
       end
@@ -182,6 +180,7 @@ module RepositoryManager
       # options :
       #   :source_folder = The directory in with the folder is created
       #   :sender = The object of the sender (ex : current_user)
+      #   :filename = The name of the file (if you want to rename it directly)
       #
       # Param file can be a File, or a instance of RepoFile
       # Returns the object of the file created if it is ok
@@ -207,6 +206,8 @@ module RepositoryManager
           else # "ActionController::Parameters"
             repo_file = RepositoryManager::RepoFile.new(file)
           end
+
+          options[:filename] ? repo_file.name = options[:filename] : repo_file.name = repo_file.file.url.split('/').last
 
           repo_file.owner = self
           repo_file.sender = options[:sender]
@@ -280,6 +281,7 @@ module RepositoryManager
 
           repo_item.download!({object: self, path: path})
         else
+          repo_item.errors.add(:download, I18n.t('repository_manager.errors.repo_item.download.no_permission'))
           raise RepositoryManager::PermissionException.new("download failed. You don't have the permission to download the repo_item '#{repo_item.name}'")
         end
       end
@@ -288,7 +290,6 @@ module RepositoryManager
         begin
           download!(repo_item, options)
         rescue RepositoryManager::PermissionException
-          repo_item.errors.add(:download, I18n.t('repository_manager.errors.repo_item.download.no_permission'))
           false
         end
       end
@@ -296,6 +297,7 @@ module RepositoryManager
       # Rename the repo_item with the new_name
       def rename_repo_item!(repo_item, new_name)
         unless can_update?(repo_item)
+          repo_item.errors.add(:rename, I18n.t('repository_manager.errors.repo_item.rename.no_permission'))
           raise RepositoryManager::PermissionException.new("rename repo_item failed. You don't have the permission to update the repo_item '#{repo_item.name}'")
         end
         repo_item.rename!(new_name)
@@ -306,35 +308,39 @@ module RepositoryManager
         begin
           rename_repo_item!(repo_item, new_name)
         rescue RepositoryManager::PermissionException
-          repo_item.errors.add(:rename, I18n.t('repository_manager.errors.repo_item.rename.no_permission'))
           false
         end
       end
 
-      # Move the repo_item. If you let all options empty, the item is moving into the self.root
+      # Move the repo_item
       # target =>  move into this source_folder
       # if target == nil, move to the root
       def move_repo_item!(repo_item, target = nil)
         if !can_read?(repo_item)
+          repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
           raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")
         end
         # If we want to change the owner we have to have the can_delete permission
         if target
           # If want to change the owner, we have to check if we have the permission
           if target.owner != repo_item.owner && !can_delete?(repo_item)
+            repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
             raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
           end
           # If we don't want to change the owner, we look if we can_update
           if target.owner == repo_item.owner && !can_update?(repo_item)
+            repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
             raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to update the '#{repo_item.name}'")
           end
           # We check if we can_create in the source_folder
           unless can_create?(target)
+            repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
             raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to create in the source_folder '#{options[:source_folder].name}'")
           end
         else
           # Else if there is no source_folder, we check if we can delete the repo_item, if the owner change
           if self != repo_item.owner && !can_delete?(repo_item)
+            repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
             raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
           end
         end
@@ -345,11 +351,7 @@ module RepositoryManager
       def move_repo_item(repo_item, target = nil)
         begin
           move_repo_item!(repo_item, target)
-        rescue RepositoryManager::PermissionException
-          repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
-          false
-        rescue RepositoryManager::ItemExistException
-          repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
+        rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException
           false
         rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.not_moved'))
@@ -363,10 +365,12 @@ module RepositoryManager
       #   :sender => the new sender (by default => still the old sender)
       def copy_repo_item!(repo_item, target = nil, options = {})
         unless can_read?(repo_item)
+          repo_item.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.copy.no_permission'))
           raise RepositoryManager::PermissionException.new("copy repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")
         end
 
         if target &&  !can_create?(target)
+          repo_item.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.copy.no_permission'))
           raise RepositoryManager::PermissionException.new("copy repo_item failed. You don't have the permission to create in the source_folder '#{target.name}'")
         end
 
@@ -384,13 +388,9 @@ module RepositoryManager
       def copy_repo_item(repo_item, target = nil, options = {})
         begin
           copy_repo_item!(repo_item, target, options)
-        rescue RepositoryManager::PermissionException
-          repo_item.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.copy.no_permission'))
+        rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException
           false
-        rescue RepositoryManager::ItemExistException
-          repo_item.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))
-          false
-        rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+        rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           repo_item.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.copy.not_copied'))
           false
         end
@@ -401,7 +401,7 @@ module RepositoryManager
         FileUtils.rm_rf(self.get_default_download_path())
       end
 
-      #Return the permissions of the sharing (can_add, can_remove)
+      # Return the permissions of the sharing (can_add, can_remove)
       def get_sharing_permissions(sharing)
         sharing.get_permissions(self)
       end
@@ -464,7 +464,7 @@ module RepositoryManager
         can_do_to?('remove', sharing)
       end
 
-      # You can here add new members in the sharing
+      # Add new members in the sharing
       # Param member could be an object or an array of object
       def add_members_to!(sharing, members, options = RepositoryManager.default_sharing_permissions)
         permissions = get_sharing_permissions(sharing)
@@ -472,6 +472,7 @@ module RepositoryManager
           sharing_permissions = make_sharing_permissions(options, permissions)
           sharing.add_members(members, sharing_permissions)
         else
+          sharing.errors.add(:add, I18n.t('repository_manager.errors.sharing.add.no_permission'))
           raise RepositoryManager::PermissionException.new("add members failed. You don't have the permission to add a member in this sharing")
         end
       end
@@ -480,17 +481,17 @@ module RepositoryManager
         begin
           add_members_to!(sharing, members, options = RepositoryManager.default_sharing_permissions)
         rescue RepositoryManager::PermissionException
-          sharing.errors.add(:add, I18n.t('repository_manager.errors.sharing.add.no_permission'))
           false
         end
       end
 
-      # You can here remove members in the sharing
+      # Remove members in the sharing
       # Param member could be an object or an array of object
       def remove_members_from!(sharing, members)
         if can_remove_from?(sharing)
           sharing.remove_members(members)
         else
+          sharing.errors.add(:remove, I18n.t('repository_manager.errors.sharing.remove.no_permission'))
           raise RepositoryManager::PermissionException.new("remove members failed. You don't have the permission to remove a member on this sharing")
         end
       end
@@ -499,7 +500,6 @@ module RepositoryManager
         begin
           remove_members_from!(sharing, members)
         rescue RepositoryManager::PermissionException
-          sharing.errors.add(:remove, I18n.t('repository_manager.errors.sharing.remove.no_permission'))
           false
         end
       end
@@ -511,7 +511,7 @@ module RepositoryManager
 
       # Returns true of false if the name exist in the root path of this instance
       def repo_item_name_exist_in_root?(name)
-        RepoItem.where('name = ? OR file = ?', name, name).where(owner: self).where(ancestry: nil).first ? true : false
+        RepoItem.where('name = ?', name).where(owner: self).where(ancestry: nil).first ? true : false
       end
 
       private
@@ -541,7 +541,6 @@ module RepositoryManager
         if permissions == nil
           permissions = get_permissions(repo_item)
         end
-
         case what
           when 'read'
             permissions == true || (permissions.kind_of?(Hash) && permissions[:can_read] == true)

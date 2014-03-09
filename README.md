@@ -118,9 +118,9 @@ A few methods are written in those two ways :
 
 The two methods do the same, but the one with the "!" returns an Exception error if it is a problem (PermissionException or RepositoryManagerException for instance) and the method without "!" return false if it has a problem.
 
-### How can I create/delete/move a repo_item (file or folder)
+### How can I manage a repo_item (file or folder)
 
-You just have to call the `has_repository` methods `create_file`, `create_folder`, `move_repo_item` or `delete_repo_item`.
+You just have to call the `has_repository` methods `create_file`, `create_folder`, `move_repo_item`, `copy_repo_item`, `rename_repo_item` or `delete_repo_item`.
 
 ```ruby
 # user1 wants to create a folder in his repository
@@ -174,7 +174,7 @@ test_folder = user1.create_folder('Test folder')
 #   |-- 'Test folder'
 
 # user1 want to move 'The new folder' in 'Test folder'
-user1.move_repo_item(the_new_folder, source_folder: test_folder)
+user1.move_repo_item(the_new_folder, test_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
@@ -183,13 +183,24 @@ user1.move_repo_item(the_new_folder, source_folder: test_folder)
 #   |  |-- 'The new folder'
 #   |  |  |-- 'file.txt'
 
-# user1 want to rename 'The new folder' to 'The renamed folder'
+# user1 want to rename 'The new folder' to 'The renamed folder' (it also can change the name of a file)
 user1.rename_repo_item(the_new_folder, 'The renamed folder')
 
 # user1 own repository :
 #   |-- 'Root folder'
 #   |-- 'file2.jpg'
 #   |-- 'Test folder'
+#   |  |-- 'The renamed folder'
+#   |  |  |-- 'file.txt'
+
+# user1 want to copy 'Root folder' into 'Test folder'
+user1.copy_repo_item(source_folder, test_folder)
+
+# user1 own repository :
+#   |-- 'Root folder'
+#   |-- 'file2.jpg'
+#   |-- 'Test folder'
+#   |  |-- 'Root folder'
 #   |  |-- 'The renamed folder'
 #   |  |  |-- 'file.txt'
 
@@ -245,7 +256,19 @@ members << user2
 sharing = user1.share(the_new_folder, members)
 
 # If you want to customize your sharing options, you can do it like this:
-options = {sharing_permissions: {can_add: true, can_remove: true}, repo_item_permissions: {can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true}}
+options = {
+    sharing_permissions: {
+        can_add: true, 
+        can_remove: false
+    }, 
+    repo_item_permissions: {
+        can_read: true, 
+        can_create: true, 
+        can_update: true, 
+        can_delete: false, 
+        can_share: true
+    }
+}
 
 sharing = user1.share(the_new_folder, members, options)
 ```
@@ -322,13 +345,15 @@ Recall: a repo_item can be:
 
 ```ruby
 # We want to know if the object repo_item is a file or a folder:
-if repo_item.is_folder
+if repo_item.is_folder?
   repo_item.name #=> Returns the name of the folder (for instance : 'New folder').
 elsif repo_item.is_file?
   repo_item.name #=> Returns the name of the file (for instance : 'file.png').
   # Here is the file
-  repo_item.file.url # => '/url/to/file.png'
-  repo_item.file.current_path # => 'path/to/file.png'
+  repo_item.file.url # => '/url/to/stored_file.png'
+  repo_item.file.current_path # => 'path/to/stored_file.png'
+else
+  # Wait... WHAT ?!
 end
 ```
 
@@ -432,6 +457,13 @@ If the `repo_item` is a file, the method returns you the path of this file.
 If the `repo_item` is a folder, it automatically generates a zip file with all the constant that the user `can_read`. The method returns the path of this zip file.
 
 ```ruby
+# user1 want to download the_file
+path_to_file = user1.download(the_file)
+# don't forget to specify the name of the file (it could have been changed since uploaded)
+send_file path_to_file, filename: the_file.name
+```
+
+```ruby
 # user1 want to download the_folder
 path_to_zip = user1.download(the_folder)
 
@@ -453,12 +485,53 @@ path = the_folder.download
 the_folder.delete_zip
 ```
 
+### Errors handling
+
+When an error happen, you (and the user also) want to know what is the source of the problem. I tried to make it the most simple as possible.
+
+For the two `has_repository` methods `create_file` and `create_folder`, the errors are pushed into the `options` hash parameter with the key `errors` (`options[:errors]`)
+
+
+```ruby
+# We want to redirect back with the notice 'Folder created' if the folder is created, and show the error(s) otherwise
+options = {source_folder: repo_item, sender: current_user}
+if @item = @group.create_folder(params[:repo_folder][:name], options)
+    redirect_to back, notice: 'Folder created'
+else
+    redirect_to back, alert: options[:errors].first # Contains the first text message error
+
+options[:errors] # Contains array of errors
+
+# Same for create_file
+options = {source_folder: repo_item, sender: current_user}
+if @item = @group.create_file(params[:repo_file][:file], options)
+    redirect_to back, notice: 'File created'
+else
+    redirect_to back, alert: options[:errors].first # Contains the first text message(s) error(s)
+
+options[:errors] # Contains array of errors
+```
+
+For the other `has_repository` methods, the errors are added in the first object passed in parameter (for instance: `repo_item` or `sharing`)
+
+
+```ruby
+# We want to catch the error if it has one
+if @group.delete_repo_item(@repo_item)
+    redirect_to :back, notice: 'Item deleted'
+else
+    redirect_to :back, alert: repo_item.errors.messages[:delete].first
+end
+
+# repo_item.errors ==> Contains the errors
+```
+
+
 ## TODO
 
-- Do the rename file method
 - Write the methods : share_link.
-- Snapshot the file if possible
 - Versioning
+- Snapshot the file if possible
 - ...
 
 
