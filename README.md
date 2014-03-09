@@ -45,7 +45,7 @@ $ rake db:migrate
 
 ## Settings
 
-You can edit the RepositoryManager settings in the initializer (/config/initializer/repository_manager.rb).
+You can edit the RepositoryManager settings in the initializer (config/initializer/repository_manager.rb).
 
 ```ruby
 RepositoryManager.setup do |config|
