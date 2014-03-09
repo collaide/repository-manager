@@ -1,6 +1,6 @@
 Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/sharing). 
 
-# RepositoryManager [![Gem Version](https://badge.fury.io/rb/repository-manager.png)](http://badge.fury.io/rb/repository-manager)
+# Repository Manager [![Gem Version](https://badge.fury.io/rb/repository-manager.png)](http://badge.fury.io/rb/repository-manager)
 
 This gem add functionalities to manage repositories. Each instance (users, groups, etc..) can have it own repository (with files and folders). It can manage them (edit, remove, add, etc) and share them with other objects.
 
@@ -100,7 +100,7 @@ class Group < ActiveRecord::Base
 end
 ```
 
-## How to use RepositoryManager
+## How to use Repository Manager
 
 ### Introduction
 
