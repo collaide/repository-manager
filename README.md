@@ -530,8 +530,8 @@ end
 ## TODO
 
 - Write the methods : share_link.
-- Snapshot the file if possible
 - Versioning
+- Snapshot the file if possible
 - ...
 
 
