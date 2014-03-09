@@ -313,9 +313,12 @@ module RepositoryManager
       end
 
       # Move the repo_item
-      # target =>  move into this source_folder
-      # if target == nil, move to the root
-      def move_repo_item!(repo_item, target = nil)
+      # options
+      #   :source_folder =>  move into this source_folder
+      #   if :source_folder == nil, move to the root
+      def move_repo_item!(repo_item, options = {})
+        target = options[:source_folder]
+
         if !can_read?(repo_item)
           repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
           raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")
@@ -348,9 +351,9 @@ module RepositoryManager
         repo_item.move!(source_folder: target)
       end
 
-      def move_repo_item(repo_item, target = nil)
+      def move_repo_item(repo_item, options = {})
         begin
-          move_repo_item!(repo_item, target)
+          move_repo_item!(repo_item, options)
         rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException
           false
         rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
@@ -360,10 +363,12 @@ module RepositoryManager
       end
 
       # Copy the repo_item in the source_folder or in own root
-      # target => the folder in witch we want to copy the repo item
       # options
+      #   :source_folder => the folder in witch we want to copy the repo item
       #   :sender => the new sender (by default => still the old sender)
-      def copy_repo_item!(repo_item, target = nil, options = {})
+      def copy_repo_item!(repo_item, options = {})
+        target = options[:source_folder]
+
         unless can_read?(repo_item)
           repo_item.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.copy.no_permission'))
           raise RepositoryManager::PermissionException.new("copy repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")
@@ -385,9 +390,9 @@ module RepositoryManager
         repo_item.copy!(source_folder: target, owner: owner, sender: options[:sender])
       end
 
-      def copy_repo_item(repo_item, target = nil, options = {})
+      def copy_repo_item(repo_item, options = {})
         begin
-          copy_repo_item!(repo_item, target, options)
+          copy_repo_item!(repo_item, options)
         rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException
           false
         rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved

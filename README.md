@@ -174,7 +174,7 @@ test_folder = user1.create_folder('Test folder')
 #   |-- 'Test folder'
 
 # user1 want to move 'The new folder' in 'Test folder'
-user1.move_repo_item(the_new_folder, test_folder)
+user1.move_repo_item(the_new_folder, source_folder: test_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
@@ -194,7 +194,7 @@ user1.rename_repo_item(the_new_folder, 'The renamed folder')
 #   |  |  |-- 'file.txt'
 
 # user1 want to copy 'Root folder' into 'Test folder'
-user1.copy_repo_item(source_folder, test_folder)
+user1.copy_repo_item(source_folder, source_folder: test_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
