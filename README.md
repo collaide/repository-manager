@@ -256,7 +256,19 @@ members << user2
 sharing = user1.share(the_new_folder, members)
 
 # If you want to customize your sharing options, you can do it like this:
-options = {sharing_permissions: {can_add: true, can_remove: true}, repo_item_permissions: {can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true}}
+options = {
+    sharing_permissions: {
+        can_add: true, 
+        can_remove: true
+    }, 
+    repo_item_permissions: {
+        can_read: true, 
+        can_create: true, 
+        can_update: true, 
+        can_delete: true, 
+        can_share: true
+    }
+}
 
 sharing = user1.share(the_new_folder, members, options)
 ```
