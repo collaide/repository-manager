@@ -2,15 +2,13 @@ Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/
 
 # Repository Manager [![Gem Version](https://badge.fury.io/rb/repository-manager.png)](http://badge.fury.io/rb/repository-manager)
 
-This gem add functionalities to manage repositories. Each instance (users, groups, etc..) can have it own repository (with files and folders). It can manage them (edit, remove, add, etc) and share them with other objects.
+This gem add functionalities to manage files and folders (repositories). Each instance (users, groups, etc..) has it own repository (with files and folders). It can manage them (create, edit, remove, copy, move, etc) and share them with other objects.
 
 This project is based on the need for a repository manager system for [Collaide](https://github.com/facenord-sud/collaide). A system for easily create/delete files and folders in a repository. For sharing these "repo items" easily with other object with a flexible and complete permissions management.
 
-Instead of creating my core repository manager system heavily 
-dependent on our development, I'm trying to implement a generic and potent repository gem.
+Instead of creating my core repository manager system heavily dependent on our development, I'm trying to implement a generic and potent repository gem.
 
-After looking for a good gem to use I noticed the lack of repository gems
-and flexibility in them. RepositoryManager tries to be the more flexible possible.
+After looking for a good gem to use I noticed the lack of repository gems and flexibility in them. Repository Manager tries to be the more easy, light and flexible possible.
 
 This gem is my informatics project for the Master in [University of Lausanne (CH)](http://www.unil.ch/index.html). 
 
