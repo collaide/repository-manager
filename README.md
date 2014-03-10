@@ -524,7 +524,7 @@ end
 
 ## Documentation
 
-For more documentation go on the [Repository Manager Doc](http://rubydoc.info/gems/repository-manager/index)
+For more documentation go on the [Repository Manager Doc](http://rubydoc.info/gems/repository-manager/index).
 
 ## TODO
 
