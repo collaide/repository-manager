@@ -10,14 +10,13 @@ Gem::Specification.new do |s|
   s.authors     = ['Yves Baumann']
   s.email       = ['texicitys@gmail.com']
   s.homepage    = 'https://github.com/Texicitys/repository-manager'
-  s.summary     = "Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/sharings)."
-  s.description = "This project is based on the need for a repository manager system for Collaide. A system for easily create/delete files and folders in a repository. For sharing these repositories easily with other object with a flexible and complete permissions management.
-Each instance (users, groups, etc..) can have it own repositories (with files and folders). It can manage them easily (edit, remove, add, etc) and sharing them with other instance."
-
-  #s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
+  s.summary     = "Ruby on Rails plugin (gem) for managing repositories ( files / folders / permissions / sharings )."
+  #s.description = "Repository Manager help you to easily manage your files and folders. Each instance has its own repository. You can share these items with other instance with a complet flexible permission control. "
+  s.description = "This project is based on the need for a system for easily create/delete files and folders in a repository. For sharing these repositories easily with other object with a flexible and complete permissions management. Each instance (users, groups, etc..) can have it own repositories (with files and folders). It can manage them easily (create, delete, edit, move, copy, etc) and sharing them with other instance."
+  
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- spec/*`.split("\n")
-  #s.test_files = Dir["spec/**/*"]
+
   s.license = 'MIT'
 
   s.add_runtime_dependency('rails', '> 3.0.0')
