@@ -522,6 +522,9 @@ end
 # repo_item.errors ==> Contains the errors
 ```
 
+## Documentation
+
+For more documentation go on the [Repository Manager Doc](http://rubydoc.info/gems/repository-manager/index)
 
 ## TODO
 
