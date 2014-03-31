@@ -14,9 +14,8 @@ module RepositoryManager
   mattr_accessor :accept_nested_sharing
   @@accept_nested_share = false
 
-  #mattr_accessor :user_model
-  ##@@user_model = 'User'
-  #@@user_model = false
+  mattr_accessor :has_paper_trail
+  @@has_paper_trail = false
 
   class << self
     def setup
