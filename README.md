@@ -71,6 +71,9 @@ RepositoryManager.setup do |config|
 end
 ```
 
+NOTE : If you want to add paper_trail to the repo_item model. You first have to install PaperTrail in you project.
+More informations on the [documentation of the PaperTrail gem](https://github.com/airblade/paper_trail)
+
 
 See the chapter [Permissions](#permissions) for more details about the permissions.
 
