@@ -55,15 +55,19 @@ RepositoryManager.setup do |config|
   # Default path for generating the zip file when a user want to download a folder
   # Default is : "download/#{member.class.to_s.underscore}/#{member.id}/#{self.class.to_s.underscore}/#{self.id}/"
   #config.default_zip_path = true
+
+  # Define if we enable or not the versioning on the repo_item
+  config.has_paper_trail = false
 end
 ```
 
-For instance, if you want that a default sharing is totally free (for edit, delete, etc), just put all default parameters to `true` :
+For instance, if you want that a default sharing is totally free (for edit, delete, etc), just put all default parameters to `true`. We want that paper_trail is activate:
 
 ```ruby
 RepositoryManager.setup do |config|
   config.default_repo_item_permissions = { can_read: true, can_create: true, can_update: true, can_delete: true, can_share: true }
   config.default_sharing_permissions = { can_add: true, can_remove: true }
+  config.has_paper_trail = true
 end
 ```
 

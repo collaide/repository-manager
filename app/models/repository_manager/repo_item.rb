@@ -5,6 +5,10 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
 
   before_save :put_sender
 
+  if RepositoryManager.has_paper_trail
+    has_paper_trail
+  end
+
   has_ancestry cache_depth: true
 
   # Associate with the User Class

@@ -1,9 +1,10 @@
 PATH
   remote: .
   specs:
-    repository-manager (0.2.0)
+    repository-manager (0.2.1)
       ancestry
       carrierwave (>= 0.5.8)
+      paper_trail (~> 3.0.1)
       rails (> 3.0.0)
       rubyzip (>= 1.0.0)
 
@@ -57,6 +58,9 @@ GEM
     mime-types (1.25.1)
     minitest (4.7.5)
     multi_json (1.8.4)
+    paper_trail (3.0.1)
+      activerecord (>= 3.0, < 5.0)
+      activesupport (>= 3.0, < 5.0)
     polyglot (0.3.4)
     rack (1.5.2)
     rack-test (0.6.2)
@@ -87,7 +91,7 @@ GEM
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
-    rubyzip (1.1.0)
+    rubyzip (1.1.2)
     sprockets (2.11.0)
       hike (~> 1.2)
       multi_json (~> 1.0)
