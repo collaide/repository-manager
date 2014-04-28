@@ -32,6 +32,7 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
   def copy!(options = {})
     new_item = RepositoryManager::RepoFile.new
     new_item.file = File.open(self.file.current_path)
+    new_item.name = self.name
 
     if options[:source_folder]
       options[:source_folder].add!(new_item)
