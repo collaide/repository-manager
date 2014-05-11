@@ -176,8 +176,7 @@ describe 'RepoItem' do
   end
 
   it 'can copy directly a file' do
-    new = @user1_file.copy!(source_folder: @user1_folder)
-    puts new.inspect
+    @user1_file.copy!(source_folder: @user1_folder)
   end
 
   it 'can\'t add a repo_item with the same name in a folder' do

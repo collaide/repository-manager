@@ -37,9 +37,14 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
 
     if options[:source_folder]
       options[:source_folder].add!(new_item)
-    elsif options[:owner].repo_item_name_exist_in_root?(new_item.name)
+    elsif options[:owner]
+      if options[:owner].repo_item_name_exist_in_root?(new_item.name)
+        self.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))
+        raise RepositoryManager::ItemExistException.new("copy failed. The repo_folder '#{new_item.name}' already exist in root.")
+      end
+    elsif self.owner.repo_item_name_exist_in_root?(new_item.name)
       self.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))
-      raise RepositoryManager::ItemExistException.new("copy failed. The repo_folder '#{new_item.name}' already exist in root.")
+      raise RepositoryManager::ItemExistException.new("copy failed. The repo_file '#{new_item.name}' already exist in root.")
     end
 
     options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner
