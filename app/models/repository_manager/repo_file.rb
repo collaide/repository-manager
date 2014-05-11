@@ -34,6 +34,17 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
     new_item.file = File.open(self.file.current_path)
     new_item.name = self.name
 
+
+
+    options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner
+    if options[:sender]
+      new_item.sender = options[:sender]
+      #elsif options[:owner]
+      #  new_item.sender = options[:owner]
+    else
+      new_item.sender = self.sender
+    end
+
     if options[:source_folder]
       options[:source_folder].add!(new_item)
     elsif options[:owner]
@@ -46,16 +57,7 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
       raise RepositoryManager::ItemExistException.new("copy failed. The repo_file '#{new_item.name}' already exist in root.")
     end
 
-    options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner
-    if options[:sender]
-      new_item.sender = options[:sender]
-      #elsif options[:owner]
-      #  new_item.sender = options[:owner]
-    else
-      new_item.sender = self.sender
-    end
-
-    new_item.save!
+    new_item.save
     new_item
   end
 
