@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    repository-manager (0.2.3)
+    repository-manager (0.2.4)
       ancestry
       carrierwave (>= 0.5.8)
       paper_trail (~> 3.0.1)

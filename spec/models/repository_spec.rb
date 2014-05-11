@@ -171,6 +171,15 @@ describe 'RepoItem' do
     @user1.delete_download_path()
   end
 
+  it 'can\'t copy directly a file in same ort' do
+    expect(@user1_file.copy).to eq(false)
+  end
+
+  it 'can copy directly a file' do
+    new = @user1_file.copy!(source_folder: @user1_folder)
+    puts new.inspect
+  end
+
   it 'can\'t add a repo_item with the same name in a folder' do
     root_folder = @user1.create_folder('Root folder')
     root_folder.add(@user1_folder)
