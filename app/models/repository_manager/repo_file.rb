@@ -34,19 +34,11 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
     new_item.file = File.open(self.file.current_path)
     new_item.name = self.name
 
-
-
     options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner
-    if options[:sender]
-      new_item.sender = options[:sender]
-      #elsif options[:owner]
-      #  new_item.sender = options[:owner]
-    else
-      new_item.sender = self.sender
-    end
+    options[:sender] ? new_item.sender = options[:sender] : new_item.sender = self.sender
 
     if options[:source_folder]
-      options[:source_folder].add!(new_item)
+      options[:source_folder].add!(new_item, do_not_save: true)
     elsif options[:owner]
       if options[:owner].repo_item_name_exist_in_root?(new_item.name)
         self.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))

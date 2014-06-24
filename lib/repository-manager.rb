@@ -17,6 +17,9 @@ module RepositoryManager
   mattr_accessor :has_paper_trail
   @@has_paper_trail = false
 
+  mattr_accessor :auto_overwrite_item
+  @@auto_overwrite_item = false
+
   class << self
     def setup
       yield self

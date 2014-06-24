@@ -5,23 +5,33 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   validates :name, presence: true
 
   # Add a repo_item in the folder.
-  # second param destroy the repo_item if it can move it.
-  def add!(repo_item, destroy_if_fail = false)
+  # options
+  #   :destroy_if_fail = false // the repo_item if it can't move it.
+  #   :do_not_save = false // Save the repo_item after changing his param
+  #   :overwrite = overwrite an item with the same name (default : see config 'auto_overwrite_item')
+  # second param destroy the repo_item if it can't move it.
+  def add!(repo_item, options = {})
+    !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
+
     # We check if this name already exist
-    #if repo_item.children.exists?(:name => repo_item.name)
-    if name_exist_in_children?(repo_item.name)
+    repo_item_with_same_name = get_children_by_name(repo_item.name)
+    if repo_item_with_same_name && !overwrite
       # we delete the repo if asked
-      repo_item.destroy if destroy_if_fail
+      repo_item.destroy if options[:destroy_if_fail]
       raise RepositoryManager::ItemExistException.new("add failed. The repo_item '#{repo_item.name}' already exist in the folder '#{name}'")
+    elsif repo_item_with_same_name && overwrite
+      # We destroy it
+      repo_item_with_same_name.destroy!
     else
-      repo_item.update_attribute :parent, self
+      repo_item.parent = self
+      repo_item.save! unless options[:do_not_save]
     end
   end
 
   def add(repo_item)
     begin
       add!(repo_item)
-    rescue RepositoryManager::ItemExistException
+    rescue RepositoryManager::ItemExistException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
       false
     end
   end
@@ -36,16 +46,10 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
     new_item.name = self.name
 
     options[:owner] ? new_item.owner = options[:owner] : new_item.owner = self.owner
-    if options[:sender]
-      new_item.sender = options[:sender]
-      #elsif options[:owner]
-      #  new_item.sender = options[:owner]
-    else
-      new_item.sender = self.sender
-    end
+    options[:sender] ? new_item.sender = options[:sender] : new_item.sender = self.sender
 
     if options[:source_folder]
-      options[:source_folder].add!(new_item)
+      options[:source_folder].add!(new_item, do_not_save: true)
     elsif options[:owner]
       if options[:owner].repo_item_name_exist_in_root?(new_item.name)
         self.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))
@@ -58,7 +62,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
 
     new_item.save
 
-    # Recursive method who copy all children.
+    # Recursive method which copy all children.
     children.each do |c|
       c.copy!(source_folder: new_item, owner: options[:owner], sender: options[:sender])
     end
@@ -139,7 +143,11 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   # Returns true or false if the name exist in this folder
   def name_exist_in_children?(name)
     #RepositoryManager::RepoItem.where(name: name).where(id: child_ids).first ? true : false
-    RepositoryManager::RepoItem.where('name = ?', name).where(id: child_ids).first ? true : false
+    get_children_by_name(name) ? true : false
+  end
+
+  def get_children_by_name(name)
+    RepositoryManager::RepoItem.where('name = ?', name).where(id: child_ids).first
   end
 
   private

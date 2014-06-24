@@ -63,7 +63,7 @@ describe 'RepoItem' do
   it 'can delete a folder an his files' do
     @user1_folder.add(@user1_file)
     @user1.delete_repo_item(@user1_folder)
-    expect(@user1.repo_items.count).to eq(0)
+    expect(@user1.reload.repo_items.count).to eq(0)
   end
 
   it 'can\'t delete a repo_item without permission' do
@@ -311,8 +311,6 @@ describe 'RepoItem' do
 
     expect(@user2.move_repo_item(folder, source_folder: file)).to eq(false)
     expect(folder.errors.messages).to eq({move: ['This item was not moved']})
-
-
   end
 
   it "move_repo_item default to the root of the self owner" do
@@ -335,8 +333,18 @@ describe 'RepoItem' do
     file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
     expect(@user2.move_repo_item(file)).to eq(false)
     expect(file.errors.messages).to eq({move: ['You don\'t have the permission to move this item']})
+  end
 
-  end 
+  # todo Tester les move et copy avec overwrite
+
+  it "can move an item with the same name and overwrite it" do
+    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
+    expect(@user1.move_repo_item!(file, overwrite: true)).to eq(file)
+    overwrited = RepositoryManager::RepoItem.where(id: @user1_file.id).first
+    expect(overwrited).to eq(nil)
+  end
+
+  # todo tester le create folder avec overwrite
 
   it "can't copy a file without permission" do
     expect(@user2.copy_repo_item(@user1_file)).to eq(false)

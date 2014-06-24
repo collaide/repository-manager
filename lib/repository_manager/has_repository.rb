@@ -101,6 +101,7 @@ module RepositoryManager
       # options :
       #   :source_folder = The directory in with the folder is created
       #   :sender = The object of the sender (ex : current_user)
+      #   :overwrite = overwrite an item with the same name (default : see config 'auto_overwrite_item')
       # Returns the object of the folder created if it is ok
       # Returns an Exception if the folder is not created
       #     RepositoryManagerException if the name already exist
@@ -112,6 +113,8 @@ module RepositoryManager
             raise RepositoryManager::RepositoryManagerException.new("create folder failed. The source folder must be a repo_folder.")
           end
         end
+
+        !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
 
         # If he want to create a folder in a directory, we have to check if he have the permission
         if can_create?(source_folder)
@@ -126,13 +129,18 @@ module RepositoryManager
           folder.sender = options[:sender]
 
           # If we are in root path we check if we can add this folder name
-          if !source_folder && repo_item_name_exist_in_root?(name)
-            raise RepositoryManager::ItemExistException.new("create folder failed. The repo_item '#{name}' already exist in the root folder.")
+          if !source_folder
+            repo_item_with_same_name = get_item_in_root_by_name(name)
+            if repo_item_with_same_name && !overwrite
+              raise RepositoryManager::ItemExistException.new("create folder failed. The repo_item '#{name}' already exist in the root folder.")
+            elsif repo_item_with_same_name && overwrite
+              # We destroy the item with same name for overwrite it
+              repo_item_with_same_name.destroy!
+            end
           end
 
           # It raise an error if name already exist and destroy the folder
-          source_folder.add!(folder) if source_folder
-
+          source_folder.add!(folder, do_not_save: true, overwrite: overwrite) if source_folder
           folder.save!
         else
           raise RepositoryManager::PermissionException.new("create_folder failed. You don't have the permission to create a folder in '#{source_folder.name}'")
@@ -219,8 +227,7 @@ module RepositoryManager
           end
 
           # It raise an error if name already exist and destroy the file
-          source_folder.add!(repo_file) if source_folder
-
+          source_folder.add!(repo_file, do_not_save: true) if source_folder
           repo_file.save!
         else
           raise RepositoryManager::PermissionException.new("create_file failed. You don't have the permission to create a file")
@@ -316,6 +323,7 @@ module RepositoryManager
       # options
       #   :source_folder =>  move into this source_folder
       #   if :source_folder == nil, move to the root
+      #   :overwrite = overwrite an item with the same name (default : see config 'auto_overwrite_item')
       def move_repo_item!(repo_item, options = {})
         target = options[:source_folder]
 
@@ -348,7 +356,7 @@ module RepositoryManager
           end
         end
         # If it has the permission, we move the repo_item in the source_folder
-        repo_item.move!(source_folder: target)
+        repo_item.move!(source_folder: target, overwrite: options[:overwrite])
       end
 
       def move_repo_item(repo_item, options = {})
@@ -374,7 +382,7 @@ module RepositoryManager
           raise RepositoryManager::PermissionException.new("copy repo_item failed. You don't have the permission to read the repo_item '#{repo_item.name}'")
         end
 
-        if target &&  !can_create?(target)
+        if target && !can_create?(target)
           repo_item.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.copy.no_permission'))
           raise RepositoryManager::PermissionException.new("copy repo_item failed. You don't have the permission to create in the source_folder '#{target.name}'")
         end
@@ -387,7 +395,7 @@ module RepositoryManager
         end
 
         # If it has the permission, we move the repo_item in the source_folder
-        repo_item.copy!(source_folder: target, owner: owner, sender: options[:sender])
+        repo_item.copy!(source_folder: target, owner: owner, sender: options[:sender], overwrite: options[:overwrite])
       end
 
       def copy_repo_item(repo_item, options = {})
@@ -516,7 +524,11 @@ module RepositoryManager
 
       # Returns true of false if the name exist in the root path of this instance
       def repo_item_name_exist_in_root?(name)
-        RepoItem.where('name = ?', name).where(owner: self).where(ancestry: nil).first ? true : false
+        get_item_in_root_by_name(name) ? true : false
+      end
+
+      def get_item_in_root_by_name(name)
+        RepoItem.where('name = ?', name).where(owner: self).where(ancestry: nil).first
       end
 
       private

@@ -297,7 +297,6 @@ describe 'HasRepository' do
     @user3.create_folder!(nil, source_folder: @user3.create_folder!)
     expect(@user3.repo_items.count).to eq(3)
     expect(@user3.root_repo_items.count).to eq(2)
-
   end
 
 end
