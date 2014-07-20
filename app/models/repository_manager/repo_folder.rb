@@ -21,11 +21,20 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
       raise RepositoryManager::ItemExistException.new("add failed. The repo_item '#{repo_item.name}' already exist in the folder '#{name}'")
     elsif repo_item_with_same_name && overwrite
       # We destroy it
-      repo_item_with_same_name.destroy!
+      if repo_item_with_same_name.is_file?
+        #p "add: updates the file #{repo_item.name}"
+        repo_item_with_same_name.file = repo_item.file
+        repo_item_with_same_name.sender = repo_item.sender
+        repo_item_with_same_name.owner = repo_item.owner
+        repo_item = repo_item_with_same_name
+      else
+        repo_item_with_same_name.destroy!
+      end
     else
       repo_item.parent = self
       repo_item.save! unless options[:do_not_save]
     end
+    repo_item
   end
 
   def add(repo_item)
@@ -41,7 +50,10 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   #   :source_folder = the folder in witch you copy this item
   #   :owner = the owner of the item
   #   :sender = the sender of the item (if you don't specify sender.. The sender is still the same)
+  #   :overwrite = overwrite an item with the same name (default : see config 'auto_overwrite_item')
   def copy!(options = {})
+    !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
+
     new_item = RepositoryManager::RepoFolder.new
     new_item.name = self.name
 
@@ -51,20 +63,28 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
     if options[:source_folder]
       options[:source_folder].add!(new_item, do_not_save: true)
     elsif options[:owner]
-      if options[:owner].repo_item_name_exist_in_root?(new_item.name)
+      repo_item_with_same_name = options[:owner].get_item_in_root_by_name(new_item.name)
+      if repo_item_with_same_name and !overwrite
         self.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))
         raise RepositoryManager::ItemExistException.new("copy failed. The repo_folder '#{new_item.name}' already exist in root.")
+      elsif repo_item_with_same_name and overwrite
+        repo_item_with_same_name.destroy!
       end
-    elsif self.owner.repo_item_name_exist_in_root?(new_item.name)
-      self.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))
-      raise RepositoryManager::ItemExistException.new("copy failed. The repo_file '#{new_item.name}' already exist in root.")
+    else
+      repo_item_with_same_name = self.owner.get_item_in_root_by_name(new_item.name)
+      if repo_item_with_same_name and !overwrite
+        self.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.item_exist'))
+        raise RepositoryManager::ItemExistException.new("copy failed. The repo_file '#{new_item.name}' already exist in root.")
+      elsif repo_item_with_same_name and overwrite
+        repo_item_with_same_name.destroy!
+      end
     end
 
     new_item.save
 
     # Recursive method which copy all children.
     children.each do |c|
-      c.copy!(source_folder: new_item, owner: options[:owner], sender: options[:sender])
+      c.copy!(source_folder: new_item, owner: options[:owner], sender: options[:sender], overwrite: overwrite)
     end
 
     new_item

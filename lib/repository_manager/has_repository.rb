@@ -137,10 +137,11 @@ module RepositoryManager
               # We destroy the item with same name for overwrite it
               repo_item_with_same_name.destroy!
             end
+          else
+            # It raise an error if name already exist and destroy the folder
+            source_folder.add!(folder, do_not_save: true, overwrite: overwrite)
           end
 
-          # It raise an error if name already exist and destroy the folder
-          source_folder.add!(folder, do_not_save: true, overwrite: overwrite) if source_folder
           folder.save!
         else
           raise RepositoryManager::PermissionException.new("create_folder failed. You don't have the permission to create a folder in '#{source_folder.name}'")
@@ -189,7 +190,8 @@ module RepositoryManager
       #   :source_folder = The directory in with the folder is created
       #   :sender = The object of the sender (ex : current_user)
       #   :filename = The name of the file (if you want to rename it directly)
-      #
+      #   :overwrite = overwrite an item with the same name (default : see config 'auto_overwrite_item')
+
       # Param file can be a File, or a instance of RepoFile
       # Returns the object of the file created if it is ok
       # Returns an Exception if the folder is not created
@@ -203,6 +205,8 @@ module RepositoryManager
           end
         end
 
+        !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
+
         # If he want to create a file in a directory, we have to check if he have the permission
         if can_create?(source_folder)
 
@@ -215,19 +219,39 @@ module RepositoryManager
             repo_file = RepositoryManager::RepoFile.new(file)
           end
 
-          options[:filename] ? repo_file.name = options[:filename] : repo_file.name = repo_file.file.url.split('/').last
+          options[:filename] ? file_name = options[:filename] : file_name = repo_file.file.url.split('/').last
 
+          repo_file.name = file_name
           repo_file.owner = self
           repo_file.sender = options[:sender]
 
-
           # If we are in root path we check if we can add this file name
-          if !source_folder && repo_item_name_exist_in_root?(repo_file.file.identifier)
-            raise RepositoryManager::ItemExistException.new("create file failed. The repo_item '#{repo_file.file.identifier}' already exist in the root folder.")
-          end
+          if !source_folder
+            repo_item_with_same_name = get_item_in_root_by_name(file_name)
+            if repo_item_with_same_name && !overwrite
+              raise RepositoryManager::ItemExistException.new("create file failed. The repo_item '#{file_name}' already exist in the root folder.")
+            elsif repo_item_with_same_name && overwrite
+              #We do not destroy, we update it !
 
-          # It raise an error if name already exist and destroy the file
-          source_folder.add!(repo_file, do_not_save: true) if source_folder
+              # We update the file
+              repo_item_with_same_name.file = file
+
+              if file.class.name == 'RepositoryManager::RepoFile'
+                repo_item_with_same_name.file = file.file
+              elsif file.class.name == 'File' || file.class.name == 'ActionDispatch::Http::UploadedFile'
+                repo_item_with_same_name.file = file
+              else # "ActionController::Parameters"
+                repo_item_with_same_name.assign_attributes(file)
+              end
+              repo_item_with_same_name.sender = options[:sender]
+              #p "source: updates the file #{repo_item_with_same_name.name}"
+
+              repo_file = repo_item_with_same_name
+            end
+          else
+            # It raise an error if name already exist and destroy the file
+            repo_file = source_folder.add!(repo_file, do_not_save: true, overwrite: overwrite)
+          end
           repo_file.save!
         else
           raise RepositoryManager::PermissionException.new("create_file failed. You don't have the permission to create a file")
@@ -325,6 +349,7 @@ module RepositoryManager
       #   if :source_folder == nil, move to the root
       #   :overwrite = overwrite an item with the same name (default : see config 'auto_overwrite_item')
       def move_repo_item!(repo_item, options = {})
+        !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
         target = options[:source_folder]
 
         if !can_read?(repo_item)
@@ -356,7 +381,7 @@ module RepositoryManager
           end
         end
         # If it has the permission, we move the repo_item in the source_folder
-        repo_item.move!(source_folder: target, overwrite: options[:overwrite])
+        repo_item.move!(source_folder: target, overwrite: overwrite)
       end
 
       def move_repo_item(repo_item, options = {})
@@ -374,7 +399,10 @@ module RepositoryManager
       # options
       #   :source_folder => the folder in witch we want to copy the repo item
       #   :sender => the new sender (by default => still the old sender)
+      #   :overwrite = overwrite an item with the same name (default : see config 'auto_overwrite_item')
       def copy_repo_item!(repo_item, options = {})
+        !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
+
         target = options[:source_folder]
 
         unless can_read?(repo_item)
@@ -395,7 +423,7 @@ module RepositoryManager
         end
 
         # If it has the permission, we move the repo_item in the source_folder
-        repo_item.copy!(source_folder: target, owner: owner, sender: options[:sender], overwrite: options[:overwrite])
+        repo_item.copy!(source_folder: target, owner: owner, sender: options[:sender], overwrite: overwrite)
       end
 
       def copy_repo_item(repo_item, options = {})

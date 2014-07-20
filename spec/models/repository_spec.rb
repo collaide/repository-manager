@@ -31,9 +31,7 @@ describe 'RepoItem' do
 
   it 'file has md5' do
     expect(@user1_file.checksum).to eq(Digest::MD5.file(File.open("#{Rails.root}/../fixture/textfile.txt")).hexdigest)
-    p @user1_file.checksum
   end
-
 
   it 'can\'t create a folder in another folder without permission' do
     options = {source_folder: @user1_folder}
@@ -340,8 +338,6 @@ describe 'RepoItem' do
     expect(file.errors.messages).to eq({move: ['You don\'t have the permission to move this item']})
   end
 
-  # todo Tester les move et copy avec overwrite
-
   it "can move an item with the same name and overwrite it" do
     file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
     expect(@user1.move_repo_item!(file, overwrite: true)).to eq(file)
@@ -349,7 +345,41 @@ describe 'RepoItem' do
     expect(overwrited).to eq(nil)
   end
 
-  # todo tester le create folder avec overwrite
+  it "can copy an item with the same name and overwrite it" do
+    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
+    copied_file = @user1.copy_repo_item!(file, overwrite: true)
+    expect(@user1_file).to eq(copied_file)
+  end
+
+
+  it "can copy an item with the same name in folder and overwrite it" do
+    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
+    copied_file = @user1.copy_repo_item!(@user1_file, source_folder: @user1_folder, overwrite: true)
+    expect(copied_file).to eq(file)
+  end
+
+  it 'can create a folder with same name and overwrite the old one' do
+    folder = @user1.create_folder('Folder', overwrite: true)
+
+    overwrited = RepositoryManager::RepoItem.where(id: @user1_folder.id).first
+    expect(overwrited).to eq(nil)
+    expect(folder.name).to eq("Folder")
+  end
+
+  it 'can create a file with same name and update the old one' do
+    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), overwrite: true)
+
+    overwrited = RepositoryManager::RepoItem.where(id: @user1_file.id).first
+    expect(overwrited).to eq(file)
+  end
+
+  it 'can create a file in folder with same name and update the old one' do
+    @user1.move_repo_item(@user1_file, source_folder: @user1_folder)
+    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder, overwrite: true)
+    overwrited = RepositoryManager::RepoItem.where(id: @user1_file.id).first
+    expect(overwrited).to eq(file)
+    #expect(folder.name).to eq("Folder")
+  end
 
   it "can't copy a file without permission" do
     expect(@user2.copy_repo_item(@user1_file)).to eq(false)
