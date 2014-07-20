@@ -29,6 +29,11 @@ describe 'RepoItem' do
     expect(folder).to eq(false)
   end
 
+  it 'file has md5' do
+    expect(@user1_file.checksum).to eq(Digest::MD5.file(File.open("#{Rails.root}/../fixture/textfile.txt")).hexdigest)
+    p @user1_file.checksum
+  end
+
 
   it 'can\'t create a folder in another folder without permission' do
     options = {source_folder: @user1_folder}
