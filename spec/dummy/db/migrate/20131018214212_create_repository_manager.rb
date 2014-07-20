@@ -23,13 +23,14 @@ class CreateRepositoryManager < ActiveRecord::Migration
     create_table :rm_repo_items do |t|
       t.references :owner, polymorphic: true, index: true
       t.references :sender, polymorphic: true, index: true
-      t.string :ancestry
+      t.string :ancestry, index: true
       t.integer :ancestry_depth, :default => 0
       t.string :name
       t.float :file_size
       t.string :content_type
       t.string :file
       t.string :type
+      t.string :checksum
     end
   end
 end

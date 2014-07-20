@@ -30,6 +30,7 @@ class CreateRepositoryManager < ActiveRecord::Migration
       t.string :content_type
       t.string :file
       t.string :type
+      t.string :checksum
     end
   end
 end

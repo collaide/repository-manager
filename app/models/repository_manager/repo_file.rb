@@ -67,6 +67,7 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
     if file.present? && file_changed?
       self.content_type = file.file.content_type
       self.file_size = file.file.size
+      self.checksum = Digest::MD5.file(file.url).hexdigest
     end
   end
 
