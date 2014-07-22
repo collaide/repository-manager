@@ -58,6 +58,9 @@ RepositoryManager.setup do |config|
 
   # Define if we enable or not the versioning on the repo_item
   config.has_paper_trail = false
+  
+  # Define if a repo item with the same name will be automaticaly overwrited when a new item is created, moved or copied
+  config.auto_overwrite_item = false
 end
 ```
 
