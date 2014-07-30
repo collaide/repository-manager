@@ -10,6 +10,7 @@ fr:
         created: Le fichier a été créé avec succès !
     errors:
       repo_item:
+        item_exist: Cet élément existe déjà dans la destination cible
         download:
           no_permission: Vous n'avez pas la permission de télécharger cet élément
         rename:
@@ -19,7 +20,12 @@ fr:
         move:
           no_permission: Vous n'avez pas la permission de déplacer cet élément
           not_moved: Cet élément n'a pas été déplacé
-          item_exist: Cet élément existe déjà dans la destination cible
+        copy:
+          no_permission: Vous n'avez pas la permission de copier cet élément
+          not_copied: Cet élément n'a pas été copié
+        unzip:
+          no_permission: Vous n'avez pas la permission de décompresser cet archive
+          not_unzipped: Cette archive n'a pas été décompressée
         repo_folder:
           item_exist: Ce dossier existe déjà
           create:

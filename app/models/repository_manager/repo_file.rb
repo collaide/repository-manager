@@ -157,6 +157,7 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
       end
 
     end
+    self
   end
 
   private

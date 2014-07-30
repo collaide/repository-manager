@@ -299,31 +299,6 @@ module RepositoryManager
         return false
       end
 
-      # Download a repo_item if the object can_read it
-      # If it is a file, he download the file
-      # If it is a folder, we check witch repo_item is in it, and witch he can_read
-      # We zip all the content that the object has access.
-      # options
-      #   :path => 'path/to/zip'
-      def download_repo_item!(repo_item, options = {})
-        if can_download?(repo_item)
-          path = options[:path] if options[:path]
-
-          repo_item.download!({object: self, path: path})
-        else
-          repo_item.errors.add(:download, I18n.t('repository_manager.errors.repo_item.download.no_permission'))
-          raise RepositoryManager::PermissionException.new("download failed. You don't have the permission to download the repo_item '#{repo_item.name}'")
-        end
-      end
-
-      def download_repo_item(repo_item, options = {})
-        begin
-          download_repo_item!(repo_item, options)
-        rescue RepositoryManager::PermissionException
-          false
-        end
-      end
-
       # Rename the repo_item with the new_name
       def rename_repo_item!(repo_item, new_name)
         unless can_update?(repo_item)
@@ -415,13 +390,13 @@ module RepositoryManager
         end
 
         # The new owner
-        if target
-          owner = target.owner
-        else
+        #if target
+        #  owner = target.owner
+        #else
           owner = self
-        end
+        #end
 
-        # If it has the permission, we move the repo_item in the source_folder
+        # If it has the permission, we copy the repo_item in the source_folder
         repo_item.copy!(source_folder: target, owner: owner, sender: options[:sender], overwrite: overwrite)
       end
 
@@ -436,9 +411,65 @@ module RepositoryManager
         end
       end
 
+      # Download a repo_item if the object can_read it
+      # If it is a file, he download the file
+      # If it is a folder, we check witch repo_item is in it, and witch he can_read
+      # We zip all the content that the object has access.
+      # options
+      #   :path => 'path/to/zip'
+      def download_repo_item!(repo_item, options = {})
+        if can_download?(repo_item)
+          path = options[:path] if options[:path]
+
+          repo_item.download!({object: self, path: path})
+        else
+          repo_item.errors.add(:download, I18n.t('repository_manager.errors.repo_item.download.no_permission'))
+          raise RepositoryManager::PermissionException.new("download failed. You don't have the permission to download the repo_item '#{repo_item.name}'")
+        end
+      end
+
+      def download_repo_item(repo_item, options = {})
+        begin
+          download_repo_item!(repo_item, options)
+        rescue RepositoryManager::PermissionException
+          false
+        end
+      end
+
       # Delete the download folder of the user
       def delete_download_path
         FileUtils.rm_rf(self.get_default_download_path())
+      end
+
+      # Unzip the compressed file and create the repo_items
+      # options
+      #   :source_folder = the folder in witch you unzip this archive
+      #   :sender = the sender of the item (if you don't specify sender.. The sender is still the same)
+      #   :overwrite = overwrite an item with the same name (default : see config 'auto_overwrite_item')
+      def unzip_repo_item!(repo_item, options = {})
+        target = options[:source_folder]
+
+        unless can_read?(repo_item)
+          repo_item.errors.add(:unzip, I18n.t('repository_manager.errors.repo_item.unzip.no_permission'))
+          raise RepositoryManager::PermissionException.new("unzip repo_file failed. You don't have the permission to read the repo_file '#{repo_item.name}'")
+        end
+
+        if target && !can_create?(target)
+          repo_item.errors.add(:unzip, I18n.t('repository_manager.errors.repo_item.unzip.no_permission'))
+          raise RepositoryManager::PermissionException.new("unzip repo_file failed. You don't have the permission to create in the source_folder '#{target.name}'")
+        end
+        repo_item.unzip!(source_folder: target, sender: options[:sender], overwrite: options[:overwrite])
+      end
+
+      def unzip_repo_item(repo_item, options = {})
+        begin
+          unzip_repo_item!(repo_item, options)
+        rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException
+          false
+        rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+          repo_item.errors.add(:copy, I18n.t('repository_manager.errors.repo_item.unzip.not_unzipped'))
+          false
+        end
       end
 
       # Return the permissions of the sharing (can_add, can_remove)

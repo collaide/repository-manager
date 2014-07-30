@@ -61,7 +61,6 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
         # If a children with the same name exist and we want to overwrite,
         # We destroy or update it
         if children_with_same_name.is_file?
-          p "add: updates the file #{self.name}"
           children_with_same_name.file = self.file
           children_with_same_name.sender = self.sender
           #children_with_same_name.owner = self.owner
@@ -88,7 +87,6 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
         # If a children with the same name exist and we want to overwrite,
         # We destroy or update it
         if children_with_same_name.is_file?
-          p "add: updates the root file #{self.name}"
           children_with_same_name.file = self.file
           children_with_same_name.sender = self.sender
           #children_with_same_name.owner = self.owner

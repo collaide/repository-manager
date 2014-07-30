@@ -23,6 +23,9 @@ en:
         copy:
           no_permission: You don't have the permission to copy this item
           not_copied: This item was not copied
+        unzip:
+          no_permission: You don't have the permission to unzip this item
+          not_unzipped: This item was not unzipped
         repo_folder:
           item_exist: This folder already exist
           create:
