@@ -340,8 +340,8 @@ describe 'RepoItem' do
 
   it "can move an item with the same name and overwrite it" do
     file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
-    expect(@user1.move_repo_item!(file, overwrite: true)).to eq(file)
-    overwrited = RepositoryManager::RepoItem.where(id: @user1_file.id).first
+    expect(@user1.move_repo_item!(file, overwrite: true)).to eq(@user1_file)
+    overwrited = RepositoryManager::RepoItem.where(id: file.id).first
     expect(overwrited).to eq(nil)
   end
 
@@ -375,7 +375,7 @@ describe 'RepoItem' do
 
   it 'can create a file in folder with same name and update the old one' do
     @user1.move_repo_item(@user1_file, source_folder: @user1_folder)
-    file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder, overwrite: true)
+    file = @user1.create_file!(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder, overwrite: true)
     overwrited = RepositoryManager::RepoItem.where(id: @user1_file.id).first
     expect(overwrited).to eq(file)
     #expect(folder.name).to eq("Folder")

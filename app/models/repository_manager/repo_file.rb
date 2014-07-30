@@ -76,6 +76,89 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
     end
   end
 
+  # Unzip the compressed file and create the repo_items
+  # options
+  #   :source_folder = the folder in witch you unzip this archive
+  #   :owner = the owner of the item
+  #   :sender = the sender of the item (if you don't specify sender.. The sender is still the same)
+  #   :overwrite = overwrite an item with the same name (default : see config 'auto_overwrite_item')
+  def unzip!(options = {})
+    !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
+    options[:owner] ? owner = options[:owner] : owner = self.owner
+    options[:sender] ? sender = options[:sender] : sender = self.sender
+
+    Zip::File.open(self.file.path) do |zip_file|
+      # This hash make the link between the path and the item (if it exist)
+      #link_path_item = {}
+
+      # Handle entries one by one
+      zip_file.each do |entry|
+        array_name = entry.name.split('/')
+        name = array_name[-1]
+        path_array = array_name.first(array_name.size - 1)
+        #name.parameterize.underscore
+
+        #it is a folder
+        if entry.ftype == :directory
+
+          new_item = RepositoryManager::RepoFolder.new(name: name)
+          new_item.owner = owner
+          new_item.sender = sender
+          if path_array.empty?
+            new_item.move!(source_folder: options[:source_folder], owner: owner, overwrite: overwrite)
+          else
+            # He specified a source_folder
+            if options[:source_folder]
+              source_folder = options[:source_folder].get_or_create_by_path_array(path_array, owner: options[:owner], sender: options[:sender])
+            else # No source folder specified
+              # We have to check if we are in a folder
+              if parent = self.parent
+                # we unzip on this folder
+                source_folder = parent.get_or_create_by_path_array(path_array, owner: options[:owner], sender: options[:sender])
+              else
+                # We are in root
+                source_folder = owner.get_or_create_by_path_array(path_array, sender: options[:sender])
+              end
+            end
+            new_item.move!(source_folder: source_folder, owner: owner, overwrite: overwrite)
+          end
+        else # it is a :file
+          new_item = RepositoryManager::RepoFile.new
+          new_item.name = name
+          new_item.sender = sender
+          new_item.owner = owner
+
+          tmp_file_path = "#{Rails.root}/tmp/unzip/#{name}"
+          # Delete the path
+          FileUtils.rm_rf(tmp_file_path)
+          entry.extract(tmp_file_path)
+          new_item.file = File.open(tmp_file_path)
+
+
+          if path_array.empty?
+            new_item.move!(source_folder: options[:source_folder], owner: owner, overwrite: overwrite)
+          else
+            # He specified a source_folder
+            if options[:source_folder]
+              source_folder = options[:source_folder].get_or_create_by_path_array(path_array, owner: options[:owner], sender: options[:sender])
+            else # No source folder specified
+              # We have to check if we are in a folder
+              if parent = self.parent
+                # we unzip on this folder
+                source_folder = parent.get_or_create_by_path_array(path_array, owner: options[:owner], sender: options[:sender])
+              else
+                # We are in root
+                source_folder = owner.get_or_create_by_path_array(path_array, sender: options[:sender])
+              end
+            end
+            new_item.move!(source_folder: source_folder, owner: owner, overwrite: overwrite)
+          end
+        end
+      end
+
+    end
+  end
+
   private
 
   def update_asset_attributes

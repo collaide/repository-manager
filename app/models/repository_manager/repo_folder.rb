@@ -4,6 +4,28 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
 
   validates :name, presence: true
 
+  # Get or create the folder with this name
+  # options
+  #   :owner = you can path an owner (you have to if you have no :source_folder)
+  #   :sender = the sender of the item
+  def get_or_create_by_path_array(path_array, options = {})
+    children = self
+    unless path_array.empty?
+      name = path_array[0]
+      children = self.get_children_by_name(name)
+      unless children
+        children = RepositoryManager::RepoFolder.new(name: name)
+        children.owner = options[:owner]
+        children.sender = options[:sender]
+        children.save!
+      end
+      # remove the first element
+      path_array.shift
+      children = children.get_or_create_by_path_array(path_array, options)
+    end
+    children
+  end
+
   # Add a repo_item in the folder.
   # options
   #   :destroy_if_fail = false // the repo_item if it can't move it.
@@ -12,29 +34,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   # second param destroy the repo_item if it can't move it.
   def add!(repo_item, options = {})
     !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
-
-    # We check if this name already exist
-    repo_item_with_same_name = get_children_by_name(repo_item.name)
-    if repo_item_with_same_name && !overwrite
-      # we delete the repo if asked
-      repo_item.destroy if options[:destroy_if_fail]
-      raise RepositoryManager::ItemExistException.new("add failed. The repo_item '#{repo_item.name}' already exist in the folder '#{name}'")
-    elsif repo_item_with_same_name && overwrite
-      # We destroy it
-      if repo_item_with_same_name.is_file?
-        #p "add: updates the file #{repo_item.name}"
-        repo_item_with_same_name.file = repo_item.file
-        repo_item_with_same_name.sender = repo_item.sender
-        repo_item_with_same_name.owner = repo_item.owner
-        repo_item = repo_item_with_same_name
-      else
-        repo_item_with_same_name.destroy!
-      end
-    else
-      repo_item.parent = self
-      repo_item.save! unless options[:do_not_save]
-    end
-    repo_item
+    repo_item.move!(source_folder: self, do_not_save: options[:do_not_save], destroy_if_fail: options[:destroy_if_fail], overwrite: overwrite)
   end
 
   def add(repo_item)

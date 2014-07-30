@@ -33,16 +33,20 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
 
   # Move itself into the target or root
   # options
+  #   :destroy_if_fail = false // the repo_item if it can't move it.
+  #   :do_not_save = false // Save the repo_item after changing his param
   #   :source_folder = the folder in witch you copy this item
   #   :owner = the owner of the item
   #   :overwrite = overwrite an item with the same name (default : see config 'auto_overwrite_item')
   # If :source_folder = nil, move to the root (of same owner)
   def move!(options = {})
+    returned_item = self
     !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
 
     # If we are in source_folder, we check if it's a folder
     if options[:source_folder]
       unless options[:source_folder].is_folder?
+        self.destroy if options[:destroy_if_fail]
         raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{options[:source_folder].name}' can't be a file")
       end
 
@@ -50,10 +54,22 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
       # If the name exist and we don't want to overwrite, we raise an error
       if children_with_same_name and !overwrite
         self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
+        # we delete the repo if asked
+        self.destroy if options[:destroy_if_fail]
         raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exist ine the folder '#{options[:source_folder].name}'")
       elsif children_with_same_name and overwrite
-        # If a children with the same name exist and we want to overwrite, we have to destroy it
-        children_with_same_name.destroy!
+        # If a children with the same name exist and we want to overwrite,
+        # We destroy or update it
+        if children_with_same_name.is_file?
+          p "add: updates the file #{self.name}"
+          children_with_same_name.file = self.file
+          children_with_same_name.sender = self.sender
+          #children_with_same_name.owner = self.owner
+          returned_item = children_with_same_name
+          self.destroy
+        else
+          children_with_same_name.destroy!
+        end
       end
     # We are in root, we check if name exist in root
     # We stay in the same owner
@@ -64,24 +80,37 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
       # If it exist and we don t want to overwrite, we raise an error
       if children_with_same_name and !overwrite
         self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
+        # we delete the repo if asked
+        self.destroy if options[:destroy_if_fail]
         raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exist ine the root")
       # else we destroy it
       elsif children_with_same_name and overwrite
-        children_with_same_name.destroy!
+        # If a children with the same name exist and we want to overwrite,
+        # We destroy or update it
+        if children_with_same_name.is_file?
+          p "add: updates the root file #{self.name}"
+          children_with_same_name.file = self.file
+          children_with_same_name.sender = self.sender
+          #children_with_same_name.owner = self.owner
+          returned_item = children_with_same_name
+          self.destroy
+        else
+          children_with_same_name.destroy!
+        end
       end
     end
 
     # here, all is ok
     # We change the owner if another one is specify
     if options[:owner]
-      self.owner = options[:owner]
+      returned_item.owner = options[:owner]
     elsif options[:source_folder]
-      self.owner = options[:source_folder].owner
+      returned_item.owner = options[:source_folder].owner
     end
     # we update the tree with the new parent
-    self.parent = options[:source_folder]
-    self.save!
-    self
+    returned_item.parent = options[:source_folder]
+    returned_item.save! unless options[:do_not_save]
+    returned_item
   end
 
   def move(options = {})

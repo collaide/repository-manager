@@ -245,7 +245,6 @@ module RepositoryManager
               end
               repo_item_with_same_name.sender = options[:sender]
               #p "source: updates the file #{repo_item_with_same_name.name}"
-
               repo_file = repo_item_with_same_name
             end
           else
@@ -557,6 +556,24 @@ module RepositoryManager
 
       def get_item_in_root_by_name(name)
         RepoItem.where('name = ?', name).where(owner: self).where(ancestry: nil).first
+      end
+
+      # Get or create the folder with this name
+      # options
+      #   :sender = the sender of the item
+      def get_or_create_by_path_array(path_array, options = {})
+        name = path_array[0]
+        children = self.get_item_in_root_by_name(name)
+        unless children
+          children = RepositoryManager::RepoFolder.new(name: name)
+          children.owner = self
+          children.sender = options[:sender]
+          children.save!
+        end
+        # remove the first element
+        path_array.shift
+        children = children.get_or_create_by_path_array(path_array, sender: options[:sender], owner: self)
+        children
       end
 
       private
