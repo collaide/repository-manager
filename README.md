@@ -1,6 +1,6 @@
 Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/sharing). 
 
-# Repository Manager [![Gem Version](https://badge.fury.io/rb/repository-manager.png)](http://badge.fury.io/rb/repository-manager)
+# Repository Manager [![Gem Version](https://badge.fury.io/rb/repository-manager.svg)](http://badge.fury.io/rb/repository-manager)
 
 This gem add functionalities to manage files and folders (repositories). Each instance (users, groups, etc..) has it own repository (with files and folders). It can manage them (create, edit, remove, copy, move, etc) and share them with other objects.
 
@@ -58,6 +58,9 @@ RepositoryManager.setup do |config|
 
   # Define if we enable or not the versioning on the repo_item
   config.has_paper_trail = false
+  
+  # Define if a repo item with the same name will be automaticaly overwrited when a new item is created, moved or copied
+  config.auto_overwrite_item = false
 end
 ```
 
@@ -72,10 +75,12 @@ end
 ```
 
 NOTE : If you want to add paper_trail to the repo_item model. You first have to install PaperTrail in you project.
-More informations on the [documentation of the PaperTrail gem](https://github.com/airblade/paper_trail)
-
+More informations on the [documentation of the PaperTrail gem](https://github.com/airblade/paper_trail).
 
 See the chapter [Permissions](#permissions) for more details about the permissions.
+
+See the chapter [Overwrite](#overwrite) for more details about the overwrite.
+
 
 ## Preparing your models
 
@@ -157,14 +162,14 @@ user1.create_file(repo_file, source_folder: the_new_folder)
 #   |  |-- 'The new folder'
 #   |  |  |-- 'file.txt'
 
-# user1 want to create a file on the root of his repository
-file2 = user1.create_file(params[:file2])
+# user1 want to create a file with a specific name on the root of his repository
+file2 = user1.create_file(params[:file2], filename: 'specific_name.jpg')
 
 # user1 own repository :
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
 #   |  |  |-- 'file.txt'
-#   |-- 'file2.jpg'
+#   |-- 'specific_name.jpg'
 
 # user1 want to create a folder on the root of his repository
 test_folder = user1.create_folder('Test folder')
@@ -173,7 +178,7 @@ test_folder = user1.create_folder('Test folder')
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
 #   |  |  |-- 'file.txt'
-#   |-- 'file2.jpg'
+#   |-- 'specific_name.jpg'
 #   |-- 'Test folder'
 
 # user1 want to move 'The new folder' in 'Test folder'
@@ -181,7 +186,7 @@ user1.move_repo_item(the_new_folder, source_folder: test_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
-#   |-- 'file2.jpg'
+#   |-- 'specific_name.jpg'
 #   |-- 'Test folder'
 #   |  |-- 'The new folder'
 #   |  |  |-- 'file.txt'
@@ -191,7 +196,7 @@ user1.rename_repo_item(the_new_folder, 'The renamed folder')
 
 # user1 own repository :
 #   |-- 'Root folder'
-#   |-- 'file2.jpg'
+#   |-- 'specific_name.jpg'
 #   |-- 'Test folder'
 #   |  |-- 'The renamed folder'
 #   |  |  |-- 'file.txt'
@@ -201,7 +206,7 @@ user1.copy_repo_item(source_folder, source_folder: test_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
-#   |-- 'file2.jpg'
+#   |-- 'specific_name.jpg'
 #   |-- 'Test folder'
 #   |  |-- 'Root folder'
 #   |  |-- 'The renamed folder'
@@ -213,7 +218,7 @@ user1.delete_repo_item(test_folder)
 
 # user1 own repository :
 #   |-- 'Root folder'
-#   |-- 'file2.jpg'
+#   |-- 'specific_name.jpg'
 
 user1.delete_repo_item(file2)
 
@@ -221,6 +226,8 @@ user1.delete_repo_item(file2)
 #   |-- 'Root folder'
 
 ```
+
+#### Owner and Sender
 
 If a user (sender of the item) send a file or folder into a group (owner of this item), you can specify the owner and the sender like this :
 
@@ -242,6 +249,23 @@ file.sender # Returns user1
 ```
 
 WARNING : There is no verification if the user1 has the permission to create a file or folder into this group. You have to check this in your controller ! The fact that user1 is the sender of this folder gives him NO PERMISSION on it !
+
+#### Overwrite
+
+You can overwrite a file or a folder. You juste have to pass the `overwrite: true` option in method : `create_file`, `create_folder`, `copy_repo_item`, `move_repo_item`. See those examples below :
+
+```ruby
+# @user want to create a new file in a `specific_folder`, and overwrite the existing one if it exist
+@user.create_file(the_new_file, source_folder: specific_folder, overwrite: true)
+
+# @user want to create a new folder, and overwrite the existing one if it exist
+@user.create_folder("Folder Name", overwrite: true)
+
+# This options can be passed to the `copy_repo_item` and the `move_repo_item` methods.
+
+```
+
+NOTE : If you overwrite a folder, the old folder will be destroyed ! If you overwrite a file, the existing file will be updated with the new file (better for versionning).
 
 ### How can I share a repo_item (file/folder)
 
