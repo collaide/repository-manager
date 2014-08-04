@@ -105,22 +105,23 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
           new_item.owner = owner
           new_item.sender = sender
           if path_array.empty?
-            new_item.move!(source_folder: options[:source_folder], owner: owner, overwrite: overwrite)
+            new_item.move!(source_folder: options[:source_folder], owner: owner, sender: sender, overwrite: overwrite)
           else
             # He specified a source_folder
             if options[:source_folder]
-              source_folder = options[:source_folder].get_or_create_by_path_array(path_array, owner: options[:owner], sender: options[:sender])
+              source_folder = options[:source_folder].get_or_create_by_path_array(path_array, owner: owner, sender: sender)
             else # No source folder specified
               # We have to check if we are in a folder
-              if parent = self.parent
+              parent = self.parent
+              if parent
                 # we unzip on this folder
-                source_folder = parent.get_or_create_by_path_array(path_array, owner: options[:owner], sender: options[:sender])
+                source_folder = parent.get_or_create_by_path_array(path_array, owner: owner, sender: sender)
               else
                 # We are in root
-                source_folder = owner.get_or_create_by_path_array(path_array, sender: options[:sender])
+                source_folder = owner.get_or_create_by_path_array(path_array, sender: sender)
               end
             end
-            new_item.move!(source_folder: source_folder, owner: owner, overwrite: overwrite)
+            new_item.move!(source_folder: source_folder, owner: owner, sender: sender, overwrite: overwrite)
           end
         else # it is a :file
           new_item = RepositoryManager::RepoFile.new
@@ -136,22 +137,23 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
 
 
           if path_array.empty?
-            new_item.move!(source_folder: options[:source_folder], owner: owner, overwrite: overwrite)
+            new_item.move!(source_folder: options[:source_folder], owner: owner, sender: sender, overwrite: overwrite)
           else
             # He specified a source_folder
             if options[:source_folder]
-              source_folder = options[:source_folder].get_or_create_by_path_array(path_array, owner: options[:owner], sender: options[:sender])
+              source_folder = options[:source_folder].get_or_create_by_path_array(path_array, owner: owner, sender: sender)
             else # No source folder specified
               # We have to check if we are in a folder
-              if parent = self.parent
+              parent = self.parent
+              if parent
                 # we unzip on this folder
-                source_folder = parent.get_or_create_by_path_array(path_array, owner: options[:owner], sender: options[:sender])
+                source_folder = parent.get_or_create_by_path_array(path_array, owner: owner, sender: sender)
               else
                 # We are in root
-                source_folder = owner.get_or_create_by_path_array(path_array, sender: options[:sender])
+                source_folder = owner.get_or_create_by_path_array(path_array, owner: owner, sender: sender)
               end
             end
-            new_item.move!(source_folder: source_folder, owner: owner, overwrite: overwrite)
+            new_item.move!(source_folder: source_folder, owner: owner, sender: sender, overwrite: overwrite)
           end
         end
       end

@@ -458,7 +458,16 @@ module RepositoryManager
           repo_item.errors.add(:unzip, I18n.t('repository_manager.errors.repo_item.unzip.no_permission'))
           raise RepositoryManager::PermissionException.new("unzip repo_file failed. You don't have the permission to create in the source_folder '#{target.name}'")
         end
-        repo_item.unzip!(source_folder: target, sender: options[:sender], overwrite: options[:overwrite])
+
+        if !target
+          parent = repo_item.parent
+          if parent && !can_create?(parent)
+            repo_item.errors.add(:unzip, I18n.t('repository_manager.errors.repo_item.unzip.no_permission'))
+            raise RepositoryManager::PermissionException.new("unzip repo_file failed. You don't have the permission to create in the source_folder '#{parent.name}'")
+          end
+        end
+
+        repo_item.unzip!(source_folder: target, owner: self, sender: options[:sender], overwrite: options[:overwrite])
       end
 
       def unzip_repo_item(repo_item, options = {})

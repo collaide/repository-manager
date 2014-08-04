@@ -60,6 +60,18 @@ describe 'Unzip' do
     expect(@user2.unzip_repo_item(@zip_file)).to eq(false)
   end
 
-  # TODO test change owner and sender
-
+  it 'User can\'t unzip file without create permission' do
+    @user2 = FactoryGirl.create(:user)
+    #shared_folder = @user1.create_folder('Shared Folder')
+    @user1.move_repo_item!(@zip_file, source_folder: @user1.create_folder('Shared Folder'))
+    @user1.share_repo_item!(@zip_file, @user2, repo_item_permissions: {
+        can_read: true,
+        can_create: true,
+        can_update: true,
+        can_delete: false,
+        can_share: true
+    } )
+    # He can t unzip because he don't have the permission to create in shared folder
+    expect(@user2.unzip_repo_item(@zip_file)).to eq(false)
+  end
 end
