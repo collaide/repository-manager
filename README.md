@@ -248,7 +248,23 @@ file.sender # Returns user1
 
 ```
 
-WARNING : There is no verification if the user1 has the permission to create a file or folder into this group. You have to check this in your controller ! The fact that user1 is the sender of this folder gives him NO PERMISSION on it !
+WARNING : There is no verification if the user1 has the permission to create a file or folder into this group. You have to check this in your controller ! The fact that user1 is the sender of this folder gives him NO MORE PERMISSION on it !
+
+#### Unzip an archive
+
+You can send a zipped file in your application and unzip it on it. Repository Manager will automaticaly create the `Repo Items` needed. This is very usefull when you want to send a folder (with sub files and folders), just zip it, send it, and unzip it in the application. You can use the `has_repository` method `unzip_repo_item(repo_item, options)`.
+
+```ruby
+# @user send a ZIP archive and want to unzip it in his own repository.
+repo_file_archive = @user.create_file(the_file_sended)
+@user.unzip_repo_item(repo_file_archive) 
+# => Will unzip all the content (files / folders) of the zip archive in his root repository
+
+# @group want to unzip this archive in another folder and overwrite the old one.
+# We want to precise that @user is the sender
+@group.unzip_repo_item(repo_file_archive, source_folder: target_folder, overwrite: true, sender: @user) 
+
+```
 
 #### Overwrite
 
@@ -265,7 +281,7 @@ You can overwrite a file or a folder. You juste have to pass the `overwrite: tru
 
 ```
 
-NOTE : If you overwrite a folder, the old folder will be destroyed ! If you overwrite a file, the existing file will be updated with the new file (better for versionning).
+NOTE : If you overwrite a folder, the old folder will be destroyed ! If you overwrite a file, the existing file will be updated with the new file (better for versioning).
 
 ### How can I share a repo_item (file/folder)
 
