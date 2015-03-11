@@ -21,7 +21,7 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
 
   # Downloading this file
   def download!(options = {})
-    file.path
+    file.url
   end
 
   # Copy itself into the source_folder
