@@ -20,6 +20,9 @@ module RepositoryManager
   mattr_accessor :auto_overwrite_item
   @@auto_overwrite_item = false
 
+  mattr_accessor :storage
+  @@storage = :file
+
   class << self
     def setup
       yield self
