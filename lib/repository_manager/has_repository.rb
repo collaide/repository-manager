@@ -234,8 +234,6 @@ module RepositoryManager
               #We do not destroy, we update it !
 
               # We update the file
-              repo_item_with_same_name.file = file
-
               if file.class.name == 'RepositoryManager::RepoFile'
                 repo_item_with_same_name.file = file.file
               elsif file.class.name == 'File' || file.class.name == 'ActionDispatch::Http::UploadedFile'
@@ -243,6 +241,7 @@ module RepositoryManager
               else # "ActionController::Parameters"
                 repo_item_with_same_name.assign_attributes(file)
               end
+
               repo_item_with_same_name.sender = options[:sender]
               #p "source: updates the file #{repo_item_with_same_name.name}"
               repo_file = repo_item_with_same_name

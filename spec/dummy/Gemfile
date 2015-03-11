@@ -2,6 +2,7 @@ source "https://rubygems.org"
 
 gem 'repository-manager', :path => '../../'
 gem 'factory_girl'
+gem 'paper_trail'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'

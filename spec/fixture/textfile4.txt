@@ -1,0 +1,1 @@
+4 This is a fixture text (txt) file.

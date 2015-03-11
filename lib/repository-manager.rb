@@ -42,3 +42,6 @@ end
 
 require 'repository_manager/engine'
 require 'repository_manager/exceptions'
+if RepositoryManager.has_paper_trail
+  require 'paper_trail'
+end
