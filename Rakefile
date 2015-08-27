@@ -1,5 +1,5 @@
 APP_RAKEFILE = File.expand_path("../spec/dummy/Rakefile", __FILE__)
-load "rails/tasks/enging.rake"
+load "rails/tasks/engine.rake"
 begin
   require 'bundler/setup'
 rescue LoadError

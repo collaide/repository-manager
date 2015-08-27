@@ -14,11 +14,11 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
       name = path_array[0]
       children = self.get_children_by_name(name)
       unless children
-        (options[:owner] || self.owner).create_folder(name: name, source_folder: children.first)
-        # children = RepositoryManager::RepoFolder.new(name: name)
-        # children.owner = options[:owner]
-        # children.sender = options[:sender]
-        # children.save!
+        children = options[:owner].create_folder(name, source_folder: self)
+        if options[:sender]
+          children.sender = options[:sender]
+          children.save!
+        end
       end
       # remove the first element
       path_array.shift
