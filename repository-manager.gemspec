@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.summary     = "Ruby on Rails plugin (gem) for managing repositories ( files / folders / permissions / sharings )."
   #s.description = "Repository Manager help you to easily manage your files and folders. Each instance has its own repository. You can share these items with other instance with a complet flexible permission control. "
   s.description = "This project is based on the need for a system for easily create/delete files and folders in a repository. For sharing these repositories easily with other object with a flexible and complete permissions management. Each instance (users, groups, etc..) can have it own repositories (with files and folders). It can manage them easily (create, delete, edit, move, copy, etc) and sharing them with other instance."
-  
+
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- spec/*`.split("\n")
 
@@ -24,6 +24,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency('factory_girl', '>= 2.6.0')
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency('rspec-rails', '>= 2.6.1')
+  s.add_development_dependency('spork')
+  s.add_development_dependency('byebug')
   s.add_runtime_dependency 'ancestry'
   s.add_runtime_dependency('carrierwave', '>= 0.5.8')
   s.add_runtime_dependency 'rubyzip', '>= 1.0.0'#, :require => 'zip/zip'
