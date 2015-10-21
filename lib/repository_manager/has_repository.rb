@@ -647,7 +647,7 @@ module RepositoryManager
             permissions == true || (permissions.kind_of?(Hash) && permissions[:can_read] == true)
           when 'delete'
             if RepositoryManager.accept_nested_sharing
-              # TODO implement to look if he can delete all the folder
+              permissions == true || (permissions.kind_of?(Hash) && permissions[:can_read] == true)
             else
               permissions == true || (permissions.kind_of?(Hash) && permissions[:can_delete] == true)
             end
@@ -655,13 +655,15 @@ module RepositoryManager
             permissions == true || (permissions.kind_of?(Hash) && permissions[:can_update] == true)
           when 'share'
             if RepositoryManager.accept_nested_sharing
-              # TODO implement to look if he can delete all the folder
+              # This allows only the repo item owners to share a repo item,
+              # effectively overriding sharing option for 'can_share'
+              repo_item == nil || repo_item.owner == self
             else
               permissions == true || (permissions.kind_of?(Hash) && permissions[:can_share] == true)
             end
           when 'create'
             if RepositoryManager.accept_nested_sharing
-              # TODO implement to look if he can delete all the folder
+              permissions == true || (permissions.kind_of?(Hash) && permissions[:can_create] == true)
             else
               permissions == true || (permissions.kind_of?(Hash) && permissions[:can_create] == true)
             end
