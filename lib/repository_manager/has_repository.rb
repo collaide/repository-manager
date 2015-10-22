@@ -57,7 +57,7 @@ module RepositoryManager
         permissions = get_permissions(repo_item)
 
         # Here we look if the instance has the permission for making a sharing
-        if can_share?(nil, permissions)
+        if can_share?(repo_item, permissions)
 
           # We put the default options
           repo_item_permissions = RepositoryManager.default_repo_item_permissions

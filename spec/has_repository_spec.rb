@@ -213,7 +213,7 @@ describe 'HasRepository' do
   #  expect(@user2.sharings.count).to eq(1)
   #end
 
-  it 'can\'t share a nested sharing' do
+  it 'checks if can_be_shared_without_nesting' do
     parent = @user1.create_folder('Parent')
     nested = @user1.create_folder('Nested', source_folder: parent)
     children = @user1.create_folder('Children', source_folder: nested)
@@ -299,4 +299,65 @@ describe 'HasRepository' do
     expect(@user3.root_repo_items.count).to eq(2)
   end
 
+  describe 'nested sharing' do
+
+    before(:all) do
+      RepositoryManager.accept_nested_sharing = true
+    end
+
+    after(:all) do
+      RepositoryManager.accept_nested_sharing = false
+    end
+
+    let(:share_options){
+      {
+        repo_item_permissions: {
+          can_read: [true, false].sample,
+          can_create: [true, false].sample,
+          can_update: [true, false].sample,
+          can_delete: [true, false].sample,
+          can_share: [true, false].sample
+        },
+        share_permissions: {
+          can_add: [true, false].sample,
+          can_remove: [true, false].sample
+        }
+      }
+    }
+
+    it 'can be created' do
+      # @user1 own repository :
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
+
+      parent = @user1.create_folder(Faker::Lorem.word)
+      nested = @user1.create_folder(Faker::Lorem.word, source_folder: parent)
+      children = @user1.create_folder(Faker::Lorem.word, source_folder: nested)
+
+      @user1.share_repo_item(parent, @user2, share_options)
+      expect(@user2.sharings.count).to eq(1)
+
+      @user1.share_repo_item(children, @user3, share_options)
+      expect(@user3.sharings.count).to eq(1)
+    end
+
+    it 'cannot be created if user is not the owner' do
+      # @user1 own repository :
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
+
+      parent = @user1.create_folder(Faker::Lorem.word)
+      nested = @user1.create_folder(Faker::Lorem.word, source_folder: parent)
+      children = @user1.create_folder(Faker::Lorem.word, source_folder: nested)
+
+      @user1.share_repo_item(parent, @user2, share_options)
+      expect(@user2.sharings.count).to eq(1)
+
+      @user2.share_repo_item(parent, @user3, share_options)
+      expect(@user3.sharings.count).to eq(0)
+    end
+
+  end
 end
