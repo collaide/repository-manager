@@ -248,7 +248,8 @@ module RepositoryManager
             end
           else
             # It raise an error if name already exist and destroy the file
-            repo_file = source_folder.add!(repo_file, do_not_save: true, overwrite: overwrite)
+            # We pass in the owner so the user creating the repo item is always the owner
+            repo_file = source_folder.add!(repo_file, do_not_save: true, overwrite: overwrite, owner: self)
           end
           repo_file.save!
         else

@@ -314,7 +314,7 @@ describe 'HasRepository' do
           can_read: [true, false].sample,
           can_create: [true, false].sample,
           can_update: [true, false].sample,
-          can_delete: false,
+          can_delete: [true, false].sample,
           can_share: [true, false].sample
         },
         share_permissions: {
@@ -348,6 +348,29 @@ describe 'HasRepository' do
       expect(@user2.sharings.count).to eq(1)
 
       @user2.share_repo_item(parent, @user3, share_options)
+      expect(@user3.sharings.count).to eq(0)
+    end
+
+    it 'can manage own item created in a nested shared folder' do
+      # @user1 own repository
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
+
+      share_options.deep_merge!({ repo_item_permissions: { can_share: true, can_create: true } })
+      @user1.share_repo_item(parent, @user2, share_options)
+      @user1.share_repo_item(children, @user2, share_options)
+      expect(@user2.sharings.count).to eq(2)
+
+      file = @user2.create_file!(FactoryGirl.build(:rm_repo_file), source_folder: children)
+
+      # Share
+      expect(@user2.share_repo_item(file, @user3, share_options)).to be_truthy
+      expect(@user3.sharings.count).to eq(1)
+
+      # Delete
+      expect(@user2.delete_repo_item(file)).to eq(file)
+      expect(file.destroyed?).to be_truthy
       expect(@user3.sharings.count).to eq(0)
     end
 
