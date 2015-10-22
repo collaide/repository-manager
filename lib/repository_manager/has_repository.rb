@@ -139,7 +139,7 @@ module RepositoryManager
             end
           else
             # It raise an error if name already exist and destroy the folder
-            source_folder.add!(folder, do_not_save: true, overwrite: overwrite)
+            source_folder.add!(folder, do_not_save: true, overwrite: overwrite, owner: self)
           end
 
           folder.save!
@@ -283,8 +283,8 @@ module RepositoryManager
         # If repo_item is nil, he can do what he want
         return true if repo_item == nil
 
-        # If the member is the owner, he can do what he want !
-        if repo_item.owner == self
+        # If member is the owner or owns an ancestor, he can do what he wants!
+        if repo_item.owner == self || self.owns_ancestor?(repo_item)
           # You can do what ever you want :)
           return true
         # Find if a sharing of this rep exist for the self instance or it ancestors
@@ -297,6 +297,11 @@ module RepositoryManager
         end
         # Else, false
         return false
+      end
+
+      def owns_ancestor?(repo_item)
+        return false if repo_item.ancestors.empty?
+        repo_item.ancestors.any? { |ancestor| ancestor.owner == self }
       end
 
       # Rename the repo_item with the new_name

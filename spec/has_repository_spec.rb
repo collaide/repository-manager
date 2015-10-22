@@ -299,6 +299,37 @@ describe 'HasRepository' do
     expect(@user3.root_repo_items.count).to eq(2)
   end
 
+  it 'can do anything if owns an ancestor' do
+    folder = @user1.create_folder(Faker::Lorem.word)
+    file = @user1.create_file!(FactoryGirl.build(:rm_repo_file), source_folder: folder)
+    expect(file.owner).to eq(@user1)
+
+    shared_folder = @user1.create_folder(Faker::Lorem.word)
+    @user1.share_repo_item(shared_folder, @user2, { repo_item_permissions: { can_create: true } })
+
+    child_folder = @user2.create_folder(Faker::Lorem.word, source_folder: shared_folder)
+    expect(child_folder.owner).to eq(@user2)
+
+    expect(@user1.get_permissions(child_folder)).to be_truthy
+    expect(@user1.delete_repo_item(child_folder)).to eq(child_folder)
+  end
+
+  it 'sets current user as owner when creating a repo item' do
+    folder = @user1.create_folder(Faker::Lorem.word)
+    file = @user1.create_file!(FactoryGirl.build(:rm_repo_file), source_folder: folder)
+    expect(file.owner).to eq(@user1)
+
+    shared_folder = @user1.create_folder(Faker::Lorem.word)
+    @user1.share_repo_item(shared_folder, @user2, { repo_item_permissions: { can_create: true } })
+
+    # Check create when in a shared folder
+    file = @user2.create_file!(FactoryGirl.build(:rm_repo_file), source_folder: shared_folder)
+    expect(file.owner).to eq(@user2)
+
+    child_folder = @user2.create_folder(Faker::Lorem.word, source_folder: shared_folder)
+    expect(child_folder.owner).to eq(@user2)
+  end
+
   describe 'nested sharing' do
 
     before(:all){ RepositoryManager.accept_nested_sharing = true }
