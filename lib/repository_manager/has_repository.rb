@@ -647,7 +647,7 @@ module RepositoryManager
             permissions == true || (permissions.kind_of?(Hash) && permissions[:can_read] == true)
           when 'delete'
             if RepositoryManager.accept_nested_sharing
-              permissions == true || (permissions.kind_of?(Hash) && permissions[:can_read] == true)
+              permissions == true || (permissions.kind_of?(Hash) && permissions[:can_delete] == true)
             else
               permissions == true || (permissions.kind_of?(Hash) && permissions[:can_delete] == true)
             end
