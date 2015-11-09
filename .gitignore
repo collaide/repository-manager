@@ -12,3 +12,13 @@ doc/*
 log/*
 pkg/*
 *.sqlite3
+
+# Folders used by tests
+spec/dummy/db/schema.rb
+spec/dummy/log/*.log
+spec/dummy/public/uploads
+spec/dummy/uploads
+spec/dummy/tmp
+
+# My stupid vim stuff
+.vimrc

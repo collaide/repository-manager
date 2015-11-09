@@ -24,6 +24,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency('factory_girl', '>= 2.6.0')
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency('rspec-rails', '>= 2.6.1')
+  s.add_development_dependency('spork')
+  s.add_development_dependency('byebug')
   s.add_runtime_dependency 'ancestry'
   s.add_runtime_dependency('carrierwave', '>= 0.5.8')
   s.add_runtime_dependency 'rubyzip', '>= 1.0.0'#, :require => 'zip/zip'

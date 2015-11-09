@@ -6,7 +6,15 @@ describe 'HasRepository' do
     @user1 = FactoryGirl.create(:user)
     @user2 = FactoryGirl.create(:user)
     @user3 = FactoryGirl.create(:user)
+    @user4 = FactoryGirl.create(:user)
+    @folder = @user4.create_folder("parent_folder")
     @group1 = FactoryGirl.create(:group)
+  end
+
+  it "creates a folder by path array" do
+    @user4.get_or_create_by_path_array([@folder.name, "subfolder"])
+    expect(@user4.repo_items.folders.count).to eq(2)
+    expect(@user4.repo_items.folders.find_by(name: "subfolder").ancestry).to eq(@folder.id.to_s)
   end
 
   it "should be associate with shares" do
