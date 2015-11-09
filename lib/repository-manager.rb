@@ -1,4 +1,5 @@
 require 'repository_manager/has_repository'
+# require 'byebug'
 
 module RepositoryManager
 

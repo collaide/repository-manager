@@ -213,7 +213,7 @@ describe 'HasRepository' do
   #  expect(@user2.sharings.count).to eq(1)
   #end
 
-  it 'can\'t share a nested sharing' do
+  it 'checks if can_be_shared_without_nesting' do
     parent = @user1.create_folder('Parent')
     nested = @user1.create_folder('Nested', source_folder: parent)
     children = @user1.create_folder('Children', source_folder: nested)
@@ -299,4 +299,146 @@ describe 'HasRepository' do
     expect(@user3.root_repo_items.count).to eq(2)
   end
 
+  it 'can do anything if owns an ancestor' do
+    folder = @user1.create_folder(Faker::Lorem.word)
+    file = @user1.create_file!(FactoryGirl.build(:rm_repo_file), source_folder: folder)
+    expect(file.owner).to eq(@user1)
+
+    shared_folder = @user1.create_folder(Faker::Lorem.word)
+    @user1.share_repo_item(shared_folder, @user2, { repo_item_permissions: { can_create: true } })
+
+    child_folder = @user2.create_folder(Faker::Lorem.word, source_folder: shared_folder)
+    expect(child_folder.owner).to eq(@user2)
+
+    expect(@user1.get_permissions(child_folder)).to be_truthy
+    expect(@user1.delete_repo_item(child_folder)).to eq(child_folder)
+  end
+
+  it 'sets current user as owner when creating a repo item' do
+    folder = @user1.create_folder(Faker::Lorem.word)
+    file = @user1.create_file!(FactoryGirl.build(:rm_repo_file), source_folder: folder)
+    expect(file.owner).to eq(@user1)
+
+    shared_folder = @user1.create_folder(Faker::Lorem.word)
+    @user1.share_repo_item(shared_folder, @user2, { repo_item_permissions: { can_create: true } })
+
+    # Check create when in a shared folder
+    file = @user2.create_file!(FactoryGirl.build(:rm_repo_file), source_folder: shared_folder)
+    expect(file.owner).to eq(@user2)
+
+    child_folder = @user2.create_folder(Faker::Lorem.word, source_folder: shared_folder)
+    expect(child_folder.owner).to eq(@user2)
+  end
+
+  describe 'nested sharing' do
+
+    before(:all){ RepositoryManager.accept_nested_sharing = true }
+    after(:all){ RepositoryManager.accept_nested_sharing = false }
+
+    let(:parent){ parent = @user1.create_folder(Faker::Lorem.word) }
+    let(:nested){ @user1.create_folder(Faker::Lorem.word, source_folder: parent) }
+    let(:children){ @user1.create_folder(Faker::Lorem.word, source_folder: nested) }
+
+    let(:share_options){
+      {
+        repo_item_permissions: {
+          can_read: [true, false].sample,
+          can_create: [true, false].sample,
+          can_update: [true, false].sample,
+          can_delete: [true, false].sample,
+          can_share: [true, false].sample
+        },
+        share_permissions: {
+          can_add: [true, false].sample,
+          can_remove: [true, false].sample
+        }
+      }
+    }
+
+    it 'can be created' do
+      # @user1 own repository :
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
+
+      @user1.share_repo_item(parent, @user2, share_options)
+      expect(@user2.sharings.count).to eq(1)
+
+      @user1.share_repo_item(children, @user3, share_options)
+      expect(@user3.sharings.count).to eq(1)
+    end
+
+    it 'cannot be created if user is not the owner' do
+      # @user1 own repository :
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
+
+      share_options.deep_merge!({ repo_item_permissions: { can_share: true } })
+      @user1.share_repo_item(parent, @user2, share_options)
+      expect(@user2.sharings.count).to eq(1)
+
+      @user2.share_repo_item(parent, @user3, share_options)
+      expect(@user3.sharings.count).to eq(0)
+    end
+
+    it 'can manage own item created in a nested shared folder' do
+      # @user1 own repository
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
+
+      share_options.deep_merge!({ repo_item_permissions: { can_share: true, can_create: true } })
+      @user1.share_repo_item(parent, @user2, share_options)
+      @user1.share_repo_item(children, @user2, share_options)
+      expect(@user2.sharings.count).to eq(2)
+
+      file = @user2.create_file!(FactoryGirl.build(:rm_repo_file), source_folder: children)
+
+      # Share
+      expect(@user2.share_repo_item(file, @user3, share_options)).to be_truthy
+      expect(@user3.sharings.count).to eq(1)
+
+      # Delete
+      expect(@user2.delete_repo_item(file)).to eq(file)
+      expect(file.destroyed?).to be_truthy
+      expect(@user3.sharings.count).to eq(0)
+    end
+
+    it 'checks create options in nested sharing ' do
+      # @user1 own repository :
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
+
+      @user1.share_repo_item(parent, @user2, share_options)
+      expect(@user2.sharings.count).to eq(1)
+
+      share_options.deep_merge!({ repo_item_permissions: { can_create: true } })
+      @user1.share_repo_item(children, @user2, share_options)
+      expect(@user2.create_folder(Faker::Lorem.word, source_folder: children)).to be_truthy
+
+      share_options.deep_merge!({ repo_item_permissions: { can_create: false } })
+      @user1.share_repo_item(children, @user3, share_options)
+      expect(@user3.create_folder(Faker::Lorem.word, source_folder: children)).to be_falsy
+    end
+
+    it 'checks delete options in nested sharing ' do
+      # @user1 own repository :
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
+
+      share_options.deep_merge!({ repo_item_permissions: { can_delete: false } })
+      @user1.share_repo_item(parent, @user2, share_options)
+      expect(@user2.sharings.count).to eq(1)
+      expect(@user2.delete_repo_item(parent)).to be_falsy
+
+      share_options.deep_merge!({ repo_item_permissions: { can_delete: true } })
+      @user1.share_repo_item(children, @user3, share_options)
+      expect(@user3.sharings.count).to eq(1)
+      expect(@user3.delete_repo_item(children)).to eq(children)
+    end
+
+  end
 end

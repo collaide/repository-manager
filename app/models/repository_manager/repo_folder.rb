@@ -34,7 +34,7 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   # second param destroy the repo_item if it can't move it.
   def add!(repo_item, options = {})
     !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
-    repo_item.move!(source_folder: self, do_not_save: options[:do_not_save], destroy_if_fail: options[:destroy_if_fail], overwrite: overwrite)
+    repo_item.move!(source_folder: self, do_not_save: options[:do_not_save], destroy_if_fail: options[:destroy_if_fail], overwrite: overwrite, owner: options[:owner])
   end
 
   def add(repo_item)
