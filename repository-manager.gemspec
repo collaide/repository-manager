@@ -30,5 +30,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'ancestry'
   s.add_runtime_dependency('carrierwave', '>= 0.5.8')
   s.add_runtime_dependency 'rubyzip', '>= 1.0.0'#, :require => 'zip/zip'
-  s.add_runtime_dependency 'paper_trail', '~> 3.0.1'
+  s.add_runtime_dependency 'paper_trail', '~> 4.0.0'
 end
