@@ -114,7 +114,7 @@ module RepositoryManager
           end
         end
 
-        !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
+        !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_folder
 
         # If he want to create a folder in a directory, we have to check if he have the permission
         if can_create?(source_folder)

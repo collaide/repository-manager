@@ -441,4 +441,25 @@ describe 'HasRepository' do
     end
 
   end
+
+  describe "folder overwrite" do
+
+    it "raises an error when auto_overwrite is false" do
+      RepositoryManager.auto_overwrite_folder = false
+      @user1.create_folder!('same_name')
+      expect{ @user1.create_folder!('same_name') }.to raise_error
+      expect(@user1.repo_items.folders.count).to eq(1)
+      RepositoryManager.auto_overwrite_folder = true
+    end
+
+    it "overwrites a folder when auto_overwrite is true" do
+      RepositoryManager.auto_overwrite_folder = true
+      folder_id = @user1.create_folder!('same_name').id
+      expect{ @user1.create_folder!('same_name') }.not_to raise_error
+
+      expect(@user1.repo_items.folders.count).to eq(1)
+      expect(@user1.repo_items.folders.last.id).not_to eq(folder_id)
+      RepositoryManager.auto_overwrite_folder = false
+    end
+  end
 end
