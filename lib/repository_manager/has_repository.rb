@@ -621,6 +621,17 @@ module RepositoryManager
         children
       end
 
+      # Get an item based on path provided
+      def get_by_path_array(path_array)
+        name = path_array[0]
+        children = self.get_item_in_root_by_name(name)
+
+        # remove the first element
+        path_array.shift
+        children = children.get_by_path_array(path_array) if children
+        children
+      end
+
       private
 
       # Return if you can do or not this action in the sharing

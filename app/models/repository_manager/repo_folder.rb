@@ -27,6 +27,20 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
     children
   end
 
+  # Get a child item based on path provided
+  def get_by_path_array(path_array)
+    children = self
+    unless path_array.empty?
+      name = path_array[0]
+      children = self.get_children_by_name(name)
+
+      # remove the first element
+      path_array.shift
+      children = children.get_by_path_array(path_array) if children
+    end
+    children
+  end
+
   # Add a repo_item in the folder.
   # options
   #   :destroy_if_fail = false // the repo_item if it can't move it.

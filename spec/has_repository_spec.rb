@@ -17,6 +17,21 @@ describe 'HasRepository' do
     expect(@user4.repo_items.folders.find_by(name: "subfolder").ancestry).to eq(@folder.id.to_s)
   end
 
+  it "creates a folder by path array" do
+    path_array = ['1','2','3']
+    @user4.get_or_create_by_path_array(path_array.dup, owner: @user)
+    @user4.reload
+    expect(@user4.repo_items.folders.count).to eq(4)
+
+    ancestry_array = path_array.dup.first(2)
+    target = @user4.repo_items.find_by(name: '3')
+
+    method_result = @user4.get_by_path_array(path_array)
+    expect(method_result.id).to eq(target.id)
+    expect(method_result.name).to eq('3')
+    expect(method_result.ancestors.pluck(:name)).to eq(ancestry_array)
+  end
+
   it "should be associate with shares" do
     folder = @user1.create_folder('salut')
     sharing = RepositoryManager::Sharing.new
