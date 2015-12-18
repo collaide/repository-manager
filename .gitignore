@@ -20,3 +20,6 @@ spec/dummy/public/uploads
 spec/dummy/public/repository_manager/repo_file/file/*
 spec/dummy/uploads
 spec/dummy/tmp
+
+# My stupid vim stuff
+.vimrc
