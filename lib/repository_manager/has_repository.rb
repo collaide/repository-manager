@@ -57,7 +57,7 @@ module RepositoryManager
         permissions = get_permissions(repo_item)
 
         # Here we look if the instance has the permission for making a sharing
-        if can_share?(nil, permissions)
+        if can_share?(repo_item, permissions)
 
           # We put the default options
           repo_item_permissions = RepositoryManager.default_repo_item_permissions
@@ -114,7 +114,7 @@ module RepositoryManager
           end
         end
 
-        !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
+        !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_folder
 
         # If he want to create a folder in a directory, we have to check if he have the permission
         if can_create?(source_folder)
@@ -139,7 +139,7 @@ module RepositoryManager
             end
           else
             # It raise an error if name already exist and destroy the folder
-            source_folder.add!(folder, do_not_save: true, overwrite: overwrite)
+            source_folder.add!(folder, do_not_save: true, overwrite: overwrite, owner: self)
           end
 
           folder.save!
@@ -248,7 +248,8 @@ module RepositoryManager
             end
           else
             # It raise an error if name already exist and destroy the file
-            repo_file = source_folder.add!(repo_file, do_not_save: true, overwrite: overwrite)
+            # We pass in the owner so the user creating the repo item is always the owner
+            repo_file = source_folder.add!(repo_file, do_not_save: true, overwrite: overwrite, owner: self)
           end
           repo_file.save!
         else
@@ -282,8 +283,8 @@ module RepositoryManager
         # If repo_item is nil, he can do what he want
         return true if repo_item == nil
 
-        # If the member is the owner, he can do what he want !
-        if repo_item.owner == self
+        # If member is the owner or owns an ancestor, he can do what he wants!
+        if repo_item.owner == self || self.owns_ancestor?(repo_item)
           # You can do what ever you want :)
           return true
         # Find if a sharing of this rep exist for the self instance or it ancestors
@@ -296,6 +297,11 @@ module RepositoryManager
         end
         # Else, false
         return false
+      end
+
+      def owns_ancestor?(repo_item)
+        return false if repo_item.ancestors.empty?
+        repo_item.ancestors.any? { |ancestor| ancestor.owner == self }
       end
 
       # Rename the repo_item with the new_name
@@ -615,6 +621,17 @@ module RepositoryManager
         children
       end
 
+      # Get an item based on path provided
+      def get_by_path_array(path_array)
+        name = path_array[0]
+        children = self.get_item_in_root_by_name(name)
+
+        # remove the first element
+        path_array.shift
+        children = children.get_by_path_array(path_array) if children
+        children
+      end
+
       private
 
       # Return if you can do or not this action in the sharing
@@ -647,7 +664,7 @@ module RepositoryManager
             permissions == true || (permissions.kind_of?(Hash) && permissions[:can_read] == true)
           when 'delete'
             if RepositoryManager.accept_nested_sharing
-              # TODO implement to look if he can delete all the folder
+              permissions == true || (permissions.kind_of?(Hash) && permissions[:can_delete] == true)
             else
               permissions == true || (permissions.kind_of?(Hash) && permissions[:can_delete] == true)
             end
@@ -655,13 +672,15 @@ module RepositoryManager
             permissions == true || (permissions.kind_of?(Hash) && permissions[:can_update] == true)
           when 'share'
             if RepositoryManager.accept_nested_sharing
-              # TODO implement to look if he can delete all the folder
+              # This allows only the repo item owners to share a repo item,
+              # effectively overriding sharing option for 'can_share'
+              repo_item == nil || repo_item.owner == self
             else
               permissions == true || (permissions.kind_of?(Hash) && permissions[:can_share] == true)
             end
           when 'create'
             if RepositoryManager.accept_nested_sharing
-              # TODO implement to look if he can delete all the folder
+              permissions == true || (permissions.kind_of?(Hash) && permissions[:can_create] == true)
             else
               permissions == true || (permissions.kind_of?(Hash) && permissions[:can_create] == true)
             end

@@ -1,4 +1,5 @@
 require 'repository_manager/has_repository'
+# require 'byebug'
 
 module RepositoryManager
 
@@ -19,6 +20,9 @@ module RepositoryManager
 
   mattr_accessor :auto_overwrite_item
   @@auto_overwrite_item = false
+
+  mattr_accessor :auto_overwrite_folder
+  @@auto_overwrite_folder = false
 
   mattr_accessor :storage
   @@storage = :file
