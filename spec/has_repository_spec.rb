@@ -153,6 +153,7 @@ describe 'HasRepository' do
 
     expect(sharing_of_user_1.can_read?).to eq(false)
     expect(sharing_of_user_1.can_update?).to eq(false)
+    expect(sharing_of_user_1.can_move?).to eq(false)
     expect(sharing_of_user_1.can_share?).to eq(false)
     #expect(@user1.sharings.count).to eq(1)
     #expect(@user2.sharings_owners.count).to eq(1)
@@ -185,6 +186,7 @@ describe 'HasRepository' do
 
     expect(sharing_of_user_1.can_read?).to eq(true)
     expect(sharing_of_user_1.can_update?).to eq(false)
+    expect(sharing_of_user_1.can_move?).to eq(false)
     expect(sharing_of_user_1.can_share?).to eq(true)
     #expect(@user1.sharings.count).to eq(1)
     #expect(@user2.sharings_owners.count).to eq(1)
@@ -368,6 +370,7 @@ describe 'HasRepository' do
           can_read: [true, false].sample,
           can_create: [true, false].sample,
           can_update: [true, false].sample,
+          can_move: [true, false].sample,
           can_delete: [true, false].sample,
           can_share: [true, false].sample
         },
