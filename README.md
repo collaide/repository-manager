@@ -329,6 +329,7 @@ Repository Manager supports nested sharing in the following way:
 - Owner (creator) of a repo item has all rights on the repo item
 - Owner (creator) of a repo item's ancestor has all rights on the repo item (even when the repo item is not created by him)
 - Only the owner (creator) of a repo item can share it; the user it was shared with can do everything in accordance to share privilages, except for resharing it
+- Share permissions cascade, and the nearest rule is the one that applies
 
 ```ruby
 

@@ -360,7 +360,7 @@ module RepositoryManager
           end
         end
         # If it has the permission, we move the repo_item in the source_folder
-        repo_item.move!(source_folder: target, overwrite: overwrite)
+        repo_item.move!(source_folder: target, overwrite: overwrite, owner: options[:owner])
       end
 
       def move_repo_item(repo_item, options = {})

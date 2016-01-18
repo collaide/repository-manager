@@ -360,9 +360,9 @@ describe 'HasRepository' do
     before(:all){ RepositoryManager.accept_nested_sharing = true }
     after(:all){ RepositoryManager.accept_nested_sharing = false }
 
-    let(:parent){ parent = @user1.create_folder(Faker::Lorem.word) }
-    let(:nested){ @user1.create_folder(Faker::Lorem.word, source_folder: parent) }
-    let(:children){ @user1.create_folder(Faker::Lorem.word, source_folder: nested) }
+    let!(:parent){ parent = @user1.create_folder('Parent') }
+    let!(:nested){ @user1.create_folder('Nested', source_folder: parent) }
+    let!(:children){ @user1.create_folder('Children', source_folder: nested) }
 
     let(:share_options){
       {
@@ -449,7 +449,7 @@ describe 'HasRepository' do
       expect(@user3.create_folder(Faker::Lorem.word, source_folder: children)).to be_falsy
     end
 
-    it 'checks move options in nested sharing ' do
+    it 'checks if can move when permitted' do
       # @user1 own repository :
       #   |-- 'Parent'
       #   |  |-- 'Nested'
@@ -459,14 +459,20 @@ describe 'HasRepository' do
       expect(@user2.sharings.count).to eq(1)
 
       share_options.deep_merge!({ repo_item_permissions: { can_read: true, can_move: true } })
-      @user1.share_repo_item(children, @user2, share_options)
+      @user1.share_repo_item!(children, @user2, share_options)
       target_folder = @user2.create_folder(Faker::Lorem.word)
-      # byebug
       expect(@user2.move_repo_item(children, source_folder: target_folder, owner: @user1)).to be_truthy
+    end
+
+    it 'checks if can move when not permitted' do
+      # @user1 own repository :
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
 
       share_options.deep_merge!({ repo_item_permissions: { can_read: true, can_move: false } })
-      @user1.share_repo_item(children, @user2, share_options)
-      target_folder = @user2.create_folder(Faker::Lorem.word)
+      @user1.share_repo_item!(children.reload, @user2, share_options)
+      target_folder = parent
       expect(@user2.move_repo_item(children, source_folder: target_folder, owner: @user1)).to be_falsy
     end
 
@@ -486,7 +492,6 @@ describe 'HasRepository' do
       expect(@user3.sharings.count).to eq(1)
       expect(@user3.delete_repo_item(children)).to eq(children)
     end
-
   end
 
   describe "folder overwrite" do
