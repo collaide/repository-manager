@@ -139,7 +139,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     end
   end
 
-  # Returns true if it exist a sharing in the ancestors of descendant_ids of the repo_item (without itself)
+  # Returns true if there is a sharing in the ancestors of descendant_ids of the repo_item (without itself)
   def can_be_shared_without_nesting?
     # An array with the ids of all ancestors and descendants
     ancestor_and_descendant_ids = []
@@ -147,7 +147,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     ancestor_and_descendant_ids << self.ancestor_ids if !self.ancestor_ids.empty?
 
     # If it exist a sharing, it returns true
-    if RepositoryManager::Sharing.where(repo_item_id: ancestor_and_descendant_ids).count > 0
+    if RepositoryManager::Sharing.where(repo_item_id: ancestor_and_descendant_ids.flatten).count > 0
       false
     else
       true

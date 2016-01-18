@@ -1,7 +1,7 @@
 class RepositoryManager::Sharing < ActiveRecord::Base
   self.table_name = :rm_sharings
 
-  attr_accessible :can_read, :can_create, :can_update, :can_delete, :can_share, :owner, :creator if RepositoryManager.protected_attributes?
+  attr_accessible :can_read, :can_create, :can_update, :can_move, :can_delete, :can_share, :owner, :creator if RepositoryManager.protected_attributes?
 
   before_save :put_creator
 

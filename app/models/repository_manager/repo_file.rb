@@ -129,7 +129,10 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
           new_item.sender = sender
           new_item.owner = owner
 
+          # Ensure tmp directory is present
+          FileUtils::mkdir_p("#{Rails.root}/tmp/unzip")
           tmp_file_path = File.join(Rails.root, 'tmp', 'unzip', name)
+
           # Delete the path
           FileUtils.rm_rf(tmp_file_path)
           entry.extract(tmp_file_path)
