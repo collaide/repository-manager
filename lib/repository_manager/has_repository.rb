@@ -338,7 +338,7 @@ module RepositoryManager
         # If we want to change the owner we have to have the can_delete permission
         if target
           # If want to change the owner, we have to check if we have the permission
-          if target.owner != repo_item.owner && !can_delete?(repo_item)
+          if target.owner != repo_item.owner && !can_delete?(repo_item) && repo_item.owner != options[:owner]
             repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
             raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
           end
@@ -366,7 +366,8 @@ module RepositoryManager
       def move_repo_item(repo_item, options = {})
         begin
           move_repo_item!(repo_item, options)
-        rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException
+        rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException => e
+          p e.message
           false
         rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.not_moved'))

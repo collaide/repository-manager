@@ -449,6 +449,27 @@ describe 'HasRepository' do
       expect(@user3.create_folder(Faker::Lorem.word, source_folder: children)).to be_falsy
     end
 
+    it 'checks move options in nested sharing ' do
+      # @user1 own repository :
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
+
+      @user1.share_repo_item(parent, @user2, share_options)
+      expect(@user2.sharings.count).to eq(1)
+
+      share_options.deep_merge!({ repo_item_permissions: { can_read: true, can_move: true } })
+      @user1.share_repo_item(children, @user2, share_options)
+      target_folder = @user2.create_folder(Faker::Lorem.word)
+      # byebug
+      expect(@user2.move_repo_item(children, source_folder: target_folder, owner: @user1)).to be_truthy
+
+      share_options.deep_merge!({ repo_item_permissions: { can_read: true, can_move: false } })
+      @user1.share_repo_item(children, @user2, share_options)
+      target_folder = @user2.create_folder(Faker::Lorem.word)
+      expect(@user2.move_repo_item(children, source_folder: target_folder, owner: @user1)).to be_falsy
+    end
+
     it 'checks delete options in nested sharing ' do
       # @user1 own repository :
       #   |-- 'Parent'
