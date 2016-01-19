@@ -367,7 +367,6 @@ module RepositoryManager
         begin
           move_repo_item!(repo_item, options)
         rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException => e
-          p e.message
           false
         rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.not_moved'))
