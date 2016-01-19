@@ -153,6 +153,7 @@ describe 'HasRepository' do
 
     expect(sharing_of_user_1.can_read?).to eq(false)
     expect(sharing_of_user_1.can_update?).to eq(false)
+    expect(sharing_of_user_1.can_move?).to eq(false)
     expect(sharing_of_user_1.can_share?).to eq(false)
     #expect(@user1.sharings.count).to eq(1)
     #expect(@user2.sharings_owners.count).to eq(1)
@@ -185,6 +186,7 @@ describe 'HasRepository' do
 
     expect(sharing_of_user_1.can_read?).to eq(true)
     expect(sharing_of_user_1.can_update?).to eq(false)
+    expect(sharing_of_user_1.can_move?).to eq(false)
     expect(sharing_of_user_1.can_share?).to eq(true)
     #expect(@user1.sharings.count).to eq(1)
     #expect(@user2.sharings_owners.count).to eq(1)
@@ -358,9 +360,9 @@ describe 'HasRepository' do
     before(:all){ RepositoryManager.accept_nested_sharing = true }
     after(:all){ RepositoryManager.accept_nested_sharing = false }
 
-    let(:parent){ parent = @user1.create_folder(Faker::Lorem.word) }
-    let(:nested){ @user1.create_folder(Faker::Lorem.word, source_folder: parent) }
-    let(:children){ @user1.create_folder(Faker::Lorem.word, source_folder: nested) }
+    let!(:parent){ parent = @user1.create_folder('Parent') }
+    let!(:nested){ @user1.create_folder('Nested', source_folder: parent) }
+    let!(:children){ @user1.create_folder('Children', source_folder: nested) }
 
     let(:share_options){
       {
@@ -368,6 +370,7 @@ describe 'HasRepository' do
           can_read: [true, false].sample,
           can_create: [true, false].sample,
           can_update: [true, false].sample,
+          can_move: [true, false].sample,
           can_delete: [true, false].sample,
           can_share: [true, false].sample
         },
@@ -446,6 +449,33 @@ describe 'HasRepository' do
       expect(@user3.create_folder(Faker::Lorem.word, source_folder: children)).to be_falsy
     end
 
+    it 'checks if can move when permitted' do
+      # @user1 own repository :
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
+
+      @user1.share_repo_item(parent, @user2, share_options)
+      expect(@user2.sharings.count).to eq(1)
+
+      share_options.deep_merge!({ repo_item_permissions: { can_read: true, can_move: true } })
+      @user1.share_repo_item!(children, @user2, share_options)
+      target_folder = @user2.create_folder(Faker::Lorem.word)
+      expect(@user2.move_repo_item(children, source_folder: target_folder, owner: @user1)).to be_truthy
+    end
+
+    it 'checks if can move when not permitted' do
+      # @user1 own repository :
+      #   |-- 'Parent'
+      #   |  |-- 'Nested'
+      #   |  |  |-- 'Children'
+
+      share_options.deep_merge!({ repo_item_permissions: { can_read: true, can_move: false } })
+      @user1.share_repo_item!(children.reload, @user2, share_options)
+      target_folder = parent
+      expect(@user2.move_repo_item(children, source_folder: target_folder, owner: @user1)).to be_falsy
+    end
+
     it 'checks delete options in nested sharing ' do
       # @user1 own repository :
       #   |-- 'Parent'
@@ -462,7 +492,6 @@ describe 'HasRepository' do
       expect(@user3.sharings.count).to eq(1)
       expect(@user3.delete_repo_item(children)).to eq(children)
     end
-
   end
 
   describe "folder overwrite" do

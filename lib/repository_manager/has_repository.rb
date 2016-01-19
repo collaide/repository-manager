@@ -292,7 +292,7 @@ module RepositoryManager
           path_ids = repo_item.path_ids
           # Check the nearest sharing if it exist
           if s = self.sharings.where(repo_item_id: path_ids).last
-            return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
+            return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_move: s.can_move, can_delete: s.can_delete}
           end
         end
         # Else, false
@@ -338,12 +338,12 @@ module RepositoryManager
         # If we want to change the owner we have to have the can_delete permission
         if target
           # If want to change the owner, we have to check if we have the permission
-          if target.owner != repo_item.owner && !can_delete?(repo_item)
+          if target.owner != repo_item.owner && !can_delete?(repo_item) && repo_item.owner != options[:owner]
             repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
             raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
           end
-          # If we don't want to change the owner, we look if we can_update
-          if target.owner == repo_item.owner && !can_update?(repo_item)
+          # If we don't want to change the owner, we look if we can_move
+          if target.owner == repo_item.owner && !can_move?(repo_item)
             repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
             raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to update the '#{repo_item.name}'")
           end
@@ -360,13 +360,13 @@ module RepositoryManager
           end
         end
         # If it has the permission, we move the repo_item in the source_folder
-        repo_item.move!(source_folder: target, overwrite: overwrite)
+        repo_item.move!(source_folder: target, overwrite: overwrite, owner: options[:owner])
       end
 
       def move_repo_item(repo_item, options = {})
         begin
           move_repo_item!(repo_item, options)
-        rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException
+        rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException => e
           false
         rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.not_moved'))
@@ -516,6 +516,11 @@ module RepositoryManager
       # Returns true if you can edit the repo, false else
       def can_update?(repo_item, permissions = nil)
         can_do?('update', repo_item, permissions)
+      end
+
+      # Returns true if you can move the repo item, false else
+      def can_move?(repo_item, permissions = nil)
+        can_do?('move', repo_item, permissions)
       end
 
       # Returns true if you can delete the repo, false else
@@ -670,6 +675,8 @@ module RepositoryManager
             end
           when 'update'
             permissions == true || (permissions.kind_of?(Hash) && permissions[:can_update] == true)
+          when 'move'
+            permissions == true || (permissions.kind_of?(Hash) && permissions[:can_move] == true)
           when 'share'
             if RepositoryManager.accept_nested_sharing
               # This allows only the repo item owners to share a repo item,
@@ -704,6 +711,9 @@ module RepositoryManager
           end
           if wanted_permissions[:can_update] == true && permissions[:can_update] == false
             wanted_permissions[:can_update] = false
+          end
+          if wanted_permissions[:can_move] == true && permissions[:can_move] == false
+            wanted_permissions[:can_move] = false
           end
           if wanted_permissions[:can_delete] == true && permissions[:can_delete] == false
             wanted_permissions[:can_delete] = false
