@@ -177,13 +177,13 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
 
   # Returns true or false if the name exist in this folder
   def name_exist_in_children?(name)
-    #RepositoryManager::RepoItem.where(name: name).where(id: child_ids).first ? true : false
     get_child_by_name(name) ? true : false
   end
 
-  def get_child_by_name(name)
-    self.children.where(name: name).take
-    # RepositoryManager::RepoItem.where('name = ?', name).where(id: child_ids).first
+  def get_child_by_name(name, type = nil)
+    children = self.children.where(name: name)
+    children = children.where(type: type) if type
+    children.take
   end
 
   private

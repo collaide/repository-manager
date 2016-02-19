@@ -51,12 +51,12 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
 
     # Check if moving to another folder or root
     if options[:source_folder].present?
-      child_with_same_name = options[:source_folder].get_child_by_name(self.name)
+      child_with_same_name = options[:source_folder].get_child_by_name(self.name, self.type)
     else
-      child_with_same_name = self.owner.get_item_in_root_by_name(self.name)
+      child_with_same_name = self.owner.get_item_in_root_by_name(self.name, self.type)
     end
 
-    # If the name exist and we don't want to overwrite, we raise an error
+    # If the name exists and we don't want to overwrite, we raise an error
     if child_with_same_name and !overwrite
       self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
       # we delete the repo if asked
