@@ -44,72 +44,51 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
 
     # If we are in source_folder, we check if it's a folder
-    if options[:source_folder]
-      unless options[:source_folder].is_folder?
-        self.destroy if options[:destroy_if_fail]
-        raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{options[:source_folder].name}' can't be a file")
-      end
+    if options[:source_folder] && !(options[:source_folder].is_folder?)
+      self.destroy if options[:destroy_if_fail]
+      raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{options[:source_folder].name}' can't be a file")
+    end
 
+    # Check if moving to another folder or root
+    if options[:source_folder].present?
       child_with_same_name = options[:source_folder].get_child_by_name(self.name)
-      # If the name exist and we don't want to overwrite, we raise an error
-      if child_with_same_name and !overwrite
-        self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
-        # we delete the repo if asked
-        self.destroy if options[:destroy_if_fail]
-        raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exists in the folder '#{options[:source_folder].name}'")
-      elsif child_with_same_name and overwrite
-        # If a children with the same name exist and we want to overwrite,
-        # We destroy or update it
-        if child_with_same_name.is_file?
-          child_with_same_name.file = self.file
-          child_with_same_name.sender = self.sender
-          child_with_same_name.metadata = self.metadata
-          #child_with_same_name.owner = self.owner
-          returned_item = child_with_same_name
-          self.destroy
-        else
-          child_with_same_name.destroy!
-        end
-      end
-    # We are in root, we check if name exist in root
-    # We stay in the same owner
     else
-      # We check if a children with same name exist
       child_with_same_name = self.owner.get_item_in_root_by_name(self.name)
+    end
 
-      # If it exist and we don t want to overwrite, we raise an error
-      if child_with_same_name and !overwrite
-        self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
-        # we delete the repo if asked
-        self.destroy if options[:destroy_if_fail]
-        raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exists in root")
-      # else we destroy it
-      elsif child_with_same_name and overwrite
-        # If a children with the same name exist and we want to overwrite,
-        # We destroy or update it
-        if child_with_same_name.is_file?
-          child_with_same_name.file = self.file
-          child_with_same_name.sender = self.sender
-          child_with_same_name.metadata = self.metadata
-          #child_with_same_name.owner = self.owner
-          returned_item = child_with_same_name
-          self.destroy
-        else
-          child_with_same_name.destroy!
-        end
+    # If the name exist and we don't want to overwrite, we raise an error
+    if child_with_same_name and !overwrite
+      self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
+      # we delete the repo if asked
+      self.destroy if options[:destroy_if_fail]
+      raise RepositoryManager::ItemExistException.new("move failed. A #{child_with_same_name.is_file? ? 'file' : 'folder'} named '#{name}' already exists in #{options[:source_folder] ? options[:source_folder].name : 'root'} folder")
+    elsif child_with_same_name and overwrite
+      # If a child with the same name exists and we want to overwrite,
+      # we destroy or update it
+      if child_with_same_name.is_file?
+        child_with_same_name.file = self.file
+        child_with_same_name.sender = self.sender
+        child_with_same_name.metadata = self.metadata
+        #child_with_same_name.owner = self.owner
+        returned_item = child_with_same_name
+        self.destroy
+      else
+        destroy_child_with_same_name = true
       end
     end
 
-    # here, all is ok
-    # We change the owner if another one is specify
+    # Here, all is ok
+    # Change the owner if another one is specified
     if options[:owner]
       returned_item.owner = options[:owner]
     elsif options[:source_folder]
       returned_item.owner = options[:source_folder].owner
     end
-    # we update the tree with the new parent
+
+    # Update the tree with the new parent
     returned_item.parent = options[:source_folder]
     returned_item.save! unless options[:do_not_save]
+    child_with_same_name.destroy! if destroy_child_with_same_name
     returned_item
   end
 
