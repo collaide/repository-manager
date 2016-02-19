@@ -46,7 +46,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     # If we are in source_folder, we check if it's a folder
     if options[:source_folder] && !(options[:source_folder].is_folder?)
       self.destroy if options[:destroy_if_fail]
-      raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{options[:source_folder].name}' can't be a file")
+      raise RepositoryManager::RepositoryManagerException.new("Move failed. Target '#{options[:source_folder].name}' can't be a file")
     end
 
     # Check if moving to another folder or root
@@ -61,7 +61,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
       self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
       # we delete the repo if asked
       self.destroy if options[:destroy_if_fail]
-      raise RepositoryManager::ItemExistException.new("move failed. A #{child_with_same_name.is_file? ? 'file' : 'folder'} named '#{name}' already exists in #{options[:source_folder] ? options[:source_folder].name : 'root'} folder")
+      raise RepositoryManager::ItemExistException.new("Move failed. A repo_#{self.is_file? ? 'file' : 'folder'} named '#{name}' already exists in #{options[:source_folder].try(:name) || 'root'} folder")
     elsif child_with_same_name and overwrite
       # If a child with the same name exists and we want to overwrite,
       # we destroy or update it
