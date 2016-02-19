@@ -9,36 +9,36 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
   #   :owner = you can path an owner (you have to if you have no :source_folder)
   #   :sender = the sender of the item
   def get_or_create_by_path_array(path_array, options = {})
-    children = self
+    child = self
     unless path_array.empty?
       name = path_array[0]
-      children = self.get_children_by_name(name)
-      unless children
-        children = options[:owner].create_folder(name, source_folder: self)
+      child = self.get_child_by_name(name)
+      unless child
+        child = options[:owner].create_folder(name, source_folder: self)
         if options[:sender]
-          children.sender = options[:sender]
-          children.save!
+          child.sender = options[:sender]
+          child.save!
         end
       end
       # remove the first element
       path_array.shift
-      children = children.get_or_create_by_path_array(path_array, options)
+      child = child.get_or_create_by_path_array(path_array, options)
     end
-    children
+    child
   end
 
   # Get a child item based on path provided
   def get_by_path_array(path_array)
-    children = self
+    child = self
     unless path_array.empty?
       name = path_array[0]
-      children = self.get_children_by_name(name)
+      child = self.get_child_by_name(name)
 
       # remove the first element
       path_array.shift
-      children = children.get_by_path_array(path_array) if children
+      child = child.get_by_path_array(path_array) if child
     end
-    children
+    child
   end
 
   # Add a repo_item in the folder.
@@ -177,12 +177,13 @@ class RepositoryManager::RepoFolder < RepositoryManager::RepoItem
 
   # Returns true or false if the name exist in this folder
   def name_exist_in_children?(name)
-    #RepositoryManager::RepoItem.where(name: name).where(id: child_ids).first ? true : false
-    get_children_by_name(name) ? true : false
+    get_child_by_name(name) ? true : false
   end
 
-  def get_children_by_name(name)
-    RepositoryManager::RepoItem.where('name = ?', name).where(id: child_ids).first
+  def get_child_by_name(name, type = nil)
+    children = self.children.where(name: name)
+    children = children.where(type: type) if type
+    children.take
   end
 
   private

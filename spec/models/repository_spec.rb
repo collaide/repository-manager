@@ -20,7 +20,7 @@ describe 'RepoItem' do
     expect(@user1_folder.has_children?).to eq(true)
   end
 
-  it 'can\'t create a folder in it a file' do
+  it 'can\'t create a folder in a file' do
     options = {source_folder: @user1_file}
     folder = @user1.create_folder('Folder1', options)
 
@@ -345,6 +345,25 @@ describe 'RepoItem' do
     expect(overwrited).to eq(nil)
   end
 
+  it "can move a folder to an ancestor and overwrite it" do
+    # @user1 own repository
+    #   |-- 'Container'
+    #   |  |-- 'Child1'
+    #   |  |  |-- 'Child2'
+    #   |  |  |   |-- 'Child1'
+
+    container = @user1.create_folder('Container')
+    child1 = @user1.create_folder('Child1', source_folder: container)
+    child2 = @user1.create_folder('Child2', source_folder: child1)
+    overwriter = @user1.create_folder('Child1', source_folder: child2)
+
+    expect { @user1.move_repo_item!(overwriter, source_folder: container, overwrite: true) }.not_to raise_error
+    expect(container.reload.children.pluck(:name).include?('Child1')).to be_truthy
+    expect(container.children.include?(overwriter)).to be_truthy
+    expect(child2.children.count).to eq(0)
+    expect{ child1.reload }.to raise_error(ActiveRecord::RecordNotFound)
+  end
+
   it "can copy an item with the same name and overwrite it" do
     file = @user1.create_file(File.open("#{Rails.root}/../fixture/textfile.txt"), source_folder: @user1_folder)
     copied_file = @user1.copy_repo_item!(file, overwrite: true)
@@ -385,7 +404,7 @@ describe 'RepoItem' do
     expect(@user2.copy_repo_item(@user1_file)).to eq(false)
     expect(@user1_file.errors.messages).to eq({copy: ['You don\'t have the permission to copy this item']})
   end
-  
+
   it "can copy a file with read permission" do
     @user1.share_repo_item(@user1_file, @user2, repo_item_permissions: {can_read:true})
     @user2.copy_repo_item(@user1_file)

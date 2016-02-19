@@ -15,13 +15,13 @@ describe 'Unzip' do
     root_folder = @user1.get_item_in_root_by_name('root_folder')
     expect(root_folder.children.count).to eq(4)
 
-    folder_in_root = root_folder.get_children_by_name('Folder In Root')
+    folder_in_root = root_folder.get_child_by_name('Folder In Root')
     expect(folder_in_root.children.count).to eq(3)
 
-    children_folder = folder_in_root.get_children_by_name('Children Folder')
+    children_folder = folder_in_root.get_child_by_name('Children Folder')
     expect(children_folder.children.count).to eq(2)
 
-    empty_folder = children_folder.get_children_by_name('Empty folder')
+    empty_folder = children_folder.get_child_by_name('Empty folder')
     expect(empty_folder.children.count).to eq(0)
   end
 
@@ -37,16 +37,16 @@ describe 'Unzip' do
     root_of_the_root = @user1.get_item_in_root_by_name('The root of the root')
     expect(root_of_the_root).to eq(root)
 
-    root_folder = root_of_the_root.get_children_by_name('root_folder')
+    root_folder = root_of_the_root.get_child_by_name('root_folder')
     expect(root_folder.children.count).to eq(4)
 
-    folder_in_root = root_folder.get_children_by_name('Folder In Root')
+    folder_in_root = root_folder.get_child_by_name('Folder In Root')
     expect(folder_in_root.children.count).to eq(3)
 
-    children_folder = folder_in_root.get_children_by_name('Children Folder')
+    children_folder = folder_in_root.get_child_by_name('Children Folder')
     expect(children_folder.children.count).to eq(2)
 
-    empty_folder = children_folder.get_children_by_name('Empty folder')
+    empty_folder = children_folder.get_child_by_name('Empty folder')
     expect(empty_folder.children.count).to eq(0)
 
     @zip_file.unzip!(source_folder: root, overwrite: true) # it raise no error, it works

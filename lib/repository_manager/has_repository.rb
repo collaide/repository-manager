@@ -604,8 +604,10 @@ module RepositoryManager
         get_item_in_root_by_name(name) ? true : false
       end
 
-      def get_item_in_root_by_name(name)
-        RepoItem.where('name = ?', name).where(owner: self).where(ancestry: nil).first
+      def get_item_in_root_by_name(name, type = nil)
+        items = RepoItem.where('name = ?', name).where(owner: self).where(ancestry: nil)
+        items = items.where(type: type) if type
+        items.first
       end
 
       # Get or create the folder with this name
