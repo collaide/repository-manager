@@ -50,52 +50,52 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
         raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{options[:source_folder].name}' can't be a file")
       end
 
-      children_with_same_name = options[:source_folder].get_children_by_name(self.name)
+      child_with_same_name = options[:source_folder].get_child_by_name(self.name)
       # If the name exist and we don't want to overwrite, we raise an error
-      if children_with_same_name and !overwrite
+      if child_with_same_name and !overwrite
         self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
         # we delete the repo if asked
         self.destroy if options[:destroy_if_fail]
-        raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exist ine the folder '#{options[:source_folder].name}'")
-      elsif children_with_same_name and overwrite
+        raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exists in the folder '#{options[:source_folder].name}'")
+      elsif child_with_same_name and overwrite
         # If a children with the same name exist and we want to overwrite,
         # We destroy or update it
-        if children_with_same_name.is_file?
-          children_with_same_name.file = self.file
-          children_with_same_name.sender = self.sender
-          children_with_same_name.metadata = self.metadata
-          #children_with_same_name.owner = self.owner
-          returned_item = children_with_same_name
+        if child_with_same_name.is_file?
+          child_with_same_name.file = self.file
+          child_with_same_name.sender = self.sender
+          child_with_same_name.metadata = self.metadata
+          #child_with_same_name.owner = self.owner
+          returned_item = child_with_same_name
           self.destroy
         else
-          children_with_same_name.destroy!
+          child_with_same_name.destroy!
         end
       end
     # We are in root, we check if name exist in root
     # We stay in the same owner
     else
       # We check if a children with same name exist
-      children_with_same_name = self.owner.get_item_in_root_by_name(self.name)
+      child_with_same_name = self.owner.get_item_in_root_by_name(self.name)
 
       # If it exist and we don t want to overwrite, we raise an error
-      if children_with_same_name and !overwrite
+      if child_with_same_name and !overwrite
         self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
         # we delete the repo if asked
         self.destroy if options[:destroy_if_fail]
-        raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exist in the root")
+        raise RepositoryManager::ItemExistException.new("move failed. The repo_item '#{name}' already exists in root")
       # else we destroy it
-      elsif children_with_same_name and overwrite
+      elsif child_with_same_name and overwrite
         # If a children with the same name exist and we want to overwrite,
         # We destroy or update it
-        if children_with_same_name.is_file?
-          children_with_same_name.file = self.file
-          children_with_same_name.sender = self.sender
-          children_with_same_name.metadata = self.metadata
-          #children_with_same_name.owner = self.owner
-          returned_item = children_with_same_name
+        if child_with_same_name.is_file?
+          child_with_same_name.file = self.file
+          child_with_same_name.sender = self.sender
+          child_with_same_name.metadata = self.metadata
+          #child_with_same_name.owner = self.owner
+          returned_item = child_with_same_name
           self.destroy
         else
-          children_with_same_name.destroy!
+          child_with_same_name.destroy!
         end
       end
     end
