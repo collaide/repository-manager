@@ -56,7 +56,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
         self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
         # we delete the repo if asked
         self.destroy if options[:destroy_if_fail]
-        raise RepositoryManager::ItemExistException.new("move failed. The repo_#{ self.folder? ? 'folder' : 'file' } '#{name}' already exist in the folder '#{options[:source_folder].name}'")
+        raise RepositoryManager::ItemExistException.new("move failed. The repo_#{ self.is_folder? ? 'folder' : 'file' } '#{name}' already exist in the folder '#{options[:source_folder].name}'")
       elsif children_with_same_name and overwrite
         # If a children with the same name exist and we want to overwrite,
         # We destroy or update it
@@ -82,7 +82,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
         self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
         # we delete the repo if asked
         self.destroy if options[:destroy_if_fail]
-        raise RepositoryManager::ItemExistException.new("move failed. The repo_#{ self.folder? ? 'folder' : 'file' } '#{name}' already exist in the root")
+        raise RepositoryManager::ItemExistException.new("move failed. The repo_#{ self.is_folder? ? 'folder' : 'file' } '#{name}' already exist in the root")
       # else we destroy it
       elsif children_with_same_name and overwrite
         # If a children with the same name exist and we want to overwrite,
