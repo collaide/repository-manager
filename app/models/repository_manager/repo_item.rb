@@ -50,7 +50,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
         raise RepositoryManager::RepositoryManagerException.new("move failed. target '#{options[:source_folder].name}' can't be a file")
       end
 
-      children_with_same_name = options[:source_folder].children.where(name: self.name, type: self.type)
+      children_with_same_name = options[:source_folder].children.where(name: self.name, type: self.type).first
       # If the name exist and we don't want to overwrite, we raise an error
       if children_with_same_name and !overwrite
         self.errors.add(:move, I18n.t('repository_manager.errors.repo_item.item_exist'))
