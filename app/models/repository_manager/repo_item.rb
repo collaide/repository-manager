@@ -53,7 +53,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     if options[:source_folder].present?
       child_with_same_name = options[:source_folder].get_child_by_name(self.name, self.type)
     else
-      child_with_same_name = self.owner.get_item_in_root_by_name(self.name, self.type)
+      child_with_same_name = (options[:owner] || self.owner).get_item_in_root_by_name(self.name, self.type)
     end
 
     # If the name exists and we don't want to overwrite, we raise an error
