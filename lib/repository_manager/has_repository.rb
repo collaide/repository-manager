@@ -354,7 +354,7 @@ module RepositoryManager
           end
         else
           # Else if there is no source_folder, we check if we can delete the repo_item, if the owner change
-          if self != repo_item.owner && !can_move?(repo_item) && !can_move?(repo_item)
+          if self != repo_item.owner && !can_move?(repo_item)
             repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
             raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
           end
