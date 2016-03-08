@@ -516,22 +516,11 @@ describe 'HasRepository' do
   end
 
   describe "folder move" do
-
     it "doesn't raise an error if moving to same parent" do
       root_folder = @user1.create_folder!('root')
       child_folder = @user1.create_folder!('child')
       expect{ @user1.move_repo_item!(child_folder, source_folder: root_folder) }.not_to raise_error
       expect(child_folder).to be
-    end
-
-    it "overwrites a folder when auto_overwrite is true" do
-      RepositoryManager.auto_overwrite_folder = true
-      folder_id = @user1.create_folder!('same_name').id
-      expect{ @user1.create_folder!('same_name') }.not_to raise_error
-
-      expect(@user1.repo_items.folders.count).to eq(1)
-      expect(@user1.repo_items.folders.last.id).not_to eq(folder_id)
-      RepositoryManager.auto_overwrite_folder = false
     end
   end
 end
