@@ -11,7 +11,7 @@ describe 'Unzip' do
 
   it 'can unzip an archive in root without options' do
     @zip_file.unzip!
-    expect(@user1.root_repo_items.count).to eq(3)
+    expect(@user1.root_repo_items.count).to eq(2)
     root_folder = @user1.get_item_in_root_by_name('root_folder')
     expect(root_folder.children.count).to eq(4)
 

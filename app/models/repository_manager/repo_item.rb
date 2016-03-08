@@ -43,6 +43,9 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
     returned_item = self
     !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
 
+    # Do nothing if moving to current folder
+    return self if options[:source_folder] == self.parent
+
     # If we are in source_folder, we check if it's a folder
     if options[:source_folder] && !(options[:source_folder].is_folder?)
       self.destroy if options[:destroy_if_fail]
