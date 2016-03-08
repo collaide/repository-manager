@@ -514,4 +514,13 @@ describe 'HasRepository' do
       RepositoryManager.auto_overwrite_folder = false
     end
   end
+
+  describe "folder move" do
+    it "doesn't raise an error if moving to same parent" do
+      root_folder = @user1.create_folder!('root')
+      child_folder = @user1.create_folder!('child')
+      expect{ @user1.move_repo_item!(child_folder, source_folder: root_folder) }.not_to raise_error
+      expect(child_folder).to be
+    end
+  end
 end
