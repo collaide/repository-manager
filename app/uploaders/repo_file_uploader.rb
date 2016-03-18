@@ -11,8 +11,8 @@ class RepoFileUploader < CarrierWave::Uploader::Base
   # include CarrierWave::MiniMagick
 
   # Choose what kind of storage to use for this uploader:
-  storage RepositoryManager.storage
-  # storage :fog
+  # storage RepositoryManager.storage
+  storage :fog
 
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
