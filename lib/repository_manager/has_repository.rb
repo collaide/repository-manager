@@ -57,7 +57,7 @@ module RepositoryManager
         permissions = get_permissions(repo_item)
 
         # Here we look if the instance has the permission for making a sharing
-        if can_share?(nil, permissions)
+        if can_share?(repo_item, permissions)
 
           # We put the default options
           repo_item_permissions = RepositoryManager.default_repo_item_permissions
@@ -114,7 +114,7 @@ module RepositoryManager
           end
         end
 
-        !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_item
+        !!options[:overwrite] == options[:overwrite] ? overwrite = options[:overwrite] : overwrite = RepositoryManager.auto_overwrite_folder
 
         # If he want to create a folder in a directory, we have to check if he have the permission
         if can_create?(source_folder)
@@ -139,7 +139,7 @@ module RepositoryManager
             end
           else
             # It raise an error if name already exist and destroy the folder
-            source_folder.add!(folder, do_not_save: true, overwrite: overwrite)
+            source_folder.add!(folder, do_not_save: true, overwrite: overwrite, owner: self)
           end
 
           folder.save!
@@ -248,7 +248,8 @@ module RepositoryManager
             end
           else
             # It raise an error if name already exist and destroy the file
-            repo_file = source_folder.add!(repo_file, do_not_save: true, overwrite: overwrite)
+            # We pass in the owner so the user creating the repo item is always the owner
+            repo_file = source_folder.add!(repo_file, do_not_save: true, overwrite: overwrite, owner: self)
           end
           repo_file.save!
         else
@@ -282,8 +283,8 @@ module RepositoryManager
         # If repo_item is nil, he can do what he want
         return true if repo_item == nil
 
-        # If the member is the owner, he can do what he want !
-        if repo_item.owner == self
+        # If member is the owner or owns an ancestor, he can do what he wants!
+        if repo_item.owner == self || self.owns_ancestor?(repo_item)
           # You can do what ever you want :)
           return true
         # Find if a sharing of this rep exist for the self instance or it ancestors
@@ -291,11 +292,16 @@ module RepositoryManager
           path_ids = repo_item.path_ids
           # Check the nearest sharing if it exist
           if s = self.sharings.where(repo_item_id: path_ids).last
-            return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_delete: s.can_delete}
+            return {can_share: s.can_share, can_read: s.can_read, can_create: s.can_create, can_update: s.can_update, can_move: s.can_move, can_delete: s.can_delete}
           end
         end
         # Else, false
         return false
+      end
+
+      def owns_ancestor?(repo_item)
+        return false if repo_item.ancestors.empty?
+        repo_item.ancestors.any? { |ancestor| ancestor.owner == self }
       end
 
       # Rename the repo_item with the new_name
@@ -332,12 +338,12 @@ module RepositoryManager
         # If we want to change the owner we have to have the can_delete permission
         if target
           # If want to change the owner, we have to check if we have the permission
-          if target.owner != repo_item.owner && !can_delete?(repo_item)
+          if target.owner != repo_item.owner && !can_move?(repo_item) && repo_item.owner != options[:owner]
             repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
             raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
           end
-          # If we don't want to change the owner, we look if we can_update
-          if target.owner == repo_item.owner && !can_update?(repo_item)
+          # If we don't want to change the owner, we look if we can_move
+          if (options[:owner].blank? || repo_item.owner == options[:owner]) && !can_move?(repo_item)
             repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
             raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to update the '#{repo_item.name}'")
           end
@@ -348,19 +354,19 @@ module RepositoryManager
           end
         else
           # Else if there is no source_folder, we check if we can delete the repo_item, if the owner change
-          if self != repo_item.owner && !can_delete?(repo_item)
+          if self != repo_item.owner && !can_move?(repo_item)
             repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.no_permission'))
             raise RepositoryManager::PermissionException.new("move repo_item failed. You don't have the permission to delete the repo_item '#{repo_item.name}'")
           end
         end
         # If it has the permission, we move the repo_item in the source_folder
-        repo_item.move!(source_folder: target, overwrite: overwrite)
+        repo_item.move!(source_folder: target, overwrite: overwrite, owner: options[:owner])
       end
 
       def move_repo_item(repo_item, options = {})
         begin
           move_repo_item!(repo_item, options)
-        rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException
+        rescue RepositoryManager::PermissionException, RepositoryManager::ItemExistException => e
           false
         rescue RepositoryManager::RepositoryManagerException, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
           repo_item.errors.add(:move, I18n.t('repository_manager.errors.repo_item.move.not_moved'))
@@ -512,6 +518,11 @@ module RepositoryManager
         can_do?('update', repo_item, permissions)
       end
 
+      # Returns true if you can move the repo item, false else
+      def can_move?(repo_item, permissions = nil)
+        can_do?('move', repo_item, permissions)
+      end
+
       # Returns true if you can delete the repo, false else
       def can_delete?(repo_item, permissions = nil)
         can_do?('delete', repo_item, permissions)
@@ -593,8 +604,10 @@ module RepositoryManager
         get_item_in_root_by_name(name) ? true : false
       end
 
-      def get_item_in_root_by_name(name)
-        RepoItem.where('name = ?', name).where(owner: self).where(ancestry: nil).first
+      def get_item_in_root_by_name(name, type = nil)
+        items = RepoItem.where('name = ?', name).where(owner: self).where(ancestry: nil)
+        items = items.where(type: type) if type
+        items.first
       end
 
       # Get or create the folder with this name
@@ -612,6 +625,17 @@ module RepositoryManager
         # remove the first element
         path_array.shift
         children = children.get_or_create_by_path_array(path_array, sender: options[:sender], owner: self)
+        children
+      end
+
+      # Get an item based on path provided
+      def get_by_path_array(path_array)
+        name = path_array[0]
+        children = self.get_item_in_root_by_name(name)
+
+        # remove the first element
+        path_array.shift
+        children = children.get_by_path_array(path_array) if children
         children
       end
 
@@ -647,21 +671,25 @@ module RepositoryManager
             permissions == true || (permissions.kind_of?(Hash) && permissions[:can_read] == true)
           when 'delete'
             if RepositoryManager.accept_nested_sharing
-              # TODO implement to look if he can delete all the folder
+              permissions == true || (permissions.kind_of?(Hash) && permissions[:can_delete] == true)
             else
               permissions == true || (permissions.kind_of?(Hash) && permissions[:can_delete] == true)
             end
           when 'update'
             permissions == true || (permissions.kind_of?(Hash) && permissions[:can_update] == true)
+          when 'move'
+            permissions == true || (permissions.kind_of?(Hash) && permissions[:can_move] == true)
           when 'share'
             if RepositoryManager.accept_nested_sharing
-              # TODO implement to look if he can delete all the folder
+              # This allows only the repo item owners to share a repo item,
+              # effectively overriding sharing option for 'can_share'
+              repo_item == nil || repo_item.owner == self
             else
               permissions == true || (permissions.kind_of?(Hash) && permissions[:can_share] == true)
             end
           when 'create'
             if RepositoryManager.accept_nested_sharing
-              # TODO implement to look if he can delete all the folder
+              permissions == true || (permissions.kind_of?(Hash) && permissions[:can_create] == true)
             else
               permissions == true || (permissions.kind_of?(Hash) && permissions[:can_create] == true)
             end
@@ -685,6 +713,9 @@ module RepositoryManager
           end
           if wanted_permissions[:can_update] == true && permissions[:can_update] == false
             wanted_permissions[:can_update] = false
+          end
+          if wanted_permissions[:can_move] == true && permissions[:can_move] == false
+            wanted_permissions[:can_move] = false
           end
           if wanted_permissions[:can_delete] == true && permissions[:can_delete] == false
             wanted_permissions[:can_delete] = false

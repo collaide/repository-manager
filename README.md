@@ -1,4 +1,4 @@
-Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/sharing). 
+Ruby on Rails plugin (gem) for managing repositories (files/folders/permissions/sharing).
 
 # Repository Manager [![Gem Version](https://badge.fury.io/rb/repository-manager.svg)](http://badge.fury.io/rb/repository-manager)
 
@@ -10,7 +10,7 @@ Instead of creating my core repository manager system heavily dependent on our d
 
 After looking for a good gem to use I noticed the lack of repository gems and flexibility in them. Repository Manager tries to be the more easy, light and flexible possible.
 
-This gem is my informatics project for the Master in [University of Lausanne (CH)](http://www.unil.ch/index.html). 
+This gem is my informatics project for the Master in [University of Lausanne (CH)](http://www.unil.ch/index.html).
 
 ## Installation
 
@@ -51,14 +51,14 @@ RepositoryManager.setup do |config|
 
   # Default permissions that an object has when he is added in a sharing.
   config.default_sharing_permissions = { can_add: false, can_remove: false }
-  
+
   # Default path for generating the zip file when a user want to download a folder
   # Default is : "download/#{member.class.to_s.underscore}/#{member.id}/#{self.class.to_s.underscore}/#{self.id}/"
   #config.default_zip_path = true
 
   # Define if we enable or not the versioning on the repo_item
   config.has_paper_trail = false
-  
+
   # Define if a repo item with the same name will be automaticaly overwrited when a new item is created, moved or copied
   config.auto_overwrite_item = false
 end
@@ -146,7 +146,7 @@ the_new_folder = user1.create_folder('The new folder', source_folder: source_fol
 #   |-- 'Root folder'
 #   |  |-- 'The new folder'
 
-# Now we want to add a file into the_new_folder 
+# Now we want to add a file into the_new_folder
 # Note : user1 needs the ':can_create => true' permission in the folder : the_new_folder (else the method returns `false`).
 user1.create_file(params[:file], source_folder: the_new_folder)
 # OR
@@ -257,12 +257,12 @@ You can send a zipped file in your application and unzip it on it. Repository Ma
 ```ruby
 # @user send a ZIP archive and want to unzip it in his own repository.
 repo_file_archive = @user.create_file(the_file_sended)
-@user.unzip_repo_item(repo_file_archive) 
+@user.unzip_repo_item(repo_file_archive)
 # => Will unzip all the content (files / folders) of the zip archive in his root repository
 
 # @group want to unzip this archive in another folder and overwrite the old one.
 # We want to precise that @user is the sender
-@group.unzip_repo_item(repo_file_archive, source_folder: target_folder, overwrite: true, sender: @user) 
+@group.unzip_repo_item(repo_file_archive, source_folder: target_folder, overwrite: true, sender: @user)
 
 ```
 
@@ -301,14 +301,14 @@ sharing = user1.share_repo_item(the_new_folder, members)
 # If you want to customize your sharing options, you can do it like this:
 options = {
     sharing_permissions: {
-        can_add: true, 
+        can_add: true,
         can_remove: false
-    }, 
+    },
     repo_item_permissions: {
-        can_read: true, 
-        can_create: true, 
-        can_update: true, 
-        can_delete: false, 
+        can_read: true,
+        can_create: true,
+        can_update: true,
+        can_delete: false,
         can_share: true
     }
 }
@@ -322,9 +322,14 @@ sharing = user1.share_repo_item(the_new_folder, members, options)
 
 See the chapter [Permissions](#permissions) for more details.
 
-### Repository Manager and the nested sharing
+### Repository Manager nesting and nested sharing
 
-Repository Manager actually don't accept nested sharing.
+Nested sharing is any situation where a share of a repo item is attempted and there is already a share on its ancestor or descendant.
+Repository Manager supports nested sharing in the following way:
+- Owner (creator) of a repo item has all rights on the repo item
+- Owner (creator) of a repo item's ancestor has all rights on the repo item (even when the repo item is not created by him)
+- Only the owner (creator) of a repo item can share it; the user it was shared with can do everything in accordance to share privilages, except for resharing it
+- Share permissions cascade, and the nearest rule is the one that applies
 
 ```ruby
 
@@ -339,19 +344,19 @@ children = @user1.create_folder('Children', nested)
 
 @user1.share_repo_item(nested, @user2)
 
-nested.can_be_shared_without_nesting? # Returns true (because `nested` is shared but there exist no nested sharing)
-parent.can_be_shared_without_nesting? # Returns false (because there is a sharing on one of his descendants)
-children.can_be_shared_without_nesting? # Returns false (because there is a sharing on one of his ancestors)
+# Here we can share 'Parent' or 'Children' thus creating a nested sharing.
+@user1.share_repo_item(parent, @user2) # Returns true
+@user1.share_repo_item(children, @user2) # Returns true
 
-# Here we can't share 'Parent' or 'Children' because it already exist a nested sharing.
-@user1.share_repo_item(parent, @user2) # Returns false
-@user1.share_repo_item!(parent, @user2) # Raise a NestedSharingException (note the "!")
-@user1.share_repo_item!(children, @user2) # Raise a NestedSharingException  (note the "!")
+# Here, user2 cannot reshare 'Nested' because he is not the owner.
+@user2.share_repo_item(nested, @user3) # Returns false
+@user2.share_repo_item!(nested, @user3) # Raises a PermissionException (note the "!")
+
 ```
 
 ### How can I see my repo_items
 
-You can have two kind of repo_items: 
+You can have two kind of repo_items:
 - Your own repo_items
 - The repo_items shared with you.
 
@@ -361,7 +366,7 @@ You can get all the items of only these who are in the root.
 # user1 want to get his own repository
 user1.repo_items.all # => You get the repo_items that user1 has created
 
-# user2 want to get his root repo_items 
+# user2 want to get his root repo_items
 user2.root_repo_items.all
 
 # user2 want to get his shared repo_items
