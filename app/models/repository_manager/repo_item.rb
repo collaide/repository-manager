@@ -20,7 +20,7 @@ class RepositoryManager::RepoItem < ActiveRecord::Base
 
   validates_presence_of :owner
 
-  if Rails::VERSION::MAJOR == 4
+  if Rails::VERSION::MAJOR >= 4
     scope :on_root, -> { where ancestry: nil}
     scope :files, -> { where type: 'RepositoryManager::RepoFile' }
     scope :folders, -> { where type: 'RepositoryManager::RepoFolder' }
