@@ -1,5 +1,5 @@
 class RepositoryManager::RepoFile < RepositoryManager::RepoItem
-  attr_accessible :file, :content_type, :file_size, :checksum #if RepositoryManager.protected_attributes?
+  attr_accessible :file, :content_type, :file_size, :checksum if RepositoryManager.protected_attributes?
 
   validates_presence_of :file
   mount_uploader :file, RepoFileUploader
@@ -164,11 +164,16 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
 
   private
 
+
+  def participant_params
+    params.require(:participant).permit(:role_ids)
+  end
+
   def update_asset_attributes
     if file.present? && file_changed?
       self.content_type = file.file.content_type
       self.file_size = file.file.size
-      self.checksum = Digest::MD5.file(file.path).hexdigest
+      # self.checksum = Digest::MD5.file(file.path).hexdigest
     end
   end
 
