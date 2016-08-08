@@ -171,9 +171,13 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
 
   def update_asset_attributes
     if file.present? && file_changed?
-      self.content_type = file.file.content_type
-      self.file_size = file.file.size
-      self.checksum = Digest::MD5.file(file.path).hexdigest
+      # self.content_type = file.file.content_type
+      # self.file_size = file.file.size
+      # self.checksum = Digest::MD5.file(file.path).hexdigest
+
+      self.update_attribute(:content_type, file.file.content_type)
+      self.update_attribute(:file_size, file.file.size)
+      self.update_attribute(:checksum, Digest::MD5.file(file.path).hexdigest)
     end
   end
 
