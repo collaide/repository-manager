@@ -164,6 +164,8 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
 
   private
 
+  def checksum=()
+
 
   def repo_file_params
     params.require(:repo_file).permit(:file, :content_type, :file_size, :checksum)
@@ -175,9 +177,15 @@ class RepositoryManager::RepoFile < RepositoryManager::RepoItem
       # self.file_size = file.file.size
       # self.checksum = Digest::MD5.file(file.path).hexdigest
 
-      self.update_attribute(:content_type, file.file.content_type)
-      self.update_attribute(:file_size, file.file.size)
-      self.update_attribute(:checksum, Digest::MD5.file(file.path).hexdigest)
+      self.attributes = {
+        content_type: file.file.content_type ,
+        file_size: file.file.size ,
+        checksum:  Digest::MD5.file(file.path).hexdigest
+       }
+
+      # self.update_attribute(:content_type, file.file.content_type)
+      # self.update_attribute(:file_size, file.file.size)
+      # self.update_attribute(:checksum, Digest::MD5.file(file.path).hexdigest)
     end
   end
 
