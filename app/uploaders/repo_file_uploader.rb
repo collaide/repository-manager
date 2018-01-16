@@ -2,7 +2,7 @@
 # require 'carrierwave/processing/mime_types'
 
 class RepoFileUploader < CarrierWave::Uploader::Base
-  include CarrierWave::MimeTypes
+  # include CarrierWave::MimeTypes
 
   process :set_content_type
 
