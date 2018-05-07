@@ -3,8 +3,8 @@ require 'spec_helper'
 describe 'Unzip' do
 
   before do
-    @user1 = FactoryGirl.create(:user)
-    @zip_file = FactoryGirl.build(:rm_unzip)
+    @user1 = FactoryBot.create(:user)
+    @zip_file = FactoryBot.build(:rm_unzip)
     @zip_file.owner = @user1
     @zip_file.save
   end
@@ -54,14 +54,14 @@ describe 'Unzip' do
   end
 
   it 'User with permission can unzip and other can\'t' do
-    @user2 = FactoryGirl.create(:user)
+    @user2 = FactoryBot.create(:user)
 
     expect(@user1.unzip_repo_item!(@zip_file)).to eq(@zip_file)
     expect(@user2.unzip_repo_item(@zip_file)).to eq(false)
   end
 
   it 'User can\'t unzip file without create permission' do
-    @user2 = FactoryGirl.create(:user)
+    @user2 = FactoryBot.create(:user)
     #shared_folder = @user1.create_folder('Shared Folder')
     @user1.move_repo_item!(@zip_file, source_folder: @user1.create_folder('Shared Folder'))
     @user1.share_repo_item!(@zip_file, @user2, repo_item_permissions: {

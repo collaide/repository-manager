@@ -3,14 +3,14 @@ require 'spec_helper'
 describe "Associations" do
 
   it "test if user can have a own file" do
-    user = FactoryGirl.build(:user)
+    user = FactoryBot.build(:user)
     file = RepositoryManager::RepoItem.new
     file.owner = user
     expect(file.owner).to eq(user)
   end
 
   it "test if user can have a own sharing" do
-    user = FactoryGirl.build(:user)
+    user = FactoryBot.build(:user)
     sharing = RepositoryManager::Sharing.new
     sharing.owner = user
     expect(sharing.owner).to eq(user)
@@ -18,8 +18,8 @@ describe "Associations" do
 
   it "should be possible for a user to share a file" do
 
-    user = FactoryGirl.create(:user)
-    user2 = FactoryGirl.create(:user)
+    user = FactoryBot.create(:user)
+    user2 = FactoryBot.create(:user)
     expect(user2.sharings.count).to eq(0)
     expect(user.repo_items.count).to eq(0)
 
@@ -51,10 +51,10 @@ describe "Associations" do
 
   it "should be possible for a group to share a file" do
 
-    user = FactoryGirl.create(:user)
-    user2 = FactoryGirl.create(:user)
-    group = FactoryGirl.create(:group)
-    group2 = FactoryGirl.create(:group)
+    user = FactoryBot.create(:user)
+    user2 = FactoryBot.create(:user)
+    group = FactoryBot.create(:group)
+    group2 = FactoryBot.create(:group)
     expect(group.sharings.count).to eq(0)
     expect(group.repo_items.count).to eq(0)
 

@@ -3,10 +3,10 @@ require 'spec_helper'
 describe 'Sharing' do
 
   before do
-    @user1 = FactoryGirl.create(:user)
-    @user2 = FactoryGirl.create(:user)
-    @user3 = FactoryGirl.create(:user)
-    @user1_file = FactoryGirl.build(:rm_repo_file)
+    @user1 = FactoryBot.create(:user)
+    @user2 = FactoryBot.create(:user)
+    @user3 = FactoryBot.create(:user)
+    @user1_file = FactoryBot.build(:rm_repo_file)
     @user1_file.owner = @user1
     @user1_file.save
   end
@@ -52,7 +52,7 @@ describe 'Sharing' do
 
   it 'can remove and add an array of members in a sharing with permission' do
     sharing = @user1.share_repo_item(@user1_file, @user2, {sharing_permissions:{can_add: true, can_remove: true}})
-    user4 = FactoryGirl.create(:user)
+    user4 = FactoryBot.create(:user)
     @user2.add_members_to(sharing, [@user3, user4])
     expect(user4.shared_repo_items.count).to eq(1)
     @user2.remove_members_from(sharing, [@user3, user4])

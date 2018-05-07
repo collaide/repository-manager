@@ -3,12 +3,12 @@ require 'spec_helper'
 describe 'HasRepository' do
 
   before do
-    @user1 = FactoryGirl.create(:user)
-    @user2 = FactoryGirl.create(:user)
-    @user3 = FactoryGirl.create(:user)
-    @user4 = FactoryGirl.create(:user)
+    @user1 = FactoryBot.create(:user)
+    @user2 = FactoryBot.create(:user)
+    @user3 = FactoryBot.create(:user)
+    @user4 = FactoryBot.create(:user)
     @folder = @user4.create_folder("parent_folder")
-    @group1 = FactoryGirl.create(:group)
+    @group1 = FactoryBot.create(:group)
   end
 
   it "creates a folder by path array" do
@@ -27,7 +27,7 @@ describe 'HasRepository' do
   end
 
   it 'can share his own repo_item with other users' do
-    rep = FactoryGirl.build(:rm_repo_file)
+    rep = FactoryBot.build(:rm_repo_file)
     rep.owner = @user1
     rep.save
 
@@ -58,7 +58,7 @@ describe 'HasRepository' do
   end
 
   it 'can not share a repo_item without sharings and without the permission' do
-    rep = FactoryGirl.build(:rm_repo_file)
+    rep = FactoryBot.build(:rm_repo_file)
     rep.owner = @user3
     rep.save
 
@@ -74,7 +74,7 @@ describe 'HasRepository' do
   end
 
   it 'can not share a repo_item with sharing but without the permission' do
-    rep = FactoryGirl.build(:rm_repo_folder)
+    rep = FactoryBot.build(:rm_repo_folder)
     rep.owner = @user3
     rep.save
 
@@ -93,7 +93,7 @@ describe 'HasRepository' do
   end
 
   it 'can share a repo_item with sharing and with the permission' do
-    rep = FactoryGirl.build(:rm_repo_folder)
+    rep = FactoryBot.build(:rm_repo_folder)
     rep.owner = @user3
     rep.save
 
@@ -115,7 +115,7 @@ describe 'HasRepository' do
   end
 
   it 'default sharings permissions are to false' do
-    rep = FactoryGirl.build(:rm_repo_folder)
+    rep = FactoryBot.build(:rm_repo_folder)
     rep.owner = @user3
     rep.save
 
@@ -144,7 +144,7 @@ describe 'HasRepository' do
   end
 
   it 'can share a repo_item with sharing and with restricted permissions' do
-    rep = FactoryGirl.build(:rm_repo_folder)
+    rep = FactoryBot.build(:rm_repo_folder)
     rep.owner = @user3
     rep.save
 
@@ -176,7 +176,7 @@ describe 'HasRepository' do
   end
 
   it 'can share a repo_item with sharing permissions' do
-    rep = FactoryGirl.build(:rm_repo_folder)
+    rep = FactoryBot.build(:rm_repo_folder)
     rep.owner = @user3
     rep.save
 
@@ -198,12 +198,12 @@ describe 'HasRepository' do
 
   # Todo implement with accepting nested set to true
   #it 'can share a repo_item with ancestor sharing permissions' do
-  #  parent = FactoryGirl.create(:repo_folder)
+  #  parent = FactoryBot.create(:repo_folder)
   #  parent.owner = @user3
   #  middle = @user3.create_folder('Middle', parent)
   #  children = @user3.create_folder('Children', middle)
   #
-  #  file = FactoryGirl.build(:rm_repo_file)
+  #  file = FactoryBot.build(:rm_repo_file)
   #  file.owner = @user3
   #  file.save
   #
@@ -244,13 +244,13 @@ describe 'HasRepository' do
   end
 
   it 'can\'t share a repo_item with ancestor sharing permissions' do
-    parent = FactoryGirl.build(:rm_repo_folder)
+    parent = FactoryBot.build(:rm_repo_folder)
     parent.owner = @user3
     parent.save
     middle = @user3.create_folder('Middle', source_folder: parent)
     children = @user3.create_folder('Children', source_folder: middle)
 
-    file = FactoryGirl.build(:rm_repo_file)
+    file = FactoryBot.build(:rm_repo_file)
     file.owner = @user3
     file.save
 

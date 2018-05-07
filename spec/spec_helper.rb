@@ -20,7 +20,7 @@ Spork.prefork do
   Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 # Load Factories
-  require 'factory_girl'
+  require 'factory_bot'
   Dir["#{File.dirname(__FILE__)}/factories/*.rb"].each {|f| require f}
 
 # Load fixtures from the engine
@@ -72,6 +72,6 @@ end
 
 #
 #class ActiveSupport::TestCase
-#  include FactoryGirl::Syntax::Methods
+#  include FactoryBot::Syntax::Methods
 #end
 

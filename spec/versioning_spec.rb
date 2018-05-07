@@ -3,14 +3,14 @@
 #describe 'Versioning' do
 #
 #  before do
-#    @user1 = FactoryGirl.create(:user)
-#    @user1_file = FactoryGirl.build(:rm_repo_file)
+#    @user1 = FactoryBot.create(:user)
+#    @user1_file = FactoryBot.build(:rm_repo_file)
 #    @user1_file.owner = @user1
 #    @user1_file.save
-#    @user1_folder = FactoryGirl.build(:rm_repo_folder)
+#    @user1_folder = FactoryBot.build(:rm_repo_folder)
 #    @user1_folder.owner = @user1
 #    @user1_folder.save
-#    @user2 = FactoryGirl.create(:user)
+#    @user2 = FactoryBot.create(:user)
 #
 #  end
 #

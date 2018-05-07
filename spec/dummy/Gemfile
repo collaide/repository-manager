@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 gem 'repository-manager', :path => '../../'
-gem 'factory_girl'
+gem 'factory_bot'
 gem 'paper_trail'
 
 # Bundle edge Rails instead:

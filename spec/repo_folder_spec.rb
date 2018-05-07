@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe RepositoryManager::RepoFolder do
   before do
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
     @folder = @user.create_folder("parent_folder")
   end
 
