@@ -14,7 +14,7 @@ module RepositoryManager
         # The sharing repo_items
         has_many :shared_repo_items, through: :sharings, source: :repo_item, class_name: 'RepositoryManager::RepoItem'
 
-        if Rails::VERSION::MAJOR == 4
+        if Rails::VERSION::MAJOR >= 4
           has_many :root_repo_items, -> { where ancestry: nil }, as: :owner, class_name: 'RepositoryManager::RepoItem'
           has_many :root_shared_repo_items,  -> { where ancestry: nil }, through: :sharings, source: :repo_item, class_name: 'RepositoryManager::RepoItem'
         else
