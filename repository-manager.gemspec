@@ -19,17 +19,17 @@ Gem::Specification.new do |s|
 
   s.license = 'MIT'
 
-  s.add_runtime_dependency('rails', '~> 5.0.0')
+  s.add_runtime_dependency('rails', '~> 5.1.0')
 
-  # s.add_development_dependency('factory_girl', '>= 2.6.0')
-  s.add_development_dependency('factory_girl', '~> 4.7.0')
+  # s.add_development_dependency('factory_bot', '>= 2.6.0')
+  s.add_development_dependency('factory_bot', '~> 4.7.0')
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency('rspec-rails', '~> 2.6.1')
   s.add_development_dependency('spork')
   s.add_development_dependency('byebug')
   s.add_runtime_dependency 'ancestry'
   # s.add_runtime_dependency('carrierwave', '>= 0.5.8')
-  s.add_runtime_dependency('carrierwave', '~> 0.11.2')
+  s.add_runtime_dependency('carrierwave', '~> 1.2.0')
   s.add_runtime_dependency 'rubyzip', '~> 1.0.0'#, :require => 'zip/zip'
   # s.add_runtime_dependency 'paper_trail', '~> 3.0.1'
   s.add_runtime_dependency 'paper_trail', '~> 5.2.0'

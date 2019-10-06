@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :rm_repo_file, :class => RepositoryManager::RepoFile do
     file { fixture_file }
   end

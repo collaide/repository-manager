@@ -3,12 +3,12 @@ require 'spec_helper'
 describe 'RepoItem' do
 
   before do
-    @user1 = FactoryGirl.create(:user)
-    @user2 = FactoryGirl.create(:user)
-    @user1_file = FactoryGirl.build(:rm_repo_file)
+    @user1 = FactoryBot.create(:user)
+    @user2 = FactoryBot.create(:user)
+    @user1_file = FactoryBot.build(:rm_repo_file)
     @user1_file.owner = @user1
     @user1_file.save
-    @user1_folder = FactoryGirl.build(:rm_repo_folder)
+    @user1_folder = FactoryBot.build(:rm_repo_folder)
     @user1_folder.owner = @user1
     @user1_folder.save
     @user1_file.save
@@ -44,7 +44,7 @@ describe 'RepoItem' do
   end
 
   it 'can create a file into a folder' do
-    file = FactoryGirl.build(:rm_repo_file)
+    file = FactoryBot.build(:rm_repo_file)
     theFile = @user1.create_file(file, source_folder: @user1_folder)
 
     expect(@user1_folder.has_children?).to eq(true)
@@ -122,12 +122,12 @@ describe 'RepoItem' do
     folder2 = @user1.create_folder('Folder2', source_folder: folder)
     @user1.create_file(@user1_file, source_folder: folder)
 
-    user1_file2 = FactoryGirl.build(:rm_repo_file)
+    user1_file2 = FactoryBot.build(:rm_repo_file)
     user1_file2.owner = @user1
     user1_file2.save
     @user1.create_file(user1_file2, source_folder: folder2)
 
-    user1_file3 = FactoryGirl.build(:rm_repo_file)
+    user1_file3 = FactoryBot.build(:rm_repo_file)
     user1_file3.owner = @user1
     user1_file3.save
     @user1.create_file(user1_file3, source_folder: @user1_folder)
@@ -148,7 +148,7 @@ describe 'RepoItem' do
     d = @user2.create_folder!('a', source_folder: c)
     e = @user2.create_folder!('a', source_folder: d)
 
-    file = FactoryGirl.build(:rm_repo_file)
+    file = FactoryBot.build(:rm_repo_file)
     #@user2.create_file!(file, source_folder: a)
     #@user2.create_file!(file, source_folder: nested)
     @user2.create_file!(file, source_folder: c)
@@ -164,7 +164,7 @@ describe 'RepoItem' do
     d = @user2.create_folder!('a', source_folder: c)
     e = @user2.create_folder!('a', source_folder: d)
 
-    file = FactoryGirl.build(:rm_repo_file)
+    file = FactoryBot.build(:rm_repo_file)
     #@user2.create_file!(file, source_folder: a)
     #@user2.create_file!(file, source_folder: nested)
     @user2.create_file!(file, source_folder: c)
